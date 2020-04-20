@@ -3,20 +3,21 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_VRML_H
-#define CNOID_UTIL_VRML_H
+#ifndef UCNOID_UTIL_VRML_H
+#define UCNOID_UTIL_VRML_H
 
 #include "Referenced.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <Eigen/StdVector>
-#include <boost/variant.hpp>
+#include <variant>
 #include <string>
 #include <bitset>
 #include <map>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 typedef bool SFBool;
 typedef int  SFInt32;
@@ -38,12 +39,12 @@ typedef Eigen::Vector3f SFVec3s; // single-precision type used for vertices and 
 typedef Eigen::Vector3f SFColor;
 typedef Eigen::AngleAxisd SFRotation;
 
-typedef struct {
+struct SFImage {
     int width;
     int height;
     int numComponents;
     std::vector<unsigned char> pixels;
-} SFImage;
+};
 
 typedef std::vector<SFInt32> MFInt32;
 typedef std::vector<SFFloat> MFFloat;
@@ -94,7 +95,7 @@ enum VRMLNodeCategory {
 class VRMLNode;
 
 //! Abstract base class of all vrml nodes.
-class CNOID_EXPORT VRMLNode : public Referenced
+class UCNOID_EXPORT VRMLNode : public Referenced
 {
 public:
 
@@ -116,7 +117,7 @@ typedef VRMLNodePtr SFNode;
 typedef std::vector<SFNode> MFNode;
 
 
-class CNOID_EXPORT  VRMLUnsupportedNode : public VRMLNode
+class UCNOID_EXPORT  VRMLUnsupportedNode : public VRMLNode
 {
 public:
     VRMLUnsupportedNode(const std::string& nodeTypeName);
@@ -127,7 +128,7 @@ typedef ref_ptr<VRMLUnsupportedNode> VRMLUnsupportedNodePtr;
 
 
 //! VRML Viewpoint node
-class CNOID_EXPORT  VRMLViewpoint : public VRMLNode
+class UCNOID_EXPORT  VRMLViewpoint : public VRMLNode
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -145,7 +146,7 @@ typedef ref_ptr<VRMLViewpoint> VRMLViewpointPtr;
 
 
 //! VRML NavigationInfo node
-class CNOID_EXPORT  VRMLNavigationInfo : public VRMLNode
+class UCNOID_EXPORT  VRMLNavigationInfo : public VRMLNode
 {
 public:
     VRMLNavigationInfo();
@@ -161,7 +162,7 @@ typedef ref_ptr<VRMLNavigationInfo> VRMLNavigationInfoPtr;
 
 
 //! VRML Background node
-class CNOID_EXPORT  VRMLBackground : public VRMLNode
+class UCNOID_EXPORT  VRMLBackground : public VRMLNode
 {
 public:
     VRMLBackground();
@@ -181,7 +182,7 @@ public:
 typedef ref_ptr<VRMLBackground> VRMLBackgroundPtr;
 
 
-class CNOID_EXPORT AbstractVRMLGroup : public VRMLNode
+class UCNOID_EXPORT AbstractVRMLGroup : public VRMLNode
 {
 public:
     AbstractVRMLGroup();
@@ -197,7 +198,7 @@ typedef ref_ptr<AbstractVRMLGroup> AbstractVRMLGroupPtr;
     
     
 //! VRML Group node
-class CNOID_EXPORT VRMLGroup : public AbstractVRMLGroup
+class UCNOID_EXPORT VRMLGroup : public AbstractVRMLGroup
 {
 public:
     VRMLGroup();
@@ -216,7 +217,7 @@ typedef ref_ptr<VRMLGroup> VRMLGroupPtr;
 
 
 //! VRML Transform node
-class CNOID_EXPORT  VRMLTransform : public VRMLGroup
+class UCNOID_EXPORT  VRMLTransform : public VRMLGroup
 {
 public:
     VRMLTransform();
@@ -233,7 +234,7 @@ public:
 typedef ref_ptr<VRMLTransform> VRMLTransformPtr;
 
 //! VRML Inline node
-class CNOID_EXPORT  VRMLInline : public VRMLGroup
+class UCNOID_EXPORT  VRMLInline : public VRMLGroup
 {
 public:
     VRMLInline();
@@ -244,7 +245,7 @@ public:
 typedef ref_ptr<VRMLInline> VRMLInlinePtr;
 
 
-class CNOID_EXPORT  VRMLNonVrmlInline : public VRMLNode
+class UCNOID_EXPORT  VRMLNonVrmlInline : public VRMLNode
 {
 public:
     VRMLNonVrmlInline();
@@ -263,7 +264,7 @@ typedef ref_ptr<VRMLGeometry> VRMLGeometryPtr;
 
 
 //! VRML Shape node
-class CNOID_EXPORT  VRMLShape : public VRMLNode
+class UCNOID_EXPORT  VRMLShape : public VRMLNode
 {
 public:
     VRMLShape();
@@ -285,7 +286,7 @@ class VRMLTextureTransform;
 typedef ref_ptr<VRMLTextureTransform> VRMLTextureTransformPtr;
 
 //! VRML Appearance node
-class CNOID_EXPORT VRMLAppearance : public VRMLNode
+class UCNOID_EXPORT VRMLAppearance : public VRMLNode
 {
 public:
     VRMLAppearance();
@@ -298,7 +299,7 @@ public:
 
 
 //! VRML Material node
-class CNOID_EXPORT VRMLMaterial : public VRMLNode
+class UCNOID_EXPORT VRMLMaterial : public VRMLNode
 {
 public:
     VRMLMaterial();
@@ -314,7 +315,7 @@ public:
 
 
 //! Base class of VRML Texture nodes
-class CNOID_EXPORT VRMLTexture : public VRMLNode
+class UCNOID_EXPORT VRMLTexture : public VRMLNode
 {
 public:
     VRMLTexture();
@@ -322,7 +323,7 @@ public:
 
     
 //! VRML ImageTexture node
-class CNOID_EXPORT VRMLImageTexture : public VRMLTexture
+class UCNOID_EXPORT VRMLImageTexture : public VRMLTexture
 {
 public:
     VRMLImageTexture();
@@ -336,7 +337,7 @@ typedef ref_ptr<VRMLImageTexture> VRMLImageTexturePtr;
 
 
 //! VRML TextureTransform node
-class CNOID_EXPORT VRMLTextureTransform : public VRMLNode
+class UCNOID_EXPORT VRMLTextureTransform : public VRMLNode
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -351,14 +352,14 @@ public:
 };
 
 //! Base class of VRML geometry nodes
-class CNOID_EXPORT VRMLGeometry : public VRMLNode
+class UCNOID_EXPORT VRMLGeometry : public VRMLNode
 {
 public:
     VRMLGeometry();
 };
 
 //! VRML Box node
-class CNOID_EXPORT VRMLBox : public VRMLGeometry
+class UCNOID_EXPORT VRMLBox : public VRMLGeometry
 {
 public:
     VRMLBox();
@@ -370,7 +371,7 @@ typedef ref_ptr<VRMLBox> VRMLBoxPtr;
 
 
 //! VRML Cone node
-class CNOID_EXPORT VRMLCone : public VRMLGeometry
+class UCNOID_EXPORT VRMLCone : public VRMLGeometry
 {
 public:
     VRMLCone();
@@ -385,7 +386,7 @@ typedef ref_ptr<VRMLCone> VRMLConePtr;
 
 
 //! VRML Cylinder node
-class CNOID_EXPORT VRMLCylinder : public VRMLGeometry
+class UCNOID_EXPORT VRMLCylinder : public VRMLGeometry
 {
 public:
     VRMLCylinder();
@@ -401,7 +402,7 @@ typedef ref_ptr<VRMLCylinder> VRMLCylinderPtr;
 
 
 //! VRML Sphere node
-class CNOID_EXPORT VRMLSphere : public VRMLGeometry
+class UCNOID_EXPORT VRMLSphere : public VRMLGeometry
 {
 public:
     VRMLSphere();
@@ -413,7 +414,7 @@ typedef ref_ptr<VRMLSphere> VRMLSpherePtr;
 
 
 //! VRML FontStyle node
-class CNOID_EXPORT VRMLFontStyle : public VRMLNode
+class UCNOID_EXPORT VRMLFontStyle : public VRMLNode
 {
 public:
     VRMLFontStyle();
@@ -433,7 +434,7 @@ typedef ref_ptr<VRMLFontStyle> VRMLFontStylePtr;
 
 
 //! VRML Text node
-class CNOID_EXPORT VRMLText : public VRMLGeometry
+class UCNOID_EXPORT VRMLText : public VRMLGeometry
 {
 public:
     VRMLText();
@@ -454,7 +455,7 @@ class VRMLCoordinate;
 typedef ref_ptr<VRMLCoordinate> VRMLCoordinatePtr;
 
 //! VRML IndexedLineSet node
-class CNOID_EXPORT VRMLIndexedLineSet : public VRMLGeometry
+class UCNOID_EXPORT VRMLIndexedLineSet : public VRMLGeometry
 {
 public: 
     VRMLIndexedLineSet();
@@ -477,7 +478,7 @@ typedef ref_ptr<VRMLTextureCoordinate> VRMLTextureCoordinatePtr;
 
 
 //! VRML IndexedFaseSet node
-class CNOID_EXPORT VRMLIndexedFaceSet : public VRMLIndexedLineSet
+class UCNOID_EXPORT VRMLIndexedFaceSet : public VRMLIndexedLineSet
 {
 public:
     VRMLIndexedFaceSet();
@@ -497,7 +498,7 @@ typedef ref_ptr<VRMLIndexedFaceSet> VRMLIndexedFaceSetPtr;
 
 
 //! VRML Color node
-class CNOID_EXPORT VRMLColor : public VRMLNode
+class UCNOID_EXPORT VRMLColor : public VRMLNode
 {
 public:
     VRMLColor();
@@ -508,7 +509,7 @@ public:
 
 
 //! VRML Coordinate node
-class CNOID_EXPORT VRMLCoordinate : public VRMLNode
+class UCNOID_EXPORT VRMLCoordinate : public VRMLNode
 {
 public:
     VRMLCoordinate();
@@ -519,7 +520,7 @@ public:
 
 
 //! VRML TextureCoordinate node
-class CNOID_EXPORT VRMLTextureCoordinate : public VRMLNode
+class UCNOID_EXPORT VRMLTextureCoordinate : public VRMLNode
 {
 public:
     VRMLTextureCoordinate();
@@ -530,7 +531,7 @@ public:
 
 
 //! VRML Normal node
-class CNOID_EXPORT VRMLNormal : public VRMLNode
+class UCNOID_EXPORT VRMLNormal : public VRMLNode
 {
 public:
     VRMLNormal();
@@ -541,7 +542,7 @@ public:
 
 
 //! VRML CylinderSensor node
-class CNOID_EXPORT VRMLCylinderSensor : public VRMLNode
+class UCNOID_EXPORT VRMLCylinderSensor : public VRMLNode
 {
 public:
     VRMLCylinderSensor();
@@ -558,7 +559,7 @@ typedef ref_ptr<VRMLCylinderSensor> VRMLCylinderSensorPtr;
 
 
 //! VRML PointSet node
-class CNOID_EXPORT VRMLPointSet : public VRMLGeometry
+class UCNOID_EXPORT VRMLPointSet : public VRMLGeometry
 {
 public:
     VRMLPointSet();
@@ -572,7 +573,7 @@ typedef ref_ptr<VRMLPointSet> VRMLPointSetPtr;
 
 
 //! VRML PixelTexture node
-class CNOID_EXPORT VRMLPixelTexture : public VRMLTexture
+class UCNOID_EXPORT VRMLPixelTexture : public VRMLTexture
 {
 public:
     VRMLPixelTexture();
@@ -587,7 +588,7 @@ typedef ref_ptr<VRMLPixelTexture> VRMLPixelTexturePtr;
 
 
 //! VRML MovieTexture node
-class CNOID_EXPORT VRMLMovieTexture : public VRMLTexture
+class UCNOID_EXPORT VRMLMovieTexture : public VRMLTexture
 {
 public:
     VRMLMovieTexture();
@@ -606,7 +607,7 @@ typedef ref_ptr<VRMLMovieTexture> VRMLMovieTexturePtr;
 
 
 //! VRML ElevationGrid node
-class CNOID_EXPORT VRMLElevationGrid : public VRMLGeometry
+class UCNOID_EXPORT VRMLElevationGrid : public VRMLGeometry
 {
 public:
     VRMLElevationGrid();
@@ -631,7 +632,7 @@ typedef ref_ptr<VRMLElevationGrid> VRMLElevationGridPtr;
 
 
 //! VRML Extrusion node
-class CNOID_EXPORT VRMLExtrusion : public VRMLGeometry
+class UCNOID_EXPORT VRMLExtrusion : public VRMLGeometry
 {
 public:
     VRMLExtrusion();
@@ -652,7 +653,7 @@ public:
 typedef ref_ptr<VRMLExtrusion> VRMLExtrusionPtr;
 
 
-class CNOID_EXPORT VRMLSwitch : public AbstractVRMLGroup
+class UCNOID_EXPORT VRMLSwitch : public AbstractVRMLGroup
 {
 public:
     VRMLSwitch();
@@ -670,7 +671,7 @@ public:
 typedef ref_ptr<VRMLSwitch> VRMLSwitchPtr;
 
 
-class CNOID_EXPORT VRMLLOD : public AbstractVRMLGroup
+class UCNOID_EXPORT VRMLLOD : public AbstractVRMLGroup
 {
 public:
     VRMLLOD();
@@ -689,7 +690,7 @@ public:
 typedef ref_ptr<VRMLLOD> VRMLLODPtr;
 
 
-class CNOID_EXPORT VRMLCollision : public VRMLGroup
+class UCNOID_EXPORT VRMLCollision : public VRMLGroup
 {
 public:
     VRMLCollision();
@@ -702,7 +703,7 @@ public:
 typedef ref_ptr<VRMLCollision> VRMLCollisionPtr;
 
 
-class CNOID_EXPORT VRMLAnchor : public VRMLGroup
+class UCNOID_EXPORT VRMLAnchor : public VRMLGroup
 {
 public:
     VRMLAnchor();
@@ -716,7 +717,7 @@ public:
 typedef ref_ptr<VRMLAnchor> VRMLAnchorPtr;
 
 
-class CNOID_EXPORT VRMLBillboard : public VRMLGroup
+class UCNOID_EXPORT VRMLBillboard : public VRMLGroup
 {
 public:
     VRMLBillboard();
@@ -728,7 +729,7 @@ public:
 typedef ref_ptr<VRMLBillboard> VRMLBillboardPtr;
 
 
-class CNOID_EXPORT VRMLFog : public VRMLNode
+class UCNOID_EXPORT VRMLFog : public VRMLNode
 {
 public:
     VRMLFog();
@@ -742,7 +743,7 @@ public:
 typedef ref_ptr<VRMLFog> VRMLFogPtr;
 
 
-class CNOID_EXPORT  VRMLWorldInfo : public VRMLNode
+class UCNOID_EXPORT  VRMLWorldInfo : public VRMLNode
 {
 public:
     VRMLWorldInfo();
@@ -755,7 +756,7 @@ public:
 typedef ref_ptr<VRMLWorldInfo> VRMLWorldInfoPtr;
 
 
-class CNOID_EXPORT VRMLLight : public VRMLNode
+class UCNOID_EXPORT VRMLLight : public VRMLNode
 {
 public:
     VRMLLight();
@@ -769,7 +770,7 @@ public:
 typedef ref_ptr<VRMLLight> VRMLLightPtr;
 
 
-class CNOID_EXPORT VRMLPointLight : public VRMLLight
+class UCNOID_EXPORT VRMLPointLight : public VRMLLight
 {
 public:
     VRMLPointLight();
@@ -783,7 +784,7 @@ public:
 typedef ref_ptr<VRMLPointLight> VRMLPointLightPtr;
 
 
-class CNOID_EXPORT VRMLDirectionalLight : public VRMLLight
+class UCNOID_EXPORT VRMLDirectionalLight : public VRMLLight
 {
 public:
     VRMLDirectionalLight();
@@ -795,7 +796,7 @@ public:
 typedef ref_ptr<VRMLDirectionalLight> VRMLDirectionalLightPtr;
 
 
-class CNOID_EXPORT VRMLSpotLight : public VRMLPointLight
+class UCNOID_EXPORT VRMLSpotLight : public VRMLPointLight
 {
 public:
     VRMLSpotLight();
@@ -808,7 +809,7 @@ public:
 
 typedef ref_ptr<VRMLSpotLight> VRMLSpotLightPtr;
 
-typedef boost::variant<SFBool,
+typedef std::variant<SFBool,
                        SFInt32, SFFloat, SFVec2f, SFVec3f, SFRotation, SFColor, SFTime, SFString, SFNode, SFImage,
                        MFInt32, MFFloat, MFVec2f, MFVec3f, MFRotation, MFColor, MFTime, MFString, MFNode> VRMLVariantField;
 
@@ -822,14 +823,14 @@ enum VRMLFieldTypeId {
 typedef std::map <std::string, VRMLVariantField> VRMLProtoFieldMap;
 typedef std::pair<std::string, VRMLVariantField> VRMLProtoFieldPair;
 
-CNOID_EXPORT const char* labelOfVRMLfieldTypeId(const std::type_info& fieldType);
+UCNOID_EXPORT const char* labelOfVRMLfieldTypeId(const std::type_info& fieldType);
 
 template<typename TValue> inline const char* labelOfVRMLfieldType() {
     return labelOfVRMLfieldTypeId(typeid(TValue));
 }
 
 //! VRML Proto definition
-class CNOID_EXPORT VRMLProto : public VRMLNode
+class UCNOID_EXPORT VRMLProto : public VRMLNode
 {
 public:
     std::string protoName;
@@ -860,7 +861,7 @@ typedef ref_ptr<VRMLProto> VRMLProtoPtr;
 
 
 //! VRML node which is instance of VRML Prototype
-class CNOID_EXPORT VRMLProtoInstance : public VRMLNode
+class UCNOID_EXPORT VRMLProtoInstance : public VRMLNode
 {
 public:
     VRMLProtoPtr proto;
@@ -892,7 +893,7 @@ inline ref_ptr<VRMLNodeType> dynamic_node_cast(VRMLNodePtr node) {
     }
 }
 
-#ifdef CNOID_BACKWARD_COMPATIBILITY
+#ifdef UCNOID_BACKWARD_COMPATIBILITY
 typedef VRMLNodeCategory VrmlNodeCategory;
 typedef VRMLNode VrmlNode;
 typedef VRMLNodePtr VrmlNodePtr;
@@ -989,6 +990,9 @@ typedef VRMLProtoInstancePtr VrmlProtoInstancePtr;
 typedef VRMLVariantField VrmlVariantField;
 #endif
 
+}   // inline namespace ucnoid
 }
+
+#include "VRML.cpp.h"
 
 #endif

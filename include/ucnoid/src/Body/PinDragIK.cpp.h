@@ -3,21 +3,24 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_PIN_DRAG_IK_CPP_H
+#define UCNOID_BODY_PIN_DRAG_IK_CPP_H
+
 #include "PinDragIK.h"
 #include "Body.h"
 #include "JointPath.h"
-#include <cnoid/EigenUtil>
+#include <ucnoid/EigenUtil>
 #include <map>
 #include <iostream>
 #include <algorithm>
 
-using namespace std;
-using namespace cnoid;
+namespace cnoid {
+inline namespace ucnoid {
 
-namespace {
+namespace detail::pin_drag_ik {
 
-const bool SOLVE_CONSTRAINTS_BY_SR_INVERSE = false;
-const bool SOLVE_CONSTRAINTS_BY_SVD = !SOLVE_CONSTRAINTS_BY_SR_INVERSE;
+constexpr bool SOLVE_CONSTRAINTS_BY_SR_INVERSE = false;
+constexpr bool SOLVE_CONSTRAINTS_BY_SVD = !SOLVE_CONSTRAINTS_BY_SR_INVERSE;
     
 double calcLU(int n, MatrixXd& a, std::vector<int>& pivots);
 void solveByLU(int n, MatrixXd& a, std::vector<int>& pivots, const MatrixXd::ColXpr& x, const VectorXd& b);
@@ -27,10 +30,8 @@ bool makePseudoInverseType2(int m, int n, const MatrixXd& J, MatrixXd& Jinv, Mat
                             const VectorXd& weights, double minValidDet);
 bool makeSRInverseMatrix(int m, int n, const MatrixXd& J, MatrixXd& Jinv, MatrixXd& JJ, MatrixXd& JJ2, MatrixXd& JJinv,
                          std::vector<int>& pivots, double srk0, double srw0);
-}
+}   // namespace detail::pin_drag_ik
 
-
-namespace cnoid {
 
 class PinDragIKImpl
 {
@@ -156,7 +157,6 @@ public:
     void addJointRangeConstraints();
     int solveLinearEquationWithSVD(MatrixXd& A, VectorXd& b, VectorXd& x, double sv_ratio);
 };
-}
 
 
 PinDragIK::PinDragIK(Body* body)
@@ -530,9 +530,9 @@ PinDragIKImpl::IKStepResult PinDragIKImpl::calcOneStep(const Vector3& v, const V
 
     bool isOk;
     if(N >= M){
-        isOk = makePseudoInverseType2(M, N, J, Jinv, JJ, JJinv, qWeights, minValidDet);
+        isOk = detail::pin_drag_ik::makePseudoInverseType2(M, N, J, Jinv, JJ, JJinv, qWeights, minValidDet);
     } else {
-        isOk = makePseudoInverseType1(M, N, J, Jinv, JJ, JJinv, minValidDet);
+        isOk = detail::pin_drag_ik::makePseudoInverseType1(M, N, J, Jinv, JJ, JJinv, minValidDet);
     }
     if(!isOk){
         return ERROR;
@@ -645,11 +645,11 @@ void PinDragIKImpl::solveConstraints()
       }
     */
 
-    if(SOLVE_CONSTRAINTS_BY_SR_INVERSE){
-        makeSRInverseMatrix(C, N, S, Sinv, JJ, JJ2, JJinv, pivots, srk0, srw0);
+    if(detail::pin_drag_ik::SOLVE_CONSTRAINTS_BY_SR_INVERSE){
+        detail::pin_drag_ik::makeSRInverseMatrix(C, N, S, Sinv, JJ, JJ2, JJinv, pivots, srk0, srw0);
         y.noalias() = Sinv * deltaPaux;
 
-    } else if(SOLVE_CONSTRAINTS_BY_SVD){
+    } else if(detail::pin_drag_ik::SOLVE_CONSTRAINTS_BY_SVD){
         y = Eigen::JacobiSVD<MatrixXd>(S, Eigen::ComputeThinU | Eigen::ComputeThinV).solve(deltaPaux);
     }
 
@@ -792,12 +792,12 @@ void PinDragIKImpl::addJointRangeConstraints()
 }
 
 
-namespace {
+namespace detail::pin_drag_ik {
 
 /**
    \param pivots row exchange index in LU decomposition (size = n)
 */
-double calcLU(int n, MatrixXd& a, std::vector<int>& pivots)
+inline double calcLU(int n, MatrixXd& a, std::vector<int>& pivots)
 {
     double det = 1.0; 
     std::vector<double> weight(n);    
@@ -854,7 +854,7 @@ double calcLU(int n, MatrixXd& a, std::vector<int>& pivots)
 /**
    Solve Ax = b for x 
 */
-void solveByLU(int n, MatrixXd& a, std::vector<int>& pivots, const MatrixXd::ColXpr& x, const VectorXd& b)
+inline void solveByLU(int n, MatrixXd& a, std::vector<int>& pivots, const MatrixXd::ColXpr& x, const VectorXd& b)
 {
     int ix;
     double t;
@@ -879,7 +879,7 @@ void solveByLU(int n, MatrixXd& a, std::vector<int>& pivots, const MatrixXd::Col
 }
 
 
-bool makeInverseMatrix(int n, MatrixXd& org, MatrixXd& inv, double minValidDet)
+inline bool makeInverseMatrix(int n, MatrixXd& org, MatrixXd& inv, double minValidDet)
 {
     std::vector<int> pivots(n);
     VectorXd unitVector(n);
@@ -900,7 +900,7 @@ bool makeInverseMatrix(int n, MatrixXd& org, MatrixXd& inv, double minValidDet)
 
 
 // N < M
-bool makePseudoInverseType1
+inline bool makePseudoInverseType1
 (int m, int n, const MatrixXd& J, MatrixXd& Jinv, MatrixXd& JJ, MatrixXd& JJinv, double minValidDet)
 {
     // JJ = J^T * J
@@ -917,7 +917,7 @@ bool makePseudoInverseType1
 
 
 // N > M
-bool makePseudoInverseType2
+inline bool makePseudoInverseType2
 (int m, int n, const MatrixXd& J, MatrixXd& Jinv, MatrixXd& JJ, MatrixXd& JJinv,
  const VectorXd& weights, double minValidDet)
 {
@@ -950,7 +950,7 @@ bool makePseudoInverseType2
 
 
 // calculate J^T(J J^T + kI)^-1
-bool makeSRInverseMatrix
+inline bool makeSRInverseMatrix
 (int m, int n, const MatrixXd& J, MatrixXd& Jinv, MatrixXd& JJ, MatrixXd& JJ2, MatrixXd& JJinv,
  std::vector<int>& pivots, double srk0, double srw0)
 {
@@ -966,7 +966,7 @@ bool makeSRInverseMatrix
         double a = 1.0 - (w / srw0);
         k = srk0 * a * a;
         static int counter = 0;
-        cout << "srk0 enabled(" << counter++ << ")" << endl;
+        std::cout << "srk0 enabled(" << counter++ << ")" << std::endl;
     } else {
         k = 0.0;
     }
@@ -985,4 +985,9 @@ bool makeSRInverseMatrix
     return false;
 }
 
-}
+}   // namespace detail::pin_drag_ik
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_PIN_DRAG_IK_CPP_H

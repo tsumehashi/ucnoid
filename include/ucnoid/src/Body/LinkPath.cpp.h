@@ -8,9 +8,8 @@
 #include "Link.h"
 #include <algorithm>
 
-using namespace std;
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 LinkPath::LinkPath()
 {
@@ -102,3 +101,6 @@ void LinkPath::findPathFromRootSub(Link* link)
         findPathFromRootSub(link->parent());
     }
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid

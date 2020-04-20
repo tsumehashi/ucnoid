@@ -2,15 +2,16 @@
    \file
    \author Shin'ichiro Nakaoka
 */
+#ifndef UCNOID_BODY_LINK_CPP_H
+#define UCNOID_BODY_LINK_CPP_H
 
 #include "Link.h"
 #include "Material.h"
-#include <cnoid/SceneGraph>
-#include <cnoid/ValueTree>
+#include <ucnoid/SceneGraph>
+#include <ucnoid/ValueTree>
 
-using namespace std;
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 Link::Link()
 {
@@ -289,12 +290,10 @@ std::string Link::actuationModeString() const
     }
 }
 
-
 std::string Link::materialName() const
 {
     return Material::name(materialId_);
 }
-
 
 void Link::setMaterial(const std::string& name)
 {
@@ -318,7 +317,6 @@ void Link::setCollisionShape(SgNode* shape)
 {
     collisionShape_ = shape;
 }
-
 
 void Link::resetInfo(Mapping* info)
 {
@@ -362,3 +360,8 @@ template<> void Link::setInfo(const std::string& key, const bool& value)
 {
     info_->write(key, value);
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_LINK_CPP_H

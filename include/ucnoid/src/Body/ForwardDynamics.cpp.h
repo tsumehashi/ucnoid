@@ -3,11 +3,14 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_FORWARD_DYNAMICS_CPP_H
+#define UCNOID_BODY_FORWARD_DYNAMICS_CPP_H
+
 #include "ForwardDynamics.h"
 #include "DyBody.h"
 
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 ForwardDynamics::ForwardDynamics(DyBody* body)
     : body(body)
@@ -91,3 +94,8 @@ void ForwardDynamics::initializeSensors()
         sensorHelper.initialize(body, timeStep, g);
     }
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_FORWARD_DYNAMICS_CPP_H

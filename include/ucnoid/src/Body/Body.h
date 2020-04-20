@@ -3,8 +3,8 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_BODY_H
-#define CNOID_BODY_BODY_H
+#ifndef UCNOID_BODY_BODY_H
+#define UCNOID_BODY_BODY_H
 
 #include "LinkTraverse.h"
 #include "Link.h"
@@ -14,20 +14,23 @@
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class Body;
 class BodyImpl;
 class Mapping;
 class SgCloneMap;
 
+#if UCNOID_NOT_SUPPORTED
 struct BodyInterface;
 struct BodyCustomizerInterface;
 typedef void* BodyCustomizerHandle;
+#endif  // UCNOID_NOT_SUPPORTED
 
 typedef ref_ptr<Body> BodyPtr;
     
 
-class CNOID_EXPORT Body : public Referenced
+class UCNOID_EXPORT Body : public Referenced
 {
 public:
     Body();
@@ -227,7 +230,7 @@ public:
     void resetInfo(Mapping* info);
 
     void cloneShapes(SgCloneMap& cloneMap);
-        
+
     template<class T> T* findCache(const std::string& name) {
         return dynamic_cast<T*>(findCacheSub(name));
     }
@@ -249,17 +252,22 @@ public:
 
     void removeCache(const std::string& name);
 
+#if UCNOID_NOT_SUPPORTED
     BodyCustomizerHandle customizerHandle() const;
     BodyCustomizerInterface* customizerInterface() const;
-
+#endif   // UCNOID_NOT_SUPPORTED
     bool installCustomizer();
+#if UCNOID_NOT_SUPPORTED
     bool installCustomizer(BodyCustomizerInterface* customizerInterface);
+#endif   // UCNOID_NOT_SUPPORTED
 
     bool hasVirtualJointForces() const;
     void setVirtualJointForces(double timeStep = 0.0);
 
+#if UCNOID_NOT_SUPPORTED
     static void addCustomizerDirectory(const std::string& path);
     static BodyInterface* bodyInterface();
+#endif  // UCNOID_NOT_SUPPORTED
 
     void setCurrentTimeFunction(std::function<double()> func);
     double currentTime() const { return currentTimeFunction(); }
@@ -288,6 +296,9 @@ private:
     void setVirtualJointForcesSub();
 };
 
+}   // inline namespace ucnoid
 }
+
+#include "Body.cpp.h"
 
 #endif

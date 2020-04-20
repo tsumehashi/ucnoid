@@ -3,10 +3,11 @@
    \author Shizuko Hattori
 */
 
-#ifndef CNOID_BODY_EXTRA_JOINT_H
-#define CNOID_BODY_EXTRA_JOINT_H
+#ifndef UCNOID_BODY_EXTRA_JOINT_H
+#define UCNOID_BODY_EXTRA_JOINT_H
         
 namespace cnoid {
+inline namespace ucnoid {
 
 struct ExtraJoint {
     
@@ -35,6 +36,7 @@ struct ExtraJoint {
     std::string linkName[2];
 };
 
+}   // inline namespace ucnoid
 }
 
 #endif

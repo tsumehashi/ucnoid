@@ -3,18 +3,18 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_FORWARD_DYNAMICS_ABM_H
-#define CNOID_BODY_FORWARD_DYNAMICS_ABM_H
+#ifndef UCNOID_BODY_FORWARD_DYNAMICS_ABM_H
+#define UCNOID_BODY_FORWARD_DYNAMICS_ABM_H
 
 #include "ForwardDynamics.h"
 #include "exportdecl.h"
 
-namespace cnoid
-{
+namespace cnoid {
+inline namespace ucnoid {
 /**
    Forward dynamics calculation using Featherstone's Articulated Body Method (ABM)
 */
-class CNOID_EXPORT ForwardDynamicsABM : public ForwardDynamics
+class UCNOID_EXPORT ForwardDynamicsABM : public ForwardDynamics
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -68,6 +68,9 @@ private:
     std::vector<double> ddq;
 };
 	
+}   // inline namespace ucnoid
 }
+
+#include "ForwardDynamicsABM.cpp.h"
 
 #endif

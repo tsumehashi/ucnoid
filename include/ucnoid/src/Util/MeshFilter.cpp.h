@@ -3,6 +3,9 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_MESH_FILTER_CPP_H
+#define UCNOID_UTIL_MESH_FILTER_CPP_H
+
 #include "MeshFilter.h"
 #include "MeshExtractor.h"
 #include "SceneDrawables.h"
@@ -11,14 +14,14 @@
 #include <unordered_set>
 #include <array>
 
-using namespace std;
-using namespace cnoid;
+namespace cnoid {
+inline namespace ucnoid {
 
-namespace {
+namespace detail::mesh_filter {
 
-const float PI = 3.14159265358979323846f;
+constexpr float PI = 3.14159265358979323846f;
 
-typedef array<int, 3> FaceId;
+typedef std::array<int, 3> FaceId;
 
 template<class Triangle>
 FaceId getOverlappingFaceId(Triangle& triangle)
@@ -40,6 +43,8 @@ FaceId getExactFaceId(Triangle& triangle)
     }
     return FaceId{triangle[2], triangle[0], triangle[1]};
 }
+
+}   // namespace detail::mesh_filter
 
 struct EdgeId : public IdPair<int>
 {
@@ -71,17 +76,18 @@ struct EdgeId : public IdPair<int>
     }
 };
     
-}
+}   // inline namespace ucnoid
+}   // namespace cnoid
 
 namespace std {
 
-template<> struct hash<FaceId>
+template<> struct hash<cnoid::ucnoid::detail::mesh_filter::FaceId>
 {
     void hash_combine(std::size_t& seed, int v) const {
         std::hash<int> hasher;
         seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
     }
-    std::size_t operator()(const FaceId& id) const {
+    std::size_t operator()(const cnoid::ucnoid::detail::mesh_filter::FaceId& id) const {
         std::size_t seed = 0;
         hash_combine(seed, id[0]);
         hash_combine(seed, id[1]);
@@ -90,43 +96,42 @@ template<> struct hash<FaceId>
     }
 };
 
-template<> struct hash<EdgeId>
+template<> struct hash<cnoid::ucnoid::EdgeId>
 {
-    std::size_t operator()(const EdgeId& id) const {
-        return std::hash<IdPair<int>>()(id);
+    std::size_t operator()(const cnoid::ucnoid::EdgeId& id) const {
+        return std::hash<cnoid::ucnoid::IdPair<int>>()(id);
     }
 };
 
 }
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class MeshFilterImpl
 {
 public:
-    unique_ptr<MeshExtractor> meshExtractor;
-    vector<Vector3f> faceNormals;
-    vector<vector<int>> facesOfVertexMap;
-    unordered_map<EdgeId, vector<int>> facesOfEdgeMap;
-    vector<vector<int>> normalsOfVertexMap;
+    std::unique_ptr<MeshExtractor> meshExtractor;
+    std::vector<Vector3f> faceNormals;
+    std::vector<std::vector<int>> facesOfVertexMap;
+    std::unordered_map<EdgeId, std::vector<int>> facesOfEdgeMap;
+    std::vector<std::vector<int>> normalsOfVertexMap;
     float minCreaseAngle;
     float maxCreaseAngle;
     bool isNormalOverwritingEnabled;
 
     MeshFilterImpl();
     MeshFilterImpl(const MeshFilterImpl& org);
-    void forAllMeshes(SgNode* node, function<void(SgMesh* mesh)> callback);
+    void forAllMeshes(SgNode* node, std::function<void(SgMesh* mesh)> callback);
     void removeRedundantVertices(SgMesh* mesh);
     void removeRedundantFaces(SgMesh* mesh, int reductionMode);
-    void removeNormalIndicesOfRedundantFaces(SgMesh* mesh, const vector<int>& validFaceIndices);
+    void removeNormalIndicesOfRedundantFaces(SgMesh* mesh, const std::vector<int>& validFaceIndices);
     void removeRedundantNormals(SgMesh* mesh);
     void calculateFaceNormals(SgMesh* mesh, bool ignoreZeroNormals);
     void makeFacesOfVertexMap(SgMesh* mesh, bool removeSameNormalFaces = false);
     void makeFacesOfEdgeMap(SgMesh* mesh);
     void setVertexNormals(SgMesh* mesh, float creaseAngle);
 };
-
-}
 
 
 MeshFilter::MeshFilter()
@@ -139,7 +144,7 @@ MeshFilterImpl::MeshFilterImpl()
 {
     isNormalOverwritingEnabled = false;
     minCreaseAngle = 0.0f;
-    maxCreaseAngle = PI;
+    maxCreaseAngle = detail::mesh_filter::PI;
 }
 
 
@@ -163,7 +168,7 @@ MeshFilter::~MeshFilter()
 }
 
 
-void MeshFilterImpl::forAllMeshes(SgNode* node, function<void(SgMesh* mesh)> callback)
+void MeshFilterImpl::forAllMeshes(SgNode* node, std::function<void(SgMesh* mesh)> callback)
 {
     if(!meshExtractor){
         meshExtractor.reset(new MeshExtractor);
@@ -233,10 +238,10 @@ void MeshFilterImpl::removeRedundantVertices(SgMesh* mesh)
     const size_t numOrgVertices = pOrgVertices->size();
     SgVertexArray& vertices = *mesh->vertices();
     vertices.clear();
-    vector<int> indexMap(numOrgVertices);
+    std::vector<int> indexMap(numOrgVertices);
     auto& triangleVertices = mesh->triangleVertices();
 
-    vector<bool> usedVertexFlags(numOrgVertices, false);
+    std::vector<bool> usedVertexFlags(numOrgVertices, false);
     for(size_t i=0; i < triangleVertices.size(); ++i){
         usedVertexFlags[triangleVertices[i]] = true;
     }
@@ -303,6 +308,7 @@ void MeshFilter::removeRedundantFaces(SgMesh* mesh, int reductionMode)
 
 void MeshFilterImpl::removeRedundantFaces(SgMesh* mesh, int reductionMode)
 {
+    using namespace detail::mesh_filter;
     const int numOrgTriangles = mesh->numTriangles();
     if(numOrgTriangles == 0){
         return;
@@ -312,7 +318,7 @@ void MeshFilterImpl::removeRedundantFaces(SgMesh* mesh, int reductionMode)
     auto& triangles = mesh->triangleVertices();
     triangles.clear();
 
-    vector<int> validFaceIndices;
+    std::vector<int> validFaceIndices;
     bool checkValidFaceIndices;
     if(mesh->hasNormals() || mesh->hasColors() || mesh->hasTexCoords()){
         checkValidFaceIndices = true;
@@ -320,7 +326,7 @@ void MeshFilterImpl::removeRedundantFaces(SgMesh* mesh, int reductionMode)
     }
 
     if(reductionMode != MeshFilter::KEEP_LAST_OVERLAPPING_FACES){
-        unordered_set<FaceId> existingFaces;
+        std::unordered_set<FaceId> existingFaces;
         existingFaces.reserve(numOrgTriangles);
         for(int i=0; i < numOrgTriangles; ++i){
             SgMesh::ConstTriangleRef triangle(&orgTriangles[i*3]);
@@ -339,7 +345,7 @@ void MeshFilterImpl::removeRedundantFaces(SgMesh* mesh, int reductionMode)
             }
         }
     } else {
-        unordered_map<FaceId, int> existingFaceMap;
+        std::unordered_map<FaceId, int> existingFaceMap;
         existingFaceMap.reserve(numOrgTriangles);
         for(int i=0; i < numOrgTriangles; ++i){
             SgMesh::ConstTriangleRef triangle(&orgTriangles[i*3]);
@@ -367,7 +373,7 @@ void MeshFilterImpl::removeRedundantFaces(SgMesh* mesh, int reductionMode)
 }
 
 
-void MeshFilterImpl::removeNormalIndicesOfRedundantFaces(SgMesh* mesh, const vector<int>& validFaceIndices)
+void MeshFilterImpl::removeNormalIndicesOfRedundantFaces(SgMesh* mesh, const std::vector<int>& validFaceIndices)
 {
     auto& normalIndices = mesh->normalIndices();
     if(!normalIndices.empty()){
@@ -414,14 +420,14 @@ void MeshFilterImpl::removeRedundantNormals(SgMesh* mesh)
         }
     }
 
-    vector<bool> usedNormalFlags(numOrgNormals, false);
+    std::vector<bool> usedNormalFlags(numOrgNormals, false);
     for(size_t i=0; i < normalIndices.size(); ++i){
         usedNormalFlags[normalIndices[i]] = true;
     }
 
     SgVertexArray& normals = *mesh->normals();
     normals.clear();
-    vector<int> indexMap(numOrgNormals);
+    std::vector<int> indexMap(numOrgNormals);
 
     for(size_t i=0; i< numOrgNormals; ++i){
         if(!usedNormalFlags[i]){
@@ -626,7 +632,7 @@ void MeshFilterImpl::setVertexNormals(SgMesh* mesh, float givenCreaseAngle)
             
             for(int j=0; j < 3; ++j){
                 const int vertexIndex2 = triangle[j];
-                const vector<int>& normalIndicesOfVertex = normalsOfVertexMap[vertexIndex2];
+                const std::vector<int>& normalIndicesOfVertex = normalsOfVertexMap[vertexIndex2];
                 for(size_t k=0; k < normalIndicesOfVertex.size(); ++k){
                     int index = normalIndicesOfVertex[k];
                     if(normals[index].isApprox(normal)){
@@ -646,3 +652,8 @@ void MeshFilterImpl::setVertexNormals(SgMesh* mesh, float givenCreaseAngle)
         }
     }
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_MESH_FILTER_CPP_H

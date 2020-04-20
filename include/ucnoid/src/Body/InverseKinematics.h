@@ -2,14 +2,15 @@
     \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_INVERSE_KINEMATICS_H
-#define CNOID_BODY_INVERSE_KINEMATICS_H
+#ifndef UCNOID_BODY_INVERSE_KINEMATICS_H
+#define UCNOID_BODY_INVERSE_KINEMATICS_H
 
-#include <cnoid/EigenTypes>
+#include <ucnoid/EigenTypes>
 #include <memory>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class InverseKinematics
 {
@@ -31,6 +32,7 @@ public:
 
 typedef std::shared_ptr<InverseKinematics> InverseKinematicsPtr;
 
+}   // inline namespace ucnoid
 }
 
 #endif

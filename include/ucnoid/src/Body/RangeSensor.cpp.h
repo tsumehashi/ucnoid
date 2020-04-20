@@ -3,12 +3,14 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_RANGE_SENSOR_CPP_H
+#define UCNOID_BODY_RANGE_SENSOR_CPP_H
+
 #include "RangeSensor.h"
-#include <cnoid/EigenUtil>
+#include <ucnoid/EigenUtil>
 
-using namespace std;
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 const char* RangeSensor::typeName()
 {
@@ -210,3 +212,8 @@ double* RangeSensor::writeState(double* out_buf) const
     out_buf[8] = delay_;
     return out_buf + 9;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_RANGE_SENSOR_CPP_H

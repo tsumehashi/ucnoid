@@ -3,13 +3,14 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_VRML_PARSER_H
-#define CNOID_UTIL_VRML_PARSER_H
+#ifndef UCNOID_UTIL_VRML_PARSER_H
+#define UCNOID_UTIL_VRML_PARSER_H
 
 #include "VRML.h"
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class VRMLParserImpl;
 
@@ -18,7 +19,7 @@ class VRMLParserImpl;
 
    The VRMLParser class reads a VRML97 file and extract its nodes.
 */
-class CNOID_EXPORT VRMLParser
+class UCNOID_EXPORT VRMLParser
 {
 public:
 
@@ -48,6 +49,9 @@ private:
     void init();
 };
 
-};
+}   // inline namespace ucnoid
+}
+
+#include "VRMLParser.cpp.h"
 
 #endif

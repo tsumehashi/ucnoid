@@ -3,10 +3,13 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_BOUNDING_BOX_CPP_H
+#define UCNOID_UTIL_BOUNDING_BOX_CPP_H
+
 #include "BoundingBox.h"
 
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 BoundingBox::BoundingBox()
 {
@@ -149,14 +152,12 @@ void BoundingBox::transform(const Affine3& T)
     }
 }
 
-
-std::ostream& cnoid::operator<<(std::ostream& os, const BoundingBox& bb)
+std::ostream& operator<<(std::ostream& os, const BoundingBox& bb)
 {
     os << "(" << bb.min().x() << ", " << bb.min().y() << ", " << bb.min().z() << ") - (";
     os << bb.max().x() << ", " << bb.max().y() << ", " << bb.max().z() << ")";
     return os;
 }
-
 
 BoundingBoxf::BoundingBoxf()
 {
@@ -285,10 +286,14 @@ void BoundingBoxf::transform(const Affine3f& T)
     }
 }
 
-
-std::ostream& cnoid::operator<<(std::ostream& os, const BoundingBoxf& bb)
+inline std::ostream& operator<<(std::ostream& os, const BoundingBoxf& bb)
 {
     os << "(" << bb.min().x() << ", " << bb.min().y() << ", " << bb.min().z() << ") - (";
     os << bb.max().x() << ", " << bb.max().y() << ", " << bb.max().z() << ")";
     return os;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_BOUNDING_BOX_CPP_H

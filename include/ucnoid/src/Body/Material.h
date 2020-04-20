@@ -3,16 +3,17 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_MATERIAL_H
-#define CNOID_BODY_MATERIAL_H
+#ifndef UCNOID_BODY_MATERIAL_H
+#define UCNOID_BODY_MATERIAL_H
 
-#include <cnoid/Referenced>
-#include <cnoid/ValueTree>
+#include <ucnoid/Referenced>
+#include <ucnoid/ValueTree>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT Material : public Referenced
+class UCNOID_EXPORT Material : public Referenced
 {
 public:
     Material();
@@ -43,11 +44,14 @@ private:
     MappingPtr info_;
 };
 
-template<> CNOID_EXPORT double Material::info(const std::string& key, const double& defaultValue) const;
-template<> CNOID_EXPORT bool Material::info(const std::string& key, const bool& defaultValue) const;
+template<> UCNOID_EXPORT double Material::info(const std::string& key, const double& defaultValue) const;
+template<> UCNOID_EXPORT bool Material::info(const std::string& key, const bool& defaultValue) const;
 
 typedef ref_ptr<Material> MaterialPtr;
 
+}   // inline namespace ucnoid
 }
+
+#include "Material.cpp.h"
 
 #endif

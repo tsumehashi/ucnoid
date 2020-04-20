@@ -2,14 +2,15 @@
    @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_SIGNAL_H
-#define CNOID_UTIL_SIGNAL_H
+#ifndef UCNOID_UTIL_SIGNAL_H
+#define UCNOID_UTIL_SIGNAL_H
 
 #include "Referenced.h"
 #include <functional>
 #include <tuple>
 
 namespace cnoid {
+inline namespace ucnoid {
 
 namespace signal_private {
 
@@ -441,6 +442,7 @@ private:
     SignalType* signal;
 };
 
+}   // inline namespace ucnoid
 } // namespace cnoid;
 
 #endif

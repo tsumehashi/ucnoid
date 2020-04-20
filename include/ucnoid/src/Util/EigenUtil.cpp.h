@@ -1,10 +1,15 @@
+#ifndef UCNOID_UTIL_EIGEN_UTIL_CPP_H
+#define UCNOID_UTIL_EIGEN_UTIL_CPP_H
 
 #include "EigenUtil.h"
+#if UCNOID_NOT_SUPPORTED
 #include <fmt/format.h>
+#endif  // UCNOID_NOT_SUPPORTED
 
 namespace cnoid {
+inline namespace ucnoid {
 
-Matrix3 rotFromRpy(double r, double p, double y)
+inline Matrix3 rotFromRpy(double r, double p, double y)
 {
     const double cr = cos(r);
     const double sr = sin(r);
@@ -22,7 +27,7 @@ Matrix3 rotFromRpy(double r, double p, double y)
 }
 
 
-Vector3 rpyFromRot(const Matrix3& R)
+inline Vector3 rpyFromRot(const Matrix3& R)
 {
     double roll, pitch, yaw;
     
@@ -62,7 +67,7 @@ Vector3 rpyFromRot(const Matrix3& R)
 }
 
 
-Vector3 omegaFromRot(const Matrix3& R)
+inline Vector3 omegaFromRot(const Matrix3& R)
 {
     double alpha = (R(0,0) + R(1,1) + R(2,2) - 1.0) / 2.0;
 
@@ -85,26 +90,42 @@ Vector3 omegaFromRot(const Matrix3& R)
     }
 }
 
-std::string str(const Vector3& v)
+inline std::string str(const Vector3& v)
 {
+#if UCNOID_NOT_SUPPORTED
     return fmt::format("{0} {1} {2}", v[0], v[1], v[2]);
+#else
+    return std::to_string(v[0]) + " " + std::to_string(v[1]) + " " + std::to_string(v[2]);
+#endif
 }
 
 
-std::string str(const Vector3f& v)
+inline std::string str(const Vector3f& v)
 {
+#if UCNOID_NOT_SUPPORTED
     return fmt::format("{0} {1} {2}", v[0], v[1], v[2]);
+#else
+    return std::to_string(v[0]) + " " + std::to_string(v[1]) + " " + std::to_string(v[2]);
+#endif
 }
 
 
-std::string str(const Vector2& v)
+inline std::string str(const Vector2& v)
 {
+#if UCNOID_NOT_SUPPORTED
     return fmt::format("{0} {1}", v[0], v[1]);
+#else
+    return std::to_string(v[0]) + " " + std::to_string(v[1]);
+#endif
 }
 
-std::string str(const AngleAxis& a)
+inline std::string str(const AngleAxis& a)
 {
+#if UCNOID_NOT_SUPPORTED
     return fmt::format("{0} {1}", str(a.axis()), a.angle());
+#else
+    return str(a.axis()) + " " + std::to_string(a.angle());
+#endif
 }
 
 template<class VectorType>
@@ -129,19 +150,19 @@ static bool toVector3_(const std::string& s, VectorType& out_v)
 }    
 
 
-bool toVector3(const std::string& s, Vector3& out_v)
+inline bool toVector3(const std::string& s, Vector3& out_v)
 {
     return toVector3_(s, out_v);
 }
 
 
-bool toVector3(const std::string& s, Vector3f& out_v)
+inline bool toVector3(const std::string& s, Vector3f& out_v)
 {
     return toVector3_(s, out_v);
 }
 
 
-void normalizeRotation(Matrix3& R)
+inline void normalizeRotation(Matrix3& R)
 {
     Matrix3::ColXpr x = R.col(0);
     Matrix3::ColXpr y = R.col(1);
@@ -151,7 +172,7 @@ void normalizeRotation(Matrix3& R)
     y = z.cross(x);
 }
 
-void normalizeRotation(Position& T)
+inline void normalizeRotation(Position& T)
 {
     typedef Position::LinearPart::ColXpr ColXpr;
     Position::LinearPart R = T.linear();
@@ -163,7 +184,7 @@ void normalizeRotation(Position& T)
     y = z.cross(x);
 }
 
-void normalizeRotation(Affine3& T)
+inline void normalizeRotation(Affine3& T)
 {
     typedef Affine3::LinearPart::ColXpr ColXpr;
     Affine3::LinearPart R = T.linear();
@@ -175,5 +196,7 @@ void normalizeRotation(Affine3& T)
     y = z.cross(x);
 }
 
+}   // inline namespace ucnoid
 }
 
+#endif  // UCNOID_UTIL_EIGEN_UTIL_CPP_H

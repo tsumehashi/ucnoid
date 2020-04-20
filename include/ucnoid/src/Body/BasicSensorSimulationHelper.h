@@ -3,8 +3,8 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_BASIC_SENSOR_SIMULATION_HELPER_H
-#define CNOID_BODY_BASIC_SENSOR_SIMULATION_HELPER_H
+#ifndef UCNOID_BODY_BASIC_SENSOR_SIMULATION_HELPER_H
+#define UCNOID_BODY_BASIC_SENSOR_SIMULATION_HELPER_H
 
 #include "DeviceList.h"
 #include "ForceSensor.h"
@@ -13,11 +13,12 @@
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class Body;
 class BasicSensorSimulationHelperImpl;
 
-class CNOID_EXPORT BasicSensorSimulationHelper
+class UCNOID_EXPORT BasicSensorSimulationHelper
 {
 public:
     BasicSensorSimulationHelper();
@@ -46,6 +47,9 @@ private:
     friend class BasicSensorSimulationHelperImpl;
 };
 
+}   // inline namespace ucnoid
 }
+
+#include "BasicSensorSimulationHelper.cpp.h"
 
 #endif

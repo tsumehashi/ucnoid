@@ -1,13 +1,16 @@
 
+#ifndef UCNOID_BODY_JACOBIAN_CPP_H
+#define UCNOID_BODY_JACOBIAN_CPP_H
+
 #include "Jacobian.h"
 #include "Link.h"
 #include "JointPath.h"
 #include <iostream>
 
-using namespace std;
-using namespace cnoid;
+namespace cnoid {
+inline namespace ucnoid {
 
-namespace {
+namespace detail::jacobian {
 
 Matrix3d D(Vector3d r)
 {
@@ -32,7 +35,7 @@ struct SubMass
     }
 };
 
-void calcSubMass(Link* link, vector<SubMass>& subMasses, bool calcIw)
+void calcSubMass(Link* link, std::vector<SubMass>& subMasses, bool calcIw)
 {
     Matrix3d R = link->R();
     SubMass& sub = subMasses[link->index()];
@@ -55,9 +58,8 @@ void calcSubMass(Link* link, vector<SubMass>& subMasses, bool calcIw)
     }
 }
 
-}
+}   // namespace detail::jacobian
 
-namespace cnoid {
 
 /**
    @brief compute CoM Jacobian
@@ -65,12 +67,13 @@ namespace cnoid {
    @param J CoM Jacobian
    @note Link::wc must be computed by calcCM() before calling
 */
-void calcCMJacobian(Body* body, Link* base, Eigen::MatrixXd& J)
+inline void calcCMJacobian(Body* body, Link* base, Eigen::MatrixXd& J)
 {
+    using detail::jacobian::SubMass;
     // prepare subm, submwc
 
     const int nj = body->numJoints();
-    vector<SubMass> subMasses(body->numLinks());
+    std::vector<SubMass> subMasses(body->numLinks());
     Link* rootLink = body->rootLink();
         
     JointPath path;
@@ -148,9 +151,9 @@ void calcCMJacobian(Body* body, Link* base, Eigen::MatrixXd& J)
    @param H Angular Momentum Jacobian
    @note Link::wc must be computed by calcCM() before calling
 */
-void calcAngularMomentumJacobian(Body* body, Link* base, Eigen::MatrixXd& H)
+inline void calcAngularMomentumJacobian(Body* body, Link* base, Eigen::MatrixXd& H)
 {
-
+    using detail::jacobian::SubMass;
     // prepare subm, submwc
 
     const int nj = body->numJoints();
@@ -231,4 +234,7 @@ void calcAngularMomentumJacobian(Body* body, Link* base, Eigen::MatrixXd& H)
     
 }
 
-}
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_JACOBIAN_CPP_H

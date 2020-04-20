@@ -3,42 +3,43 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_FILE_UTIL_CPP_H
+#define UCNOID_UTIL_FILE_UTIL_CPP_H
+
 #include "FileUtil.h"
 
-using namespace std;
-using namespace boost;
-
 namespace cnoid {
+inline namespace ucnoid {
 
 #ifdef _WIN32
-const char* DLL_PREFIX = "";
-const char* DLL_SUFFIX = ".dll";
-const char* DLL_EXTENSION = "dll";
-const char* EXEC_SUFFIX = ".exe";
-const char* EXEC_EXTENSION = "exe";
-const char* PATH_DELIMITER = ";";
+inline const char* DLL_PREFIX = "";
+inline const char* DLL_SUFFIX = ".dll";
+inline const char* DLL_EXTENSION = "dll";
+inline const char* EXEC_SUFFIX = ".exe";
+inline const char* EXEC_EXTENSION = "exe";
+inline const char* PATH_DELIMITER = ";";
 #elif defined(__APPLE__)
-const char* DLL_PREFIX = "lib";
-const char* DLL_SUFFIX = ".dylib";
-const char* DLL_EXTENSION = "dylib";
-const char* EXEC_SUFFIX = ".app";
-const char* EXEC_EXTENSION = "app";
-const char* PATH_DELIMITER = ":";
+inline const char* DLL_PREFIX = "lib";
+inline const char* DLL_SUFFIX = ".dylib";
+inline const char* DLL_EXTENSION = "dylib";
+inline const char* EXEC_SUFFIX = ".app";
+inline const char* EXEC_EXTENSION = "app";
+inline const char* PATH_DELIMITER = ":";
 #else
-const char* DLL_PREFIX = "lib";
-const char* DLL_SUFFIX = ".so";
-const char* DLL_EXTENSION = "so";
-const char* EXEC_SUFFIX = "";
-const char* EXEC_EXTENSION = "";
-const char* PATH_DELIMITER = ":";
+inline const char* DLL_PREFIX = "lib";
+inline const char* DLL_SUFFIX = ".so";
+inline const char* DLL_EXTENSION = "so";
+inline const char* EXEC_SUFFIX = "";
+inline const char* EXEC_EXTENSION = "";
+inline const char* PATH_DELIMITER = ":";
 #endif
 
 
-filesystem::path getCompactPath(const filesystem::path& path)
+inline std::filesystem::path getCompactPath(const std::filesystem::path& path)
 {
-    filesystem::path compact;
+    std::filesystem::path compact;
     
-    for(filesystem::path::const_iterator p = path.begin(); p != path.end(); ++p){
+    for(std::filesystem::path::const_iterator p = path.begin(); p != path.end(); ++p){
         if(*p == ".."){
             compact = compact.parent_path();
         } else if(*p != "."){
@@ -50,21 +51,21 @@ filesystem::path getCompactPath(const filesystem::path& path)
 }
 
 
-void makePathCompact(filesystem::path& io_path)
+inline void makePathCompact(std::filesystem::path& io_path)
 {
     io_path = getCompactPath(io_path);
 }
 
 
-int findSubDirectory(const filesystem::path& directory, const filesystem::path& path, filesystem::path& out_subdirectory)
+inline int findSubDirectory(const std::filesystem::path& directory, const std::filesystem::path& path, std::filesystem::path& out_subdirectory)
 {
     int numMatchedDepth = 0;
         
     if(directory.is_absolute() && path.is_absolute()){
-        filesystem::path compactPath = getCompactPath(path);
+        std::filesystem::path compactPath = getCompactPath(path);
 
-        filesystem::path::const_iterator p = directory.begin();
-        filesystem::path::const_iterator q = compactPath.begin();
+        std::filesystem::path::const_iterator p = directory.begin();
+        std::filesystem::path::const_iterator q = compactPath.begin();
 
         while(p != directory.end() && q != compactPath.end()){
             if(!(*p == *q)){
@@ -88,13 +89,13 @@ int findSubDirectory(const filesystem::path& directory, const filesystem::path& 
 }
 
 
-bool findRelativePath(const filesystem::path& from_, const filesystem::path& to, filesystem::path& out_relativePath)
+inline bool findRelativePath(const std::filesystem::path& from_, const std::filesystem::path& to, std::filesystem::path& out_relativePath)
 {
-    if(from_.is_complete() && to.is_complete()){
+    if(from_.is_absolute() && to.is_absolute()){
 
-        filesystem::path from(getCompactPath(from_));
-        filesystem::path::const_iterator p = from.begin();
-        filesystem::path::const_iterator q = to.begin();
+        std::filesystem::path from(getCompactPath(from_));
+        std::filesystem::path::const_iterator p = from.begin();
+        std::filesystem::path::const_iterator q = to.begin();
         
         while(p != from.end() && q != to.end()){
             if(!(*p == *q)){
@@ -120,8 +121,8 @@ bool findRelativePath(const filesystem::path& from_, const filesystem::path& to,
 }
 
 
-#ifndef CNOID_FILE_UTIL_SUPPORT_WINDOWS_FILESYSTEM
-std::string toActualPathName(const std::string& path)
+#ifndef UCNOID_FILE_UTIL_SUPPORT_WINDOWS_FILESYSTEM
+inline std::string toActualPathName(const std::string& path)
 {
     return path;
 }
@@ -132,7 +133,7 @@ std::string toActualPathName(const std::string& path)
    when the exploer hides the extension of registered file types.
    \todo Support the case where the exploer hides the extension of registered file types.
 */
-std::string toActualPathName(const std::string& path)
+inline std::string toActualPathName(const std::string& path)
 {
     int codepage = _getmbcp();
     size_t length = ::MultiByteToWideChar(codepage, 0, path.c_str(), path.size(), NULL, 0);
@@ -225,9 +226,9 @@ std::string toActualPathName(const std::string& path)
 #endif
 
 
-std::string getExtension(const boost::filesystem::path& path)
+inline std::string getExtension(const std::filesystem::path& path)
 {
-    string ext = filesystem::extension(path);
+    std::string ext = path.extension().string();
     if(!ext.empty()){
         if(ext[0] == '.'){
             ext = ext.substr(1);
@@ -239,59 +240,62 @@ std::string getExtension(const boost::filesystem::path& path)
 }
 
 
-std::string getGenericPathString(const boost::filesystem::path& path)
+inline std::string getGenericPathString(const std::filesystem::path& path)
 {
     return path.generic_string();
 }
 
 
-bool checkAbsolute(const boost::filesystem::path& path)
+inline bool checkAbsolute(const std::filesystem::path& path)
 {
     return path.is_absolute();
 }
 
 
-boost::filesystem::path getAbsolutePath(const boost::filesystem::path& path)
+inline std::filesystem::path getAbsolutePath(const std::filesystem::path& path)
 {
-    return boost::filesystem::absolute(path);
+    return std::filesystem::absolute(path);
 }
 
 
-std::string getAbsolutePathString(const boost::filesystem::path& path)
+inline std::string getAbsolutePathString(const std::filesystem::path& path)
 {
-    return boost::filesystem::absolute(path).string();
+    return std::filesystem::absolute(path).string();
 }
 
 
-std::string getFilename(const boost::filesystem::path& path)
+inline std::string getFilename(const std::filesystem::path& path)
 {
     return path.filename().string();
 }
 
 
-std::string getFilename(const std::string& pathString)
+inline std::string getFilename(const std::string& pathString)
 {
-    boost::filesystem::path path(pathString);
+    std::filesystem::path path(pathString);
     return path.filename().string();
 }
 
 
-std::string getBasename(const boost::filesystem::path& path)
+inline std::string getBasename(const std::filesystem::path& path)
 {
     return path.stem().string();
 }
 
 
-std::string getPathString(const boost::filesystem::path& path)
+inline std::string getPathString(const std::filesystem::path& path)
 {
     return path.string();
 }
 
 
-std::string getNativePathString(const boost::filesystem::path& path)
+inline std::string getNativePathString(const std::filesystem::path& path)
 {
-    boost::filesystem::path p(path);
+    std::filesystem::path p(path);
     return p.make_preferred().string();
 }
 
+}   // inline namespace ucnoid
 }
+
+#endif  // UCNOID_UTIL_FILE_UTIL_CPP_H

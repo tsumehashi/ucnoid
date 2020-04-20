@@ -3,21 +3,22 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_MESH_EXTRACTOR_H
-#define CNOID_UTIL_MESH_EXTRACTOR_H
+#ifndef UCNOID_UTIL_MESH_EXTRACTOR_H
+#define UCNOID_UTIL_MESH_EXTRACTOR_H
 
 #include "EigenTypes.h"
 #include <functional>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class SgNode;
 class SgMesh;
 class SgShape;
 class MeshExtractorImpl;
 
-class CNOID_EXPORT MeshExtractor
+class UCNOID_EXPORT MeshExtractor
 {
 public:
     MeshExtractor();
@@ -35,6 +36,9 @@ private:
     MeshExtractorImpl* impl;
 };
 
+}   // inline namespace ucnoid
 }
+
+#include "MeshExtractor.cpp.h"
 
 #endif

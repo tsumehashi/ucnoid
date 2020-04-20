@@ -3,26 +3,27 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_DYBODY_H
-#define CNOID_BODY_DYBODY_H
+#ifndef UCNOID_BODY_DYBODY_H
+#define UCNOID_BODY_DYBODY_H
 
 #include "Body.h"
 #include "Link.h"
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 /**
    A Link class used for forward dynamics based on the articulated body method (ABM)
 */
-class CNOID_EXPORT DyLink : public Link
+class UCNOID_EXPORT DyLink : public Link
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     DyLink();
     DyLink(const Link& link);
-    virtual Link* clone() const;
+    virtual Link* clone() const override;
 
     virtual void initializeState() override;
 
@@ -76,8 +77,8 @@ public:
     ConstraintForceArray& constraintForces() { return constraintForces_; }
     const ConstraintForceArray& constraintForces() const { return constraintForces_; }
 
-    virtual void prependChild(Link* link);
-    virtual void appendChild(Link* link);
+    virtual void prependChild(Link* link) override;
+    virtual void appendChild(Link* link) override;
         
 private:
     Vector3 vo_;  ///< translation elements of spacial velocity
@@ -115,7 +116,7 @@ private:
 /**
    A Body class used for forward dynamics based on the articulated body method (ABM)
 */
-class CNOID_EXPORT DyBody : public Body
+class UCNOID_EXPORT DyBody : public Body
 {
 public:
     DyBody();
@@ -145,6 +146,9 @@ public:
 
 typedef ref_ptr<DyBody> DyBodyPtr;
 
+}   // inline namespace ucnoid
 }
+
+#include "DyBody.cpp.h"
 
 #endif

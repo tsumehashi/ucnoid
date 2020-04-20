@@ -3,8 +3,8 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_RANGE_SENSOR_H
-#define CNOID_BODY_RANGE_SENSOR_H
+#ifndef UCNOID_BODY_RANGE_SENSOR_H
+#define UCNOID_BODY_RANGE_SENSOR_H
 
 #include "Device.h"
 #include <vector>
@@ -12,8 +12,9 @@
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT RangeSensor : public Device
+class UCNOID_EXPORT RangeSensor : public Device
 {
 public:
     RangeSensor();
@@ -104,6 +105,9 @@ private:
 
 typedef ref_ptr<RangeSensor> RangeSensorPtr;
 
+}   // inline namespace ucnoid
 }
+
+#include "RangeSensor.cpp.h"
 
 #endif

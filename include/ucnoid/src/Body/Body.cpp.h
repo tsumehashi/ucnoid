@@ -3,17 +3,23 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_BODY_CPP_H
+#define UCNOID_BODY_BODY_CPP_H
+
 #include "Body.h"
+#if UCNOID_NOT_SUPPORTED
 #include "BodyCustomizerInterface.h"
-#include <cnoid/SceneGraph>
-#include <cnoid/EigenUtil>
-#include <cnoid/ValueTree>
+#endif  // UCNOID_NOT_SUPPORTED
+#include <ucnoid/SceneGraph>
+#include <ucnoid/EigenUtil>
+#include <ucnoid/ValueTree>
 #include <iostream>
+#include <map>
 
-using namespace std;
-using namespace cnoid;
+namespace cnoid {
+inline namespace ucnoid {
 
-namespace {
+namespace detail::body {
 
 const bool PUT_DEBUG_MESSAGE = true;
 
@@ -22,47 +28,48 @@ typedef unsigned int uint;
 #endif
 
 struct BodyHandleEntity {
-    Body* body;
+    cnoid::Body* body;
 };
 
-typedef std::map<std::string, LinkPtr> NameToLinkMap;
-typedef std::map<std::string, Device*> DeviceNameMap;
-typedef std::map<std::string, ReferencedPtr> CacheMap;
+typedef std::map<std::string, cnoid::LinkPtr> NameToLinkMap;
+typedef std::map<std::string, cnoid::Device*> DeviceNameMap;
+typedef std::map<std::string, cnoid::ReferencedPtr> CacheMap;
 
-double getCurrentTime()
+inline double getCurrentTime()
 {
     return 0.0;
 }
 
-}
-
-namespace cnoid {
+}   // namespace detail::body
 
 class BodyImpl
 {
 public:
-    NameToLinkMap nameToLinkMap;
-    DeviceNameMap deviceNameMap;
-    CacheMap cacheMap;
+    detail::body::NameToLinkMap nameToLinkMap;
+    detail::body::DeviceNameMap deviceNameMap;
+    detail::body::CacheMap cacheMap;
     MappingPtr info;
     Vector3 centerOfMass;
     double mass;
     std::string name;
     std::string modelName;
 
+#if UCNOID_NOT_SUPPORTED
     // Members for the customizer
     BodyCustomizerHandle customizerHandle;
     BodyCustomizerInterface* customizerInterface;
-    BodyHandleEntity bodyHandleEntity;
+    detail::body::BodyHandleEntity bodyHandleEntity;
     BodyHandle bodyHandle;
+#endif  // UCNOID_NOT_SUPPORTED
 
+#if UCNOID_NOT_SUPPORTED
     bool installCustomizer(BodyCustomizerInterface* customizerInterface);
-    void expandLinkOffsetRotations(Body* body, Link* link, const Matrix3& parentRs, vector<bool>& validRsFlags);
+#endif  // UCNOID_NOT_SUPPORTED
+    void expandLinkOffsetRotations(Body* body, Link* link, const Matrix3& parentRs, std::vector<bool>& validRsFlags);
     void setRsToShape(const Matrix3& Rs, SgNode* shape, std::function<void(SgNode* node)> setShape);
-    void applyLinkOffsetRotationsToDevices(Body* body, vector<bool>& validRsFlags);    
+    void applyLinkOffsetRotationsToDevices(Body* body, std::vector<bool>& validRsFlags);
 };
 
-}
 
 
 Body::Body()
@@ -70,7 +77,7 @@ Body::Body()
     initialize();
     rootLink_ = createLink();
     numActualJoints = 0;
-    currentTimeFunction = getCurrentTime;
+    currentTimeFunction = detail::body::getCurrentTime;
 
     impl->centerOfMass.setZero();
     impl->mass = 0.0;
@@ -82,10 +89,12 @@ void Body::initialize()
 {
     impl = new BodyImpl;
     
+#if UCNOID_NOT_SUPPORTED
     impl->customizerHandle = 0;
     impl->customizerInterface = 0;
     impl->bodyHandleEntity.body = this;
     impl->bodyHandle = &impl->bodyHandleEntity;
+#endif    // UCNOID_NOT_SUPPORTED
 }
 
 
@@ -129,9 +138,11 @@ void Body::copy(const Body& org)
         extraJoints_.push_back(extraJoint);
     }
 
+#if UCNOID_NOT_SUPPORTED
     if(org.impl->customizerInterface){
         installCustomizer(org.impl->customizerInterface);
     }
+#endif  // UCNOID_NOT_SUPPORTED
 }
 
 
@@ -155,7 +166,6 @@ Link* Body::createLink(const Link* org) const
 {
     return org ? new Link(*org) : new Link();
 }
-
 
 void Body::cloneShapes(SgCloneMap& cloneMap)
 {
@@ -181,10 +191,11 @@ void Body::cloneShapes(SgCloneMap& cloneMap)
 Body::~Body()
 {
     setRootLink(0);
-    
+#if UCNOID_NOT_SUPPORTED
     if(impl->customizerHandle){
         impl->customizerInterface->destroy(impl->customizerHandle);
     }
+#endif  // UCNOID_NOT_SUPPORTED
     delete impl;
 }
 
@@ -297,7 +308,6 @@ void Body::setModelName(const std::string& name)
     impl->modelName = name;
 }
 
-
 const Mapping* Body::info() const
 {
     return impl->info;
@@ -314,7 +324,6 @@ void Body::resetInfo(Mapping* info)
 {
     impl->info = info;
 }
-
 
 void Body::addDevice(Device* device)
 {
@@ -335,17 +344,16 @@ void Body::clearDevices()
 
 Device* Body::findDeviceSub(const std::string& name) const
 {
-    DeviceNameMap::const_iterator p = impl->deviceNameMap.find(name);
+    detail::body::DeviceNameMap::const_iterator p = impl->deviceNameMap.find(name);
     if(p != impl->deviceNameMap.end()){
         return p->second;
     }
     return nullptr;
 }
 
-
 Referenced* Body::findCacheSub(const std::string& name)
 {
-    CacheMap::iterator p = impl->cacheMap.find(name);
+    detail::body::CacheMap::iterator p = impl->cacheMap.find(name);
     if(p != impl->cacheMap.end()){
         return p->second;
     }
@@ -355,7 +363,7 @@ Referenced* Body::findCacheSub(const std::string& name)
 
 const Referenced* Body::findCacheSub(const std::string& name) const
 {
-    CacheMap::iterator p = impl->cacheMap.find(name);
+    detail::body::CacheMap::iterator p = impl->cacheMap.find(name);
     if(p != impl->cacheMap.end()){
         return p->second;
     }
@@ -373,7 +381,7 @@ bool Body::getCaches(PolymorphicReferencedArrayBase<>& out_caches, std::vector<s
 {
     out_caches.clear_elements();
     out_names.clear();
-    for(CacheMap::const_iterator p = impl->cacheMap.begin(); p != impl->cacheMap.end(); ++p){
+    for(detail::body::CacheMap::const_iterator p = impl->cacheMap.begin(); p != impl->cacheMap.end(); ++p){
         if(out_caches.try_push_back(p->second)){
             out_names.push_back(p->first);
         }
@@ -387,10 +395,9 @@ void Body::removeCache(const std::string& name)
     impl->cacheMap.erase(name);
 }
 
-
 Link* Body::link(const std::string& name) const
 {
-    NameToLinkMap::const_iterator p = impl->nameToLinkMap.find(name);
+    detail::body::NameToLinkMap::const_iterator p = impl->nameToLinkMap.find(name);
     return (p != impl->nameToLinkMap.end()) ? p->second : 0;
 }
 
@@ -441,14 +448,12 @@ void Body::clearExternalForces()
     }
 }
 
-
 void Body::initializeDeviceStates()
 {
     for(size_t i=0; i < devices_.size(); ++i){
         devices_[i]->clearState();
     }
 }
-
 
 const Vector3& Body::calcCenterOfMass()
 {
@@ -500,7 +505,7 @@ void Body::calcTotalMomentum(Vector3& out_P, Vector3& out_L)
     }
 }
 
-
+#if UCNOID_NOT_SUPPORTED
 BodyCustomizerHandle Body::customizerHandle() const
 {
     return impl->customizerHandle;
@@ -511,10 +516,11 @@ BodyCustomizerInterface* Body::customizerInterface() const
 {
     return impl->customizerInterface;
 }
-
+#endif  // UCNOID_NOT_SUPPORTED
 
 bool Body::hasVirtualJointForces() const
 {
+#if UCNOID_NOT_SUPPORTED
     if(impl->customizerInterface){
         if(impl->customizerInterface->setVirtualJointForces){
             return true;
@@ -524,12 +530,14 @@ bool Body::hasVirtualJointForces() const
             return true;
         }
     }
+#endif  // UCNOID_NOT_SUPPORTED
     return false;
 }
 
 
 void Body::setVirtualJointForces(double timeStep)
 {
+#if UCNOID_NOT_SUPPORTED
     auto customizer = impl->customizerInterface;
     if(customizer){
         if(customizer->version >= 2 && customizer->setVirtualJointForces2){
@@ -538,6 +546,7 @@ void Body::setVirtualJointForces(double timeStep)
             customizer->setVirtualJointForces(impl->customizerHandle);
         }
     }
+#endif  // UCNOID_NOT_SUPPORTED
 }
 
 
@@ -546,15 +555,17 @@ void Body::setVirtualJointForces(double timeStep)
 */
 bool Body::installCustomizer()
 {
+#if UCNOID_NOT_SUPPORTED
     loadDefaultBodyCustomizers(std::cerr);
     BodyCustomizerInterface* interface = findBodyCustomizer(impl->modelName);
     if(interface){
         return installCustomizer(interface);
     }
+#endif  // UCNOID_NOT_SUPPORTED
     return false;
 }
 
-
+#if UCNOID_NOT_SUPPORTED
 bool Body::installCustomizer(BodyCustomizerInterface* customizerInterface)
 {
     return impl->installCustomizer(customizerInterface);
@@ -580,17 +591,18 @@ bool BodyImpl::installCustomizer(BodyCustomizerInterface* customizerInterface)
 
     return (customizerHandle != 0);
 }
+#endif  // UCNOID_NOT_SUPPORTED
 
-
+#if UCNOID_NOT_SUPPORTED
 static inline Link* extractLink(BodyHandle bodyHandle, int linkIndex)
 {
-    return static_cast<BodyHandleEntity*>(bodyHandle)->body->link(linkIndex);
+    return static_cast<detail::body::BodyHandleEntity*>(bodyHandle)->body->link(linkIndex);
 }
 
 
 static int getLinkIndexFromName(BodyHandle bodyHandle, const char* linkName)
 {
-    Body* body = static_cast<BodyHandleEntity*>(bodyHandle)->body;
+    Body* body = static_cast<detail::body::BodyHandleEntity*>(bodyHandle)->body;
     Link* link = body->link(linkName);
     return (link ? link->index() : -1);
 }
@@ -619,7 +631,6 @@ static double* getJointTorqueForcePtr(BodyHandle bodyHandle, int linkIndex)
     return &(extractLink(bodyHandle, linkIndex)->u());
 }
 
-
 BodyInterface* Body::bodyInterface()
 {
     static BodyInterface interface = {
@@ -633,12 +644,12 @@ BodyInterface* Body::bodyInterface()
 
     return &interface;
 }
-
+#endif  // UCNOID_NOT_SUPPORTED
 
 void Body::expandLinkOffsetRotations()
 {
     Matrix3 Rs = Matrix3::Identity();
-    vector<bool> validRsFlags;
+    std::vector<bool> validRsFlags;
 
     for(Link* child = rootLink()->child(); child; child = child->sibling()){
         impl->expandLinkOffsetRotations(this, child, Rs, validRsFlags);
@@ -650,7 +661,7 @@ void Body::expandLinkOffsetRotations()
 }
 
 
-void BodyImpl::expandLinkOffsetRotations(Body* body, Link* link, const Matrix3& parentRs, vector<bool>& validRsFlags)
+void BodyImpl::expandLinkOffsetRotations(Body* body, Link* link, const Matrix3& parentRs, std::vector<bool>& validRsFlags)
 {
     link->setOffsetTranslation(parentRs * link->offsetTranslation());
 
@@ -668,7 +679,6 @@ void BodyImpl::expandLinkOffsetRotations(Body* body, Link* link, const Matrix3& 
         link->setCenterOfMass(Rs * link->centerOfMass());
         link->setInertia(Rs * link->I() * Rs.transpose());
         link->setJointAxis(Rs * link->jointAxis());
-
         SgNode* visualShape = link->visualShape();
         SgNode* collisionShape = link->collisionShape();
 
@@ -689,7 +699,6 @@ void BodyImpl::expandLinkOffsetRotations(Body* body, Link* link, const Matrix3& 
     }
 }
 
-
 void BodyImpl::setRsToShape(const Matrix3& Rs, SgNode* shape, std::function<void(SgNode* node)> setShape)
 {
     SgPosTransform* transformRs = new SgPosTransform;
@@ -699,7 +708,7 @@ void BodyImpl::setRsToShape(const Matrix3& Rs, SgNode* shape, std::function<void
 }
 
 
-void BodyImpl::applyLinkOffsetRotationsToDevices(Body* body, vector<bool>& validRsFlags)
+void BodyImpl::applyLinkOffsetRotationsToDevices(Body* body, std::vector<bool>& validRsFlags)
 {
     for(int i=0; i < body->numDevices(); ++i){
         Device* device = body->device(i);
@@ -711,9 +720,12 @@ void BodyImpl::applyLinkOffsetRotationsToDevices(Body* body, vector<bool>& valid
     }
 }
 
-
 void Body::setCurrentTimeFunction(std::function<double()> func)
 {
     currentTimeFunction = func;
 }
 
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_BODY_CPP_H

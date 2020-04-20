@@ -3,19 +3,20 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_VRML_BODY_LOADER_H
-#define CNOID_BODY_VRML_BODY_LOADER_H
+#ifndef UCNOID_BODY_VRML_BODY_LOADER_H
+#define UCNOID_BODY_VRML_BODY_LOADER_H
 
 #include "AbstractBodyLoader.h"
-#include <cnoid/VRML>
+#include <ucnoid/VRML>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class Link;
 class VRMLBodyLoaderImpl;
   
-class CNOID_EXPORT VRMLBodyLoader : public AbstractBodyLoader
+class UCNOID_EXPORT VRMLBodyLoader : public AbstractBodyLoader
 {
 public:
     VRMLBodyLoader();
@@ -31,6 +32,9 @@ private:
     VRMLBodyLoaderImpl* impl;
 };
 
+}   // inline namespace ucnoid
 }
+
+#include "VRMLBodyLoader.cpp.h"
 
 #endif

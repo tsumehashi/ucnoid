@@ -2,12 +2,13 @@
    @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_VALUE_TREE_UTIL_H
-#define CNOID_UTIL_VALUE_TREE_UTIL_H
+#ifndef UCNOID_UTIL_VALUE_TREE_UTIL_H
+#define UCNOID_UTIL_VALUE_TREE_UTIL_H
 
 #include "ValueTree.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 template<class Container>
 bool writeElements(Mapping& mapping, const std::string& key, const Container& elements, bool isFlowStyle = false)
@@ -38,6 +39,7 @@ bool readElements(const Mapping& mapping, const std::string& key, Container& ele
     return !elements.empty();
 }
 
+}   // inline namespace ucnoid
 }
 
 #endif

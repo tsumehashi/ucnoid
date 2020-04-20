@@ -3,15 +3,16 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_LINK_PATH_H
-#define CNOID_BODY_LINK_PATH_H
+#ifndef UCNOID_BODY_LINK_PATH_H
+#define UCNOID_BODY_LINK_PATH_H
 
 #include "LinkTraverse.h"
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT LinkPath : public LinkTraverse
+class UCNOID_EXPORT LinkPath : public LinkTraverse
 {
 public:
     LinkPath();
@@ -29,7 +30,7 @@ public:
         return links.back();
     }
 
-#ifdef CNOID_BACKWARD_COMPATIBILITY
+#ifdef UCNOID_BACKWARD_COMPATIBILITY
     //! Deprecated. Use "setPath()" instead of this.
     bool find(Link* base, Link* end) { return setPath(base, end); }
     //! Deprecated. Use "setPath()" instead of this.
@@ -43,6 +44,9 @@ private:
     void findPathFromRootSub(Link* link);
 };
 
+}   // inline namespace ucnoid
 }
+
+#include "LinkPath.cpp.h"
 
 #endif

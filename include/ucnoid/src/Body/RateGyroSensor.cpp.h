@@ -3,10 +3,13 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_RATE_GYRO_SENSOR_CPP_H
+#define UCNOID_BODY_RATE_GYRO_SENSOR_CPP_H
+
 #include "RateGyroSensor.h"
 
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 RateGyroSensor::RateGyroSensor()
     : spec(new Spec)
@@ -97,3 +100,8 @@ double* RateGyroSensor::writeState(double* out_buf) const
     Eigen::Map<Vector3>(out_buf) << w_;
     return out_buf + 3;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_RATE_GYRO_SENSOR_CPP_H

@@ -3,11 +3,13 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_SCENE_EFFECTS_CPP_H
+#define UCNOID_UTIL_SCENE_EFFECTS_CPP_H
+
 #include "SceneEffects.h"
 
-using namespace std;
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 SgFog::SgFog(int polymorhicId)
     : SgPreprocessed(polymorhicId)
@@ -52,10 +54,9 @@ SgOutlineGroup::SgOutlineGroup()
 
 }
 
+namespace detail::scene_effects {
 
-namespace {
-
-struct NodeTypeRegistration {
+inline struct NodeTypeRegistration {
     NodeTypeRegistration() {
         SgNode::registerType<SgFog, SgPreprocessed>();
         SgNode::registerType<SgOutlineGroup, SgGroup>();
@@ -63,3 +64,8 @@ struct NodeTypeRegistration {
 } registration;
 
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_SCENE_EFFECTS_CPP_H

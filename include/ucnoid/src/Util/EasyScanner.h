@@ -4,8 +4,8 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_EASYSCANNER_H_INCLUDED
-#define CNOID_UTIL_EASYSCANNER_H_INCLUDED
+#ifndef UCNOID_UTIL_EASYSCANNER_H_INCLUDED
+#define UCNOID_UTIL_EASYSCANNER_H_INCLUDED
 
 #include <unordered_map>
 #include <string>
@@ -14,11 +14,12 @@
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 /**
    @todo introduce a pimpl to hide the use of unordered_map, vector
 */
-class CNOID_EXPORT  EasyScanner {
+class UCNOID_EXPORT  EasyScanner {
 
 public:
 
@@ -26,7 +27,7 @@ public:
         //int dummy;
     };
 
-    class CNOID_EXPORT Exception {
+    class UCNOID_EXPORT Exception {
 public:
         std::string message;
         std::string filename;
@@ -105,7 +106,7 @@ public:
 
     /**
        In contrast to readWord(),
-       this function allows a string to include siglums such as !,",#,$,%,&,...
+       this function allows a std::string to include siglums such as !,",#,$,%,&,...
     */
     inline bool readString(const int delimiterChar = ',') {
         skipSpace();
@@ -194,7 +195,7 @@ public:
     }
     /**
        The exception version of readWord().
-       \return Scanned word string.
+       \return Scanned word std::string.
     */
     inline const std::string& readWordEx(const char* message = 0) {
         if(!readWord()) throwException(message);
@@ -207,7 +208,7 @@ public:
 
     /**
        The exception version of readString().
-       \return Scanned word string.
+       \return Scanned word std::string.
     */
     inline const std::string& readStringEx(const char* message = 0) {
         if(!readString()) throwException(message);
@@ -271,22 +272,25 @@ private:
 
     std::shared_ptr<SymbolMap> symbols;
 
-    friend CNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, double& value);
-    friend CNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, int& value);
-    friend CNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, const char* matchString);
-    friend CNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, char matchChar);
-    friend CNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, std::string& str);
-    friend CNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, EasyScanner::Endl endl);
+    friend UCNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, double& value);
+    friend UCNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, int& value);
+    friend UCNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, const char* matchString);
+    friend UCNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, char matchChar);
+    friend UCNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, std::string& str);
+    friend UCNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, EasyScanner::Endl endl);
 
 };
 
 
-CNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, double& value);
-CNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, int& value);
-CNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, const char* matchString);
-CNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, char matchChar);
-CNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, std::string& str);
-CNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, EasyScanner::Endl endl);
+UCNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, double& value);
+UCNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, int& value);
+UCNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, const char* matchString);
+UCNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, char matchChar);
+UCNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, std::string& str);
+UCNOID_EXPORT EasyScanner& operator>>(EasyScanner& scanner, EasyScanner::Endl endl);
+}   // inline namespace ucnoid
 }
+
+#include "EasyScanner.cpp.h"
 
 #endif

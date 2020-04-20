@@ -2,13 +2,14 @@
    @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_POLYMORPHIC_REFERENCED_ARRAY_H
-#define CNOID_UTIL_POLYMORPHIC_REFERENCED_ARRAY_H
+#ifndef UCNOID_UTIL_POLYMORPHIC_REFERENCED_ARRAY_H
+#define UCNOID_UTIL_POLYMORPHIC_REFERENCED_ARRAY_H
 
 #include "Referenced.h"
 #include <vector>
 
 namespace cnoid {
+inline namespace ucnoid {
 
 template <class BaseReferencedType = Referenced>
 class PolymorphicReferencedArrayBase
@@ -200,6 +201,7 @@ public:
     }
 };
 
+}   // inline namespace ucnoid
 }
 
 #endif

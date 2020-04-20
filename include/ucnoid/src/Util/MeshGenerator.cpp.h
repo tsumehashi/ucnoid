@@ -3,26 +3,29 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_MESH_GENERATOR_CPP_H
+#define UCNOID_UTIL_MESH_GENERATOR_CPP_H
+
 #include "MeshGenerator.h"
 #include "MeshFilter.h"
 #include "MeshExtractor.h"
 #include "Triangulator.h"
 
-using namespace std;
-using namespace cnoid;
+namespace cnoid {
+inline namespace ucnoid {
 
-namespace {
+namespace detail::mesh_generator {
 
-const double PI = 3.14159265358979323846;
-const int defaultDivisionNumber = 20;
+constexpr double PI = 3.14159265358979323846;
+constexpr int defaultDivisionNumber = 20;
 
-}
+}   // namespace detail::mesh_generator
 
 MeshGenerator::MeshGenerator()
 {
     isNormalGenerationEnabled_ = true;
     meshFilter = nullptr;
-    divisionNumber_ = ::defaultDivisionNumber;
+    divisionNumber_ = detail::mesh_generator::defaultDivisionNumber;
 }
 
 
@@ -37,7 +40,7 @@ MeshGenerator::~MeshGenerator()
 void MeshGenerator::setDivisionNumber(int n)
 {
     if(n < 0){
-        divisionNumber_ = ::defaultDivisionNumber;
+        divisionNumber_ = detail::mesh_generator::defaultDivisionNumber;
     } else {
         divisionNumber_ = n;
     }
@@ -52,7 +55,7 @@ int MeshGenerator::divisionNumber() const
 
 int MeshGenerator::defaultDivisionNumber()
 {
-    return ::defaultDivisionNumber;
+    return detail::mesh_generator::defaultDivisionNumber;
 }
 
 
@@ -132,6 +135,7 @@ SgMesh* MeshGenerator::generateBox(Vector3 size, bool enableTextureCoordinate)
 
 SgMesh* MeshGenerator::generateSphere(double radius, bool enableTextureCoordinate)
 {
+    using detail::mesh_generator::PI;
     if(radius < 0.0 || divisionNumber_ < 4){
         return 0;
     }
@@ -199,6 +203,7 @@ SgMesh* MeshGenerator::generateSphere(double radius, bool enableTextureCoordinat
 SgMesh* MeshGenerator::generateCylinder(double radius, double height, bool bottom, bool top, bool side,
         bool enableTextureCoordinate)
 {
+    using detail::mesh_generator::PI;
     if(height < 0.0 || radius < 0.0){
         return 0;
     }
@@ -259,6 +264,7 @@ SgMesh* MeshGenerator::generateCylinder(double radius, double height, bool botto
 SgMesh* MeshGenerator::generateCone(double radius, double height, bool bottom, bool side,
         bool enableTextureCoordinate)
 {
+    using detail::mesh_generator::PI;
     if(radius < 0.0 || height < 0.0){
         return 0;
     }
@@ -306,6 +312,7 @@ SgMesh* MeshGenerator::generateCone(double radius, double height, bool bottom, b
 
 SgMesh* MeshGenerator::generateCapsule(double radius, double height)
 {
+    using detail::mesh_generator::PI;
     if(height < 0.0 || radius < 0.0){
         return 0;
     }
@@ -379,6 +386,7 @@ SgMesh* MeshGenerator::generateCapsule(double radius, double height)
 
 SgMesh* MeshGenerator::generateDisc(double radius, double innerRadius)
 {
+    using detail::mesh_generator::PI;
     if(innerRadius <= 0.0 || radius <= innerRadius){
         return 0;
     }
@@ -441,6 +449,7 @@ SgMesh* MeshGenerator::generateArrow(double cylinderRadius, double cylinderHeigh
 
 SgMesh* MeshGenerator::generateTorus(double radius, double crossSectionRadius)
 {
+    using detail::mesh_generator::PI;
     int divisionNumber2 = divisionNumber_ / 4;
 
     SgMesh* mesh = new SgMesh();
@@ -506,8 +515,8 @@ SgMesh* MeshGenerator::generateExtrusion(const Extrusion& extrusion, bool enable
 
     Vector3 preZaxis(Vector3::Zero());
     int definedZaxis = -1;
-    vector<Vector3> Yaxisarray;
-    vector<Vector3> Zaxisarray;
+    std::vector<Vector3> Yaxisarray;
+    std::vector<Vector3> Zaxisarray;
     if(numSpines > 2){
         for(int i=0; i < numSpines; ++i){
             Vector3 Yaxis, Zaxis;
@@ -629,7 +638,7 @@ SgMesh* MeshGenerator::generateExtrusion(const Extrusion& extrusion, bool enable
     }
 
     Triangulator<SgVertexArray> triangulator;
-    vector<int> polygon;
+    std::vector<int> polygon;
         
     int numTriOfbeginCap = 0;
     int numTriOfendCap = 0;
@@ -640,7 +649,7 @@ SgMesh* MeshGenerator::generateExtrusion(const Extrusion& extrusion, bool enable
             polygon.push_back(i);
         }
         triangulator.apply(polygon);
-        const vector<int>& triangles = triangulator.triangles();
+        const std::vector<int>& triangles = triangulator.triangles();
         numTriOfbeginCap = triangles.size() / 3;
         for(size_t i=0; i < triangles.size(); i += 3){
             mesh->addTriangle(polygon[triangles[i]], polygon[triangles[i+1]], polygon[triangles[i+2]]);
@@ -654,7 +663,7 @@ SgMesh* MeshGenerator::generateExtrusion(const Extrusion& extrusion, bool enable
             polygon.push_back(numCrosses * (numSpines - 1) + i);
         }
         triangulator.apply(polygon);
-        const vector<int>& triangles = triangulator.triangles();
+        const std::vector<int>& triangles = triangulator.triangles();
         numTriOfendCap = triangles.size() / 3;
         for(size_t i=0; i < triangles.size(); i +=3){
             mesh->addTriangle(polygon[triangles[i]], polygon[triangles[i+2]], polygon[triangles[i+1]]);
@@ -800,6 +809,7 @@ int MeshGenerator::findTexCoordPoint(const SgTexCoordArray& texCoords, const Vec
 
 void MeshGenerator::generateTextureCoordinateForSphere(SgMesh* mesh)
 {
+    using detail::mesh_generator::PI;
     const SgMesh::Sphere& sphere = mesh->primitive<SgMesh::Sphere>();
     const SgVertexArray& vertices = *mesh->vertices();
 
@@ -848,6 +858,7 @@ void MeshGenerator::generateTextureCoordinateForSphere(SgMesh* mesh)
 
 void MeshGenerator::generateTextureCoordinateForCylinder(SgMesh* mesh)
 {
+    using detail::mesh_generator::PI;
     const SgVertexArray& vertices = *mesh->vertices();
     mesh->setTexCoords(new SgTexCoordArray());
     SgTexCoordArray& texCoords = *mesh->texCoords();
@@ -932,6 +943,7 @@ void MeshGenerator::generateTextureCoordinateForCylinder(SgMesh* mesh)
 
 void MeshGenerator::generateTextureCoordinateForCone(SgMesh* mesh)
 {
+    using detail::mesh_generator::PI;
     mesh->setTexCoords(new SgTexCoordArray());
     SgTexCoordArray& texCoords = *mesh->texCoords();
     SgIndexArray& texCoordIndices = mesh->texCoordIndices();
@@ -1016,8 +1028,8 @@ void MeshGenerator::generateTextureCoordinateForExtrusion(SgMesh* mesh, const Ex
     mesh->setTexCoords(new SgTexCoordArray());
     SgTexCoordArray& texCoords = *mesh->texCoords();
 
-    vector<double> s;
-    vector<double> t;
+    std::vector<double> s;
+    std::vector<double> t;
     double slen = 0.0;
     s.push_back(0.0);
     for(int i=1; i < numcross; ++i){
@@ -1180,3 +1192,8 @@ void MeshGenerator::generateTextureCoordinateForIndexedFaceSet(SgMesh* mesh)
     // Is this really necessary for rendering?
     mesh->texCoordIndices() = mesh->triangleVertices();
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_MESH_GENERATOR_CPP_H

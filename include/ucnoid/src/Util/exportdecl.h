@@ -1,37 +1,37 @@
-#ifndef CNOID_UTIL_EXPORTDECL_H_INCLUDED
-# define CNOID_UTIL_EXPORTDECL_H_INCLUDED
+#ifndef UCNOID_UTIL_EXPORTDECL_H_INCLUDED
+# define UCNOID_UTIL_EXPORTDECL_H_INCLUDED
 
 # if defined _WIN32 || defined __CYGWIN__
-#  define CNOID_UTIL_DLLIMPORT __declspec(dllimport)
-#  define CNOID_UTIL_DLLEXPORT __declspec(dllexport)
-#  define CNOID_UTIL_DLLLOCAL
+#  define UCNOID_UTIL_DLLIMPORT __declspec(dllimport)
+#  define UCNOID_UTIL_DLLEXPORT __declspec(dllexport)
+#  define UCNOID_UTIL_DLLLOCAL
 # else
 #  if __GNUC__ >= 4
-#   define CNOID_UTIL_DLLIMPORT __attribute__ ((visibility("default")))
-#   define CNOID_UTIL_DLLEXPORT __attribute__ ((visibility("default")))
-#   define CNOID_UTIL_DLLLOCAL  __attribute__ ((visibility("hidden")))
+#   define UCNOID_UTIL_DLLIMPORT __attribute__ ((visibility("default")))
+#   define UCNOID_UTIL_DLLEXPORT __attribute__ ((visibility("default")))
+#   define UCNOID_UTIL_DLLLOCAL  __attribute__ ((visibility("hidden")))
 #  else
-#   define CNOID_UTIL_DLLIMPORT
-#   define CNOID_UTIL_DLLEXPORT
-#   define CNOID_UTIL_DLLLOCAL
+#   define UCNOID_UTIL_DLLIMPORT
+#   define UCNOID_UTIL_DLLEXPORT
+#   define UCNOID_UTIL_DLLLOCAL
 #  endif
 # endif
 
-# ifdef CNOID_UTIL_STATIC
-#  define CNOID_UTIL_DLLAPI
-#  define CNOID_UTIL_LOCAL
+# ifdef UCNOID_UTIL_STATIC
+#  define UCNOID_UTIL_DLLAPI
+#  define UCNOID_UTIL_LOCAL
 # else
 #  ifdef CnoidUtil_EXPORTS
-#   define CNOID_UTIL_DLLAPI CNOID_UTIL_DLLEXPORT
+#   define UCNOID_UTIL_DLLAPI UCNOID_UTIL_DLLEXPORT
 #  else
-#   define CNOID_UTIL_DLLAPI CNOID_UTIL_DLLIMPORT
+#   define UCNOID_UTIL_DLLAPI UCNOID_UTIL_DLLIMPORT
 #  endif
-#  define CNOID_UTIL_LOCAL CNOID_UTIL_DLLLOCAL
+#  define UCNOID_UTIL_LOCAL UCNOID_UTIL_DLLLOCAL
 # endif
 
 #endif
 
-#ifdef CNOID_EXPORT
-# undef CNOID_EXPORT
+#ifdef UCNOID_EXPORT
+# undef UCNOID_EXPORT
 #endif
-#define CNOID_EXPORT CNOID_UTIL_DLLAPI
+#define UCNOID_EXPORT UCNOID_UTIL_DLLAPI

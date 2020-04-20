@@ -3,16 +3,17 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_DYWORLD_H
-#define CNOID_BODY_DYWORLD_H
+#ifndef UCNOID_BODY_DYWORLD_H
+#define UCNOID_BODY_DYWORLD_H
 
 #include "ForwardDynamics.h"
 #include "ExtraJoint.h"
-#include <cnoid/TimeMeasure>
+#include <ucnoid/TimeMeasure>
 #include <map>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class DyLink;
 class DyBody;
@@ -24,7 +25,7 @@ const bool BODY_SIMULATION_PROFILING = true;
 const bool BODY_SIMULATION_PROFILING = false;
 #endif
 
-class CNOID_EXPORT WorldBase
+class UCNOID_EXPORT WorldBase
 {
 public:
     WorldBase();
@@ -246,6 +247,9 @@ public:
     }
 };
 
-};
+}   // inline namespace ucnoid
+}
+
+#include "DyWorld.cpp.h"
 
 #endif

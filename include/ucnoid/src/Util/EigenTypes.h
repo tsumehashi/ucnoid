@@ -2,14 +2,15 @@
    @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_EIGEN_TYPES_H
-#define CNOID_UTIL_EIGEN_TYPES_H
+#ifndef UCNOID_UTIL_EIGEN_TYPES_H
+#define UCNOID_UTIL_EIGEN_TYPES_H
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 //#include <Eigen/AlignedVector3>
 
 namespace cnoid {
+inline namespace ucnoid {
 
 using Eigen::Vector2i;
 using Eigen::Matrix2f;
@@ -110,6 +111,7 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW        
 };
 
+}   // inline namespace ucnoid
 }
 
 #endif

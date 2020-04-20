@@ -4,22 +4,23 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_JOINT_PATH_H
-#define CNOID_BODY_JOINT_PATH_H
+#ifndef UCNOID_BODY_JOINT_PATH_H
+#define UCNOID_BODY_JOINT_PATH_H
 
 #include "LinkPath.h"
 #include "InverseKinematics.h"
-#include <cnoid/Referenced>
-#include <cnoid/EigenTypes>
+#include <ucnoid/Referenced>
+#include <ucnoid/EigenTypes>
 #include <functional>
 #include <memory>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class JointPathIkImpl;
 
-class CNOID_EXPORT JointPath : public InverseKinematics
+class UCNOID_EXPORT JointPath : public InverseKinematics
 {
 public:
 		
@@ -161,8 +162,11 @@ class Body;
    when the body has the analytical one for a given path.
    \todo move back this function to the Body class
 */
-CNOID_EXPORT JointPathPtr getCustomJointPath(Body* body, Link* baseLink, Link* targetLink);
+UCNOID_EXPORT JointPathPtr getCustomJointPath(Body* body, Link* baseLink, Link* targetLink);
 
+}   // inline namespace ucnoid
 }
+
+#include "JointPath.cpp.h"
 
 #endif

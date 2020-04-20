@@ -2,9 +2,13 @@
    @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_IMPL_REFERENCED_CPP_H
+#define UCNOID_UTIL_IMPL_REFERENCED_CPP_H
+
 #include "Referenced.h"
 
-using namespace cnoid;
+namespace cnoid {
+inline namespace ucnoid {
 
 Referenced::~Referenced()
 {
@@ -12,3 +16,8 @@ Referenced::~Referenced()
         weakCounter_->setDestructed();
     }
 }
+
+}   // inline namespace ucnoid
+}
+
+#endif  // UCNOID_UTIL_IMPL_REFERENCED_CPP_H

@@ -3,19 +3,20 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_POLYGON_MESH_TRIANGULATOR_H
-#define CNOID_UTIL_POLYGON_MESH_TRIANGULATOR_H
+#ifndef UCNOID_UTIL_POLYGON_MESH_TRIANGULATOR_H
+#define UCNOID_UTIL_POLYGON_MESH_TRIANGULATOR_H
 
 #include <string>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class SgMesh;
 class SgPolygonMesh;
 class PolygonMeshTriangulatorImpl;
 
-class CNOID_EXPORT PolygonMeshTriangulator
+class UCNOID_EXPORT PolygonMeshTriangulator
 {
 public:
     PolygonMeshTriangulator();
@@ -32,7 +33,10 @@ private:
     PolygonMeshTriangulatorImpl * impl;
 };
 
+}   // inline namespace ucnoid
 }
+
+#include "PolygonMeshTriangulator.cpp.h"
 
 #endif
 

@@ -3,13 +3,17 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_POINT_LIGHT_CPP_H
+#define UCNOID_BODY_POINT_LIGHT_CPP_H
+
 #include "PointLight.h"
 
-using namespace cnoid;
+namespace cnoid {
+inline namespace ucnoid {
 
-namespace {
+namespace detail::point_light {
 
-const int LightStateSize = Light::lightStateSize();
+static const int LightStateSize = Light::lightStateSize();
 
 }
 
@@ -75,13 +79,13 @@ void PointLight::forEachActualType(std::function<bool(const std::type_info& type
 
 int PointLight::pointLightStateSize()
 {
-    return LightStateSize + 3;
+    return detail::point_light::LightStateSize + 3;
 }
 
 
 int PointLight::stateSize() const
 {
-    return LightStateSize + 3;
+    return detail::point_light::LightStateSize + 3;
 }
 
 
@@ -103,3 +107,8 @@ double* PointLight::writeState(double* out_buf) const
     out_buf[2] = quadraticAttenuation_;
     return out_buf + 3;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_POINT_LIGHT_CPP_H

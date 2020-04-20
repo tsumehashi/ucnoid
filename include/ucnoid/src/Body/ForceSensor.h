@@ -3,16 +3,17 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_FORCE_SENSOR_H
-#define CNOID_BODY_FORCE_SENSOR_H
+#ifndef UCNOID_BODY_FORCE_SENSOR_H
+#define UCNOID_BODY_FORCE_SENSOR_H
 
 #include "Device.h"
 #include <memory>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT ForceSensor : public Device
+class UCNOID_EXPORT ForceSensor : public Device
 {
     Vector6 F_; // f (linear force) + tau (torque)
         
@@ -54,6 +55,9 @@ public:
 
 typedef ref_ptr<ForceSensor> ForceSensorPtr;
     
+}   // inline namespace ucnoid
 }
+
+#include "ForceSensor.cpp.h"
 
 #endif

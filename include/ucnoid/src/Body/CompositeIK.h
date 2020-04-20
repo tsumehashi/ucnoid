@@ -3,16 +3,17 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_COMPOSITE_IK_H
-#define CNOID_BODY_COMPOSITE_IK_H
+#ifndef UCNOID_BODY_COMPOSITE_IK_H
+#define UCNOID_BODY_COMPOSITE_IK_H
 
 #include "Body.h"
 #include "JointPath.h"
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT CompositeIK : public InverseKinematics
+class UCNOID_EXPORT CompositeIK : public InverseKinematics
 {
 public:
     CompositeIK();
@@ -48,6 +49,9 @@ private:
 
 typedef std::shared_ptr<CompositeIK> CompositeIKPtr;
 
+}   // inline namespace ucnoid
 }
+
+#include "CompositeIK.cpp.h"
 
 #endif

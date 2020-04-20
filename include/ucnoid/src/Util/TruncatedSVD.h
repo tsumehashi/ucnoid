@@ -3,12 +3,13 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_TRUNCATED_SVD_SOLVER_H_INCLUDED
-#define CNOID_UTIL_TRUNCATED_SVD_SOLVER_H_INCLUDED
+#ifndef UCNOID_UTIL_TRUNCATED_SVD_SOLVER_H_INCLUDED
+#define UCNOID_UTIL_TRUNCATED_SVD_SOLVER_H_INCLUDED
 
 #include <Eigen/Core>
 
 namespace cnoid {
+inline namespace ucnoid {
 
 template <class MatrixType>
 class TruncatedSVD
@@ -87,6 +88,8 @@ public:
         }
     }
 };
+
+}   // inline namespace ucnoid
 }
 
 #endif

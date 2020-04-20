@@ -2,10 +2,13 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_ABSTRACT_SCENE_LOADER_CPP_H
+#define UCNOID_UTIL_ABSTRACT_SCENE_LOADER_CPP_H
+
 #include "AbstractSceneLoader.h"
 
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 AbstractSceneLoader::~AbstractSceneLoader()
 {
@@ -29,3 +32,8 @@ void AbstractSceneLoader::setDefaultCreaseAngle(double /* theta */)
 {
 
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_ABSTRACT_SCENE_LOADER_CPP_H

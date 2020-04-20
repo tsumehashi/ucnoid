@@ -3,8 +3,8 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_MESH_GENERATOR_H
-#define CNOID_UTIL_MESH_GENERATOR_H
+#ifndef UCNOID_UTIL_MESH_GENERATOR_H
+#define UCNOID_UTIL_MESH_GENERATOR_H
 
 #include "EigenTypes.h"
 #include <Eigen/StdVector>
@@ -12,10 +12,11 @@
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class MeshFilter;
 
-class CNOID_EXPORT MeshGenerator
+class UCNOID_EXPORT MeshGenerator
 {
 public:
     MeshGenerator();
@@ -103,6 +104,9 @@ private:
             int numTriOfbeginCap, int numTriOfendCap, int indexOfendCap);
 };
 
+}   // inline namespace ucnoid
 }
+
+#include "MeshGenerator.cpp.h"
 
 #endif

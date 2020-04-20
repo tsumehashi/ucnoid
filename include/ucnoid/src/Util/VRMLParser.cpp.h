@@ -5,29 +5,42 @@
   @author Takafumi.Tawara
 */
 
+#ifndef UCNOID_UTIL_VRML_PARSER_CPP_H
+#define UCNOID_UTIL_VRML_PARSER_CPP_H
+
 #include "VRMLParser.h"
 #include "EasyScanner.h"
 #include "UTF8.h"
 #include "NullOut.h"
 #include "FileUtil.h"
-#include <boost/algorithm/string/predicate.hpp>
 #include <list>
 #include <cmath>
 #include <vector>
 #include <mutex>
 
-using namespace std;
-using namespace cnoid;
-namespace filesystem = boost::filesystem;
-using boost::get;
-using boost::dynamic_pointer_cast;
+namespace cnoid {
+inline namespace ucnoid {
 
-namespace {
+namespace detail::vrml_parser {
 
-string removeURLScheme(string url)
+// boost::algorithm::iends_with
+inline bool iends_with(const std::string& text, const std::string& cmp_text) {
+    if (text.size() < cmp_text.size()) {
+        return false;
+    }
+    return text.substr(text.size() - cmp_text.size(), cmp_text.size()) == cmp_text;
+}
+
+inline std::filesystem::path lexically_normal(const std::filesystem::path& p)
 {
-    static const string fileProtocolHeader1("file://");
-    static const string fileProtocolHeader2("file:");
+    std::filesystem::path lp = p;
+    return lp.lexically_normal();
+}
+
+inline std::string removeURLScheme(std::string url)
+{
+    static const std::string fileProtocolHeader1("file://");
+    static const std::string fileProtocolHeader2("file:");
 
     size_t pos = url.find(fileProtocolHeader1);
     if(0 == pos){
@@ -48,11 +61,11 @@ string removeURLScheme(string url)
 }
 
 
-bool isFileProtocol(const string& ref)
+inline bool isFileProtocol(const std::string& ref)
 {
     bool ret = false;
-    string::size_type pos = ref.find(":");
-    if(pos == string::npos || pos == 1){
+    std::string::size_type pos = ref.find(":");
+    if(pos == std::string::npos || pos == 1){
         // Directly local path || Windows drive letter separator
         ret = true;
     } else if(ref.find("file:") == 0){
@@ -322,9 +335,7 @@ enum {
     U_EXTERNPROTO
 };
 
-}
-
-namespace cnoid {
+}   // namespace detail::vrml_parser
 
 class VRMLParserImpl
 {
@@ -332,35 +343,35 @@ public:
     VRMLParserImpl(VRMLParser* self);
 
     VRMLParser* self;
-    ostream* os_;
-    ostream& os() { return *os_; }
+    std::ostream* os_;
+    std::ostream& os() { return *os_; }
     std::shared_ptr<EasyScanner> topScanner;
     EasyScanner* scanner; // current one
     VRMLProtoInstancePtr currentProtoInstance;
 
     bool protoInstanceActualNodeExtractionMode;
 
-    typedef map<VRMLProto*, std::shared_ptr<EasyScanner> > ProtoToEntityScannerMap;
+    typedef std::map<VRMLProto*, std::shared_ptr<EasyScanner> > ProtoToEntityScannerMap;
     ProtoToEntityScannerMap protoToEntityScannerMap;
 
-    typedef map<string, VRMLNodePtr> TDefNodeMap;
-    typedef pair<string, VRMLNodePtr> TDefNodePair;
-    typedef map<string, VRMLProtoPtr> TProtoMap;
-    typedef pair<string, VRMLProtoPtr> TProtoPair;
+    typedef std::map<std::string, VRMLNodePtr> TDefNodeMap;
+    typedef std::pair<std::string, VRMLNodePtr> TDefNodePair;
+    typedef std::map<std::string, VRMLProtoPtr> TProtoMap;
+    typedef std::pair<std::string, VRMLProtoPtr> TProtoPair;
 
     TProtoMap protoMap;
     TDefNodeMap defNodeMap;
 
-    void load(const string& filename, bool doClearAncestorPathsList);
+    void load(const std::string& filename, bool doClearAncestorPathsList);
     VRMLNodePtr readSpecificNode(VRMLNodeCategory nodeCategory, int symbol, const std::string& symbolString);
     VRMLNodePtr readInlineNode(VRMLNodeCategory nodeCategory);
-    VRMLNodePtr newInlineSource(string& io_filename);
+    VRMLNodePtr newInlineSource(std::string& io_filename);
     VRMLProtoPtr defineProto();
 
     void checkEOF();
     VRMLNodePtr readNode(VRMLNodeCategory nodeCategory);
-    VRMLProtoInstancePtr readProtoInstanceNode(const std::string& proto_name, VRMLNodeCategory nodeCategory, const string& defName);
-    VRMLNodePtr evalProtoInstance(VRMLProtoInstancePtr proto, VRMLNodeCategory nodeCategory, const string& defName);
+    VRMLProtoInstancePtr readProtoInstanceNode(const std::string& proto_name, VRMLNodeCategory nodeCategory, const std::string& defName);
+    VRMLNodePtr evalProtoInstance(VRMLProtoInstancePtr proto, VRMLNodeCategory nodeCategory, const std::string& defName);
     VRMLUnsupportedNodePtr skipUnsupportedNode(const std::string& nodeTypeName);
     VRMLUnsupportedNodePtr skipScriptNode();
     VRMLUnsupportedNodePtr skipExternProto();
@@ -436,15 +447,14 @@ public:
     void readMFNode(MFNode& out_nodes, VRMLNodeCategory nodeCategory);
     void readSFImage( SFImage& out_image );
 private:
-    VRMLParserImpl(const VRMLParserImpl& self, const list<string>& ref);
-    const list<string>* getAncestorPathsList() const {return &ancestorPathsList;}
+    VRMLParserImpl(const VRMLParserImpl& self, const std::list<std::string>& ref);
+    const std::list<std::string>* getAncestorPathsList() const {return &ancestorPathsList;}
     void setSymbols();
     void init();
     void convertUrl(MFString& url);
-    list<string> ancestorPathsList;
-    string getRealPath(string url);
+    std::list<std::string> ancestorPathsList;
+    std::string getRealPath(std::string url);
 };
-}
 
 
 VRMLParser::VRMLParser()
@@ -453,7 +463,7 @@ VRMLParser::VRMLParser()
 }
 
 
-VRMLParser::VRMLParser(const string& filename)
+VRMLParser::VRMLParser(const std::string& filename)
 {
     init();
     load(filename);
@@ -474,7 +484,7 @@ VRMLParserImpl::VRMLParserImpl(VRMLParser* self)
     init();
 }
 
-VRMLParserImpl::VRMLParserImpl(const VRMLParserImpl& refThis, const list<string>& refSet)
+VRMLParserImpl::VRMLParserImpl(const VRMLParserImpl& refThis, const std::list<std::string>& refSet)
     : self(refThis.self), ancestorPathsList(refSet)
 {
     init();
@@ -502,22 +512,21 @@ void VRMLParser::setProtoInstanceActualNodeExtractionMode(bool isOn)
 /**
    This function throws EasyScanner::Exception when an error occurs.
 */
-void VRMLParser::load(const string& filename)
+void VRMLParser::load(const std::string& filename)
 {
     impl->load(filename, true);
 }
 
 
-void VRMLParserImpl::load(const string& filename, bool doClearAncestorPathsList)
+void VRMLParserImpl::load(const std::string& filename, bool doClearAncestorPathsList)
 {
     currentProtoInstance = 0;
     protoToEntityScannerMap.clear();
     protoMap.clear();
     defNodeMap.clear();
     
-    filesystem::path path(filename);
-    path.normalize();
-    string pathString(path.string());
+    std::filesystem::path path(detail::vrml_parser::lexically_normal(filename));
+    std::string pathString(path.string());
     if(doClearAncestorPathsList){
         ancestorPathsList.clear();
     }
@@ -567,6 +576,7 @@ VRMLNodePtr VRMLParser::readNode()
 
 VRMLNodePtr VRMLParserImpl::readNode(VRMLNodeCategory nodeCategory)
 {
+    using namespace detail::vrml_parser;
     VRMLNodePtr node;
 
     /* comment out this to allow empty proto instance node
@@ -581,8 +591,8 @@ VRMLNodePtr VRMLParserImpl::readNode(VRMLNodeCategory nodeCategory)
         return 0;
     }
 
-    string def_name;
-    string nodeTypeName(scanner->stringValue);
+    std::string def_name;
+    std::string nodeTypeName(scanner->stringValue);
     int symbol = scanner->getSymbolID(scanner->stringValue);
 
     if(symbol){
@@ -601,13 +611,13 @@ VRMLNodePtr VRMLParserImpl::readNode(VRMLNodeCategory nodeCategory)
 
         if(symbol==D_USE){
             scanner->readString();
-            const string& label = scanner->stringValue;
+            const std::string& label = scanner->stringValue;
             TDefNodeMap::iterator p = defNodeMap.find(label);
             if(p != defNodeMap.end()){
                 return p->second;
             } else {
                 scanner->throwException
-                    (string("A node \"") + label + "\" specified by the USE directive does not exist");
+                    (std::string("A node \"") + label + "\" specified by the USE directive does not exist");
             }
         }
 
@@ -625,12 +635,12 @@ VRMLNodePtr VRMLParserImpl::readNode(VRMLNodeCategory nodeCategory)
 
         // unsupported keywords
         if(symbol == U_SCRIPT){
-            os() << "Script is not supported. " << endl;
+            os() << "Script is not supported. " << std::endl;
             skipScriptNode();
             return readNode(nodeCategory);
         }
         if(symbol == U_EXTERNPROTO){
-            os() << "ExternProto is not supported." << endl;
+            os() << "ExternProto is not supported." << std::endl;
             skipExternProto();
             return readNode(nodeCategory);
         }
@@ -646,7 +656,7 @@ VRMLNodePtr VRMLParserImpl::readNode(VRMLNodeCategory nodeCategory)
 
     if(!scanner->readChar('{')){
         scanner->throwException
-            (string("The entity of a ") + nodeTypeName + " node does not correctly begin with '{'");
+            (std::string("The entity of a ") + nodeTypeName + " node does not correctly begin with '{'");
     }
 
     if(symbol){
@@ -657,7 +667,7 @@ VRMLNodePtr VRMLParserImpl::readNode(VRMLNodeCategory nodeCategory)
 
     if(!scanner->readChar('}')){
         scanner->throwException
-            (string("A ") + nodeTypeName + " node is not correctly closed with '}'");
+            (std::string("A ") + nodeTypeName + " node is not correctly closed with '}'");
     }
 
     if(def_name.size() > 0) {
@@ -669,8 +679,9 @@ VRMLNodePtr VRMLParserImpl::readNode(VRMLNodeCategory nodeCategory)
 }
 
 
-VRMLNodePtr VRMLParserImpl::readSpecificNode(VRMLNodeCategory nodeCategory, int symbol, const string& nodeTypeName)
+VRMLNodePtr VRMLParserImpl::readSpecificNode(VRMLNodeCategory nodeCategory, int symbol, const std::string& nodeTypeName)
 {
+    using namespace detail::vrml_parser;
     VRMLNodePtr node;
 
     switch(symbol){
@@ -736,13 +747,13 @@ VRMLNodePtr VRMLParserImpl::readSpecificNode(VRMLNodeCategory nodeCategory, int 
     case N_VISIBILITY_SENSOR:  node = skipUnsupportedNode("VisibilitySensor");   break;
 
     default: scanner->throwException
-            (string("Node type \"") + nodeTypeName + "\" is not supported");
+            (std::string("Node type \"") + nodeTypeName + "\" is not supported");
 
     }
 
     if(!node->isCategoryOf(nodeCategory)){
         scanner->throwException
-            (string("A ") + nodeTypeName + " node is put in illegal place");
+            (std::string("A ") + nodeTypeName + " node is put in illegal place");
     }
 
     return node;
@@ -812,6 +823,7 @@ VRMLUnsupportedNodePtr VRMLParserImpl::skipExternProto()
 
 VRMLNodePtr VRMLParserImpl::readInlineNode(VRMLNodeCategory nodeCategory)
 {
+    using namespace detail::vrml_parser;
     scanner->readChar('{');
 
     if(scanner->readSymbol() && scanner->symbolValue == F_URL){
@@ -821,8 +833,8 @@ VRMLNodePtr VRMLParserImpl::readInlineNode(VRMLNodeCategory nodeCategory)
 
         VRMLInlinePtr inlineNode = new VRMLInline();
         for(size_t i=0; i < inlineUrls.size(); ++i){
-            string url(fromUTF8(inlineUrls[i]));
-            if(boost::algorithm::iends_with(url, "wrl")){
+            std::string url(fromUTF8(inlineUrls[i]));
+            if(detail::vrml_parser::iends_with(url, "wrl")){
                 inlineNode->children.push_back(newInlineSource(url));
             } else {
                 auto nonVrmlInline = new VRMLNonVrmlInline;
@@ -837,27 +849,26 @@ VRMLNodePtr VRMLParserImpl::readInlineNode(VRMLNodeCategory nodeCategory)
 }
 
 
-string VRMLParserImpl::getRealPath(string url)
+std::string VRMLParserImpl::getRealPath(std::string url)
 { 
+    using namespace detail::vrml_parser;
     if(!isFileProtocol(url)){
         return url;
     } else {
-        filesystem::path path(removeURLScheme(url));
-        path.normalize();
+        std::filesystem::path path(lexically_normal(removeURLScheme(url)));
         if(!checkAbsolute(path)){
-            filesystem::path parentPath(scanner->filename);
-            path = parentPath.parent_path() / path;
-            path.normalize();
+            std::filesystem::path parentPath(scanner->filename);
+            path = lexically_normal(parentPath.parent_path() / path);
         }
         return getAbsolutePathString(path);
     }
 }
 
 
-VRMLNodePtr VRMLParserImpl::newInlineSource(string& io_filename)
+VRMLNodePtr VRMLParserImpl::newInlineSource(std::string& io_filename)
 {
-    string chkFile = getRealPath(io_filename);
-    for(list<string>::const_iterator p = ancestorPathsList.begin(); p != ancestorPathsList.end(); ++p){
+    std::string chkFile = getRealPath(io_filename);
+    for(std::list<std::string>::const_iterator p = ancestorPathsList.begin(); p != ancestorPathsList.end(); ++p){
         if(*p == chkFile){
             scanner->throwException("Infinity loop ! " + chkFile + " is included ancestor list");
         }
@@ -886,7 +897,8 @@ VRMLNodePtr VRMLParserImpl::newInlineSource(string& io_filename)
 
 VRMLProtoPtr VRMLParserImpl::defineProto()
 {
-    string proto_name = scanner->readWordEx("illegal PROTO name");
+    using namespace detail::vrml_parser;
+    std::string proto_name = scanner->readWordEx("illegal PROTO name");
     scanner->readCharEx('[', "syntax error 3");
 
     VRMLProtoPtr proto = new VRMLProto(proto_name);
@@ -894,7 +906,7 @@ VRMLProtoPtr VRMLParserImpl::defineProto()
     while(!scanner->readChar(']')){
         int event_type = scanner->readSymbolEx("illegal field event type");
         int field_symbol = scanner->readSymbolEx("illegal field type");
-        string field_name = scanner->readWordEx("syntax error 4");
+        std::string field_name = scanner->readWordEx("syntax error 4");
 
         // insert a new empty field and get it, contents of which will be set below
         VRMLVariantField& field = proto->fields.insert(
@@ -907,22 +919,22 @@ VRMLProtoPtr VRMLParserImpl::defineProto()
 
             switch(field_symbol){
 
-            case T_SFINT32:    field = SFInt32();    readSFInt32(get<SFInt32>(field));         break;
-            case T_SFFLOAT:    field = SFFloat();    readSFFloat(get<SFFloat>(field));         break;
-            case T_MFINT32:    field = MFInt32();    readMFInt32(get<MFInt32>(field));         break;
-            case T_MFFLOAT:    field = MFFloat();    readMFFloat(get<MFFloat>(field));         break;
-            case T_SFVEC3F:    field = SFVec3f();    readSFVec3f(get<SFVec3f>(field));         break;
-            case T_MFVEC3F:    field = MFVec3f();    readMFVec3f(get<MFVec3f>(field));         break;
-            case T_SFCOLOR:    field = SFColor();    readSFColor(get<SFColor>(field));         break;
-            case T_MFCOLOR:    field = MFColor();    readMFColor(get<MFColor>(field));         break;
-            case T_SFSTRING:   field = SFString();   readSFString(get<SFString>(field));       break;
-            case T_MFSTRING:   field = MFString();   readMFString(get<MFString>(field));       break;
-            case T_SFROTATION: field = SFRotation(); readSFRotation(get<SFRotation>(field));   break;
-            case T_MFROTATION: field = MFRotation(); readMFRotation(get<MFRotation>(field));   break;
-            case T_SFBOOL:     field = SFBool();     readSFBool(get<SFBool>(field));           break;
-            case T_SFNODE:     field = SFNode();     readSFNode(get<SFNode>(field), ANY_NODE); break;
-            case T_MFNODE:     field = MFNode();     readMFNode(get<MFNode>(field), ANY_NODE); break;
-            case T_SFIMAGE:    field = SFImage();    readSFImage(get<SFImage>(field));         break;
+            case T_SFINT32:    field = SFInt32();    readSFInt32(std::get<SFInt32>(field));         break;
+            case T_SFFLOAT:    field = SFFloat();    readSFFloat(std::get<SFFloat>(field));         break;
+            case T_MFINT32:    field = MFInt32();    readMFInt32(std::get<MFInt32>(field));         break;
+            case T_MFFLOAT:    field = MFFloat();    readMFFloat(std::get<MFFloat>(field));         break;
+            case T_SFVEC3F:    field = SFVec3f();    readSFVec3f(std::get<SFVec3f>(field));         break;
+            case T_MFVEC3F:    field = MFVec3f();    readMFVec3f(std::get<MFVec3f>(field));         break;
+            case T_SFCOLOR:    field = SFColor();    readSFColor(std::get<SFColor>(field));         break;
+            case T_MFCOLOR:    field = MFColor();    readMFColor(std::get<MFColor>(field));         break;
+            case T_SFSTRING:   field = SFString();   readSFString(std::get<SFString>(field));       break;
+            case T_MFSTRING:   field = MFString();   readMFString(std::get<MFString>(field));       break;
+            case T_SFROTATION: field = SFRotation(); readSFRotation(std::get<SFRotation>(field));   break;
+            case T_MFROTATION: field = MFRotation(); readMFRotation(std::get<MFRotation>(field));   break;
+            case T_SFBOOL:     field = SFBool();     readSFBool(std::get<SFBool>(field));           break;
+            case T_SFNODE:     field = SFNode();     readSFNode(std::get<SFNode>(field), ANY_NODE); break;
+            case T_MFNODE:     field = MFNode();     readMFNode(std::get<MFNode>(field), ANY_NODE); break;
+            case T_SFIMAGE:    field = SFImage();    readSFImage(std::get<SFImage>(field));         break;
 
             default: scanner->throwException("illegal field type");
             }
@@ -987,7 +999,7 @@ VRMLProtoPtr VRMLParserImpl::defineProto()
 }
 
 
-VRMLProtoInstancePtr VRMLParserImpl::readProtoInstanceNode(const string& proto_name, VRMLNodeCategory nodeCategory, const string& defName)
+VRMLProtoInstancePtr VRMLParserImpl::readProtoInstanceNode(const std::string& proto_name, VRMLNodeCategory nodeCategory, const std::string& defName)
 {
     TProtoMap::iterator p = protoMap.find(proto_name);
     if(p == protoMap.end()){
@@ -1004,26 +1016,26 @@ VRMLProtoInstancePtr VRMLParserImpl::readProtoInstanceNode(const string& proto_n
 
         VRMLVariantField& field = p->second;
 
-        switch(field.which()){
+        switch(field.index()){
 
-        case SFINT32:    readSFInt32(get<SFInt32>(field));         break;
-        case MFINT32:    readMFInt32(get<MFInt32>(field));         break;
-        case SFFLOAT:    readSFFloat(get<SFFloat>(field));         break;
-        case MFFLOAT:    readMFFloat(get<MFFloat>(field));         break;
-        case SFVEC2F:    readSFVec2f(get<SFVec2f>(field));         break;
-        case MFVEC2F:    readMFVec2f(get<MFVec2f>(field));         break;
-        case SFVEC3F:    readSFVec3f(get<SFVec3f>(field));         break;
-        case MFVEC3F:    readMFVec3f(get<MFVec3f>(field));         break;
-        case SFCOLOR:    readSFColor(get<SFColor>(field));         break;
-        case MFCOLOR:    readMFColor(get<MFColor>(field));         break;
-        case SFSTRING:   readSFString(get<SFString>(field));       break;
-        case MFSTRING:   readMFString(get<MFString>(field));       break;
-        case SFROTATION: readSFRotation(get<SFRotation>(field));   break;
-        case MFROTATION: readMFRotation(get<MFRotation>(field));   break;
-        case SFBOOL:     readSFBool(get<SFBool>(field));           break;
-        case SFNODE:     readSFNode(get<SFNode>(field), ANY_NODE); break;
-        case MFNODE:     readMFNode(get<MFNode>(field), ANY_NODE); break;
-        case SFIMAGE:    readSFImage(get<SFImage>(field));         break;
+        case SFINT32:    readSFInt32(std::get<SFInt32>(field));         break;
+        case MFINT32:    readMFInt32(std::get<MFInt32>(field));         break;
+        case SFFLOAT:    readSFFloat(std::get<SFFloat>(field));         break;
+        case MFFLOAT:    readMFFloat(std::get<MFFloat>(field));         break;
+        case SFVEC2F:    readSFVec2f(std::get<SFVec2f>(field));         break;
+        case MFVEC2F:    readMFVec2f(std::get<MFVec2f>(field));         break;
+        case SFVEC3F:    readSFVec3f(std::get<SFVec3f>(field));         break;
+        case MFVEC3F:    readMFVec3f(std::get<MFVec3f>(field));         break;
+        case SFCOLOR:    readSFColor(std::get<SFColor>(field));         break;
+        case MFCOLOR:    readMFColor(std::get<MFColor>(field));         break;
+        case SFSTRING:   readSFString(std::get<SFString>(field));       break;
+        case MFSTRING:   readMFString(std::get<MFString>(field));       break;
+        case SFROTATION: readSFRotation(std::get<SFRotation>(field));   break;
+        case MFROTATION: readMFRotation(std::get<MFRotation>(field));   break;
+        case SFBOOL:     readSFBool(std::get<SFBool>(field));           break;
+        case SFNODE:     readSFNode(std::get<SFNode>(field), ANY_NODE); break;
+        case MFNODE:     readMFNode(std::get<MFNode>(field), ANY_NODE); break;
+        case SFIMAGE:    readSFImage(std::get<SFImage>(field));         break;
         default:
             break;
         }
@@ -1037,7 +1049,7 @@ VRMLProtoInstancePtr VRMLParserImpl::readProtoInstanceNode(const string& proto_n
 }
 
 
-VRMLNodePtr VRMLParserImpl::evalProtoInstance(VRMLProtoInstancePtr protoInstance, VRMLNodeCategory nodeCategory, const string& defName)
+VRMLNodePtr VRMLParserImpl::evalProtoInstance(VRMLProtoInstancePtr protoInstance, VRMLNodeCategory nodeCategory, const std::string& defName)
 {
     EasyScanner* orgScanner = scanner;
     ProtoToEntityScannerMap::iterator p;
@@ -1065,6 +1077,7 @@ VRMLNodePtr VRMLParserImpl::evalProtoInstance(VRMLProtoInstancePtr protoInstance
 
 VRMLViewpointPtr VRMLParserImpl::readViewpointNode()
 {
+    using namespace detail::vrml_parser;
     VRMLViewpointPtr node(new VRMLViewpoint);
 
     while(scanner->readSymbol()){
@@ -1086,6 +1099,7 @@ VRMLViewpointPtr VRMLParserImpl::readViewpointNode()
 
 VRMLNavigationInfoPtr VRMLParserImpl::readNavigationInfoNode()
 {
+    using namespace detail::vrml_parser;
     VRMLNavigationInfoPtr node(new VRMLNavigationInfo);
 
     while(scanner->readSymbol()){
@@ -1107,6 +1121,7 @@ VRMLNavigationInfoPtr VRMLParserImpl::readNavigationInfoNode()
 
 VRMLBackgroundPtr VRMLParserImpl::readBackgroundNode()
 {
+    using namespace detail::vrml_parser;
     VRMLBackgroundPtr node(new VRMLBackground);
 
     while(scanner->readSymbol()){
@@ -1133,6 +1148,7 @@ VRMLBackgroundPtr VRMLParserImpl::readBackgroundNode()
 
 VRMLGroupPtr VRMLParserImpl::readGroupNode()
 {
+    using namespace detail::vrml_parser;
     VRMLGroupPtr node(new VRMLGroup);
 
     while(scanner->readSymbol()){
@@ -1162,6 +1178,7 @@ VRMLGroupPtr VRMLParserImpl::readGroupNode()
 
 VRMLTransformPtr VRMLParserImpl::readTransformNode()
 {
+    using namespace detail::vrml_parser;
     VRMLTransformPtr node(new VRMLTransform);
 
     while(scanner->readSymbol()){
@@ -1185,6 +1202,7 @@ VRMLTransformPtr VRMLParserImpl::readTransformNode()
 
 VRMLShapePtr VRMLParserImpl::readShapeNode()
 {
+    using namespace detail::vrml_parser;
     VRMLShapePtr node(new VRMLShape);
 
     while(scanner->readSymbol()){
@@ -1210,6 +1228,7 @@ VRMLShapePtr VRMLParserImpl::readShapeNode()
 
 VRMLCylinderSensorPtr VRMLParserImpl::readCylinderSensorNode()
 {
+    using namespace detail::vrml_parser;
     VRMLCylinderSensorPtr node(new VRMLCylinderSensor);
 
     while(scanner->readSymbol()){
@@ -1232,6 +1251,7 @@ VRMLCylinderSensorPtr VRMLParserImpl::readCylinderSensorNode()
 
 VRMLPointSetPtr VRMLParserImpl::readPointSetNode()
 {
+    using namespace detail::vrml_parser;
     VRMLPointSetPtr node(new VRMLPointSet);
 
     while(scanner->readSymbol()){
@@ -1255,6 +1275,7 @@ VRMLPointSetPtr VRMLParserImpl::readPointSetNode()
 
 VRMLPixelTexturePtr VRMLParserImpl::readPixelTextureNode()
 {
+    using namespace detail::vrml_parser;
     VRMLPixelTexturePtr node(new VRMLPixelTexture);
 
     while(scanner->readSymbol()){
@@ -1273,6 +1294,7 @@ VRMLPixelTexturePtr VRMLParserImpl::readPixelTextureNode()
 
 VRMLMovieTexturePtr VRMLParserImpl::readMovieTextureNode()
 {
+    using namespace detail::vrml_parser;
     VRMLMovieTexturePtr node(new VRMLMovieTexture);
 
     while(scanner->readSymbol()){
@@ -1297,6 +1319,7 @@ VRMLMovieTexturePtr VRMLParserImpl::readMovieTextureNode()
 
 VRMLElevationGridPtr VRMLParserImpl::readElevationGridNode()
 {
+    using namespace detail::vrml_parser;
     VRMLElevationGridPtr node(new VRMLElevationGrid);
 
     while(scanner->readSymbol()){
@@ -1334,6 +1357,7 @@ VRMLElevationGridPtr VRMLParserImpl::readElevationGridNode()
 
 VRMLExtrusionPtr VRMLParserImpl::readExtrusionNode()
 {
+    using namespace detail::vrml_parser;
     VRMLExtrusionPtr node(new VRMLExtrusion);
 
     while(scanner->readSymbol()){
@@ -1359,6 +1383,7 @@ VRMLExtrusionPtr VRMLParserImpl::readExtrusionNode()
 
 VRMLSwitchPtr VRMLParserImpl::readSwitchNode()
 {
+    using namespace detail::vrml_parser;
     VRMLSwitchPtr node( new VRMLSwitch );
 
     while(scanner->readSymbol()){
@@ -1376,6 +1401,7 @@ VRMLSwitchPtr VRMLParserImpl::readSwitchNode()
 
 VRMLLODPtr VRMLParserImpl::readLODNode()
 {
+    using namespace detail::vrml_parser;
     VRMLLODPtr node( new VRMLLOD );
 
     while(scanner->readSymbol()){
@@ -1394,6 +1420,7 @@ VRMLLODPtr VRMLParserImpl::readLODNode()
 
 VRMLCollisionPtr VRMLParserImpl::readCollisionNode()
 {
+    using namespace detail::vrml_parser;
     VRMLCollisionPtr node(new VRMLCollision);
 
     while(scanner->readSymbol()){
@@ -1414,6 +1441,7 @@ VRMLCollisionPtr VRMLParserImpl::readCollisionNode()
 
 VRMLAnchorPtr VRMLParserImpl::readAnchorNode()
 {
+    using namespace detail::vrml_parser;
     VRMLAnchorPtr node(new VRMLAnchor);
 
     while(scanner->readSymbol()){
@@ -1435,6 +1463,7 @@ VRMLAnchorPtr VRMLParserImpl::readAnchorNode()
 
 VRMLFogPtr VRMLParserImpl::readFogNode()
 {
+    using namespace detail::vrml_parser;
     VRMLFogPtr node(new VRMLFog);
 
     while(scanner->readSymbol()){
@@ -1453,6 +1482,7 @@ VRMLFogPtr VRMLParserImpl::readFogNode()
 
 VRMLBillboardPtr VRMLParserImpl::readBillboardNode()
 {
+    using namespace detail::vrml_parser;
     VRMLBillboardPtr node( new VRMLBillboard );
 
     while(scanner->readSymbol()){
@@ -1472,6 +1502,7 @@ VRMLBillboardPtr VRMLParserImpl::readBillboardNode()
 
 VRMLWorldInfoPtr VRMLParserImpl::readWorldInfoNode()
 {
+    using namespace detail::vrml_parser;
     VRMLWorldInfoPtr node(new VRMLWorldInfo);
 
     while(scanner->readSymbol()){
@@ -1489,6 +1520,7 @@ VRMLWorldInfoPtr VRMLParserImpl::readWorldInfoNode()
 
 VRMLPointLightPtr VRMLParserImpl::readPointLightNode()
 {
+    using namespace detail::vrml_parser;
     VRMLPointLightPtr node( new VRMLPointLight );
 
     while(scanner->readSymbol()){
@@ -1512,6 +1544,7 @@ VRMLPointLightPtr VRMLParserImpl::readPointLightNode()
 
 VRMLDirectionalLightPtr VRMLParserImpl::readDirectionalLightNode()
 {
+    using namespace detail::vrml_parser;
     VRMLDirectionalLightPtr node(new VRMLDirectionalLight);
 
     while(scanner->readSymbol()){
@@ -1532,6 +1565,7 @@ VRMLDirectionalLightPtr VRMLParserImpl::readDirectionalLightNode()
 
 VRMLSpotLightPtr VRMLParserImpl::readSpotLightNode()
 {
+    using namespace detail::vrml_parser;
     VRMLSpotLightPtr node(new VRMLSpotLight);
 
     while(scanner->readSymbol()){
@@ -1557,6 +1591,7 @@ VRMLSpotLightPtr VRMLParserImpl::readSpotLightNode()
 
 VRMLBoxPtr VRMLParserImpl::readBoxNode()
 {
+    using namespace detail::vrml_parser;
     VRMLBoxPtr node(new VRMLBox);
 
     if(scanner->readSymbol()){
@@ -1571,6 +1606,7 @@ VRMLBoxPtr VRMLParserImpl::readBoxNode()
 
 VRMLConePtr VRMLParserImpl::readConeNode()
 {
+    using namespace detail::vrml_parser;
     VRMLConePtr node(new VRMLCone);
 
     while(scanner->readSymbol()){
@@ -1590,6 +1626,7 @@ VRMLConePtr VRMLParserImpl::readConeNode()
 
 VRMLCylinderPtr VRMLParserImpl::readCylinderNode()
 {
+    using namespace detail::vrml_parser;
     VRMLCylinderPtr node(new VRMLCylinder);
 
     while(scanner->readSymbol()){
@@ -1610,6 +1647,7 @@ VRMLCylinderPtr VRMLParserImpl::readCylinderNode()
 
 VRMLSpherePtr VRMLParserImpl::readSphereNode()
 {
+    using namespace detail::vrml_parser;
     VRMLSpherePtr node(new VRMLSphere);
 
     if(scanner->readSymbol()){
@@ -1624,6 +1662,7 @@ VRMLSpherePtr VRMLParserImpl::readSphereNode()
 
 VRMLTextPtr VRMLParserImpl::readTextNode()
 {
+    using namespace detail::vrml_parser;
     VRMLTextPtr node(new VRMLText);
 
     while(scanner->readSymbol()){
@@ -1645,6 +1684,7 @@ VRMLTextPtr VRMLParserImpl::readTextNode()
 
 VRMLFontStylePtr VRMLParserImpl::readFontStyleNode()
 {
+    using namespace detail::vrml_parser;
     VRMLFontStylePtr node(new VRMLFontStyle);
 
     while(scanner->readSymbol()){
@@ -1669,6 +1709,7 @@ VRMLFontStylePtr VRMLParserImpl::readFontStyleNode()
 
 VRMLIndexedLineSetPtr VRMLParserImpl::readIndexedLineSetNode()
 {
+    using namespace detail::vrml_parser;
     VRMLIndexedLineSetPtr node(new VRMLIndexedLineSet);
 
     while(scanner->readSymbol()){
@@ -1697,6 +1738,7 @@ VRMLIndexedLineSetPtr VRMLParserImpl::readIndexedLineSetNode()
 
 VRMLIndexedFaceSetPtr VRMLParserImpl::readIndexedFaceSetNode()
 {
+    using namespace detail::vrml_parser;
     VRMLIndexedFaceSetPtr node(new VRMLIndexedFaceSet);
 
     while(scanner->readSymbol()){
@@ -1747,12 +1789,12 @@ void VRMLParserImpl::checkIndexedFaceSet(VRMLIndexedFaceSetPtr node)
     MFVec3s& coord = node->coord->point;
 
     int numUsedVertices = 0;
-    vector<bool> usedVertices(coord.size(), false);
+    std::vector<bool> usedVertices(coord.size(), false);
 
     int n = index.size();
 
     int i = 0;
-    vector<int> polygon;
+    std::vector<int> polygon;
     while(i < n){
         polygon.resize(0);
         bool isSeparated = false;
@@ -1773,24 +1815,24 @@ void VRMLParserImpl::checkIndexedFaceSet(VRMLIndexedFaceSetPtr node)
         const int numVertices = polygon.size();
 
         if(numVertices < 3){
-            os() << "Number of vertices is less than 3 !" << endl;
+            os() << "Number of vertices is less than 3 !" << std::endl;
         }
         if(numVertices > 3){
             os() << "Polygon is not a triangle in ";
-            os() << scanner->filename << endl;
+            os() << scanner->filename << std::endl;
             for(int j=0; j < numVertices; j++){
                 os() << polygon[j] << ",";
             }
-            os() << endl;
+            os() << std::endl;
         }
         if(!isSeparated){
-            os() << "Vertex index is not correctly separated by '-1'" << endl;
+            os() << "Vertex index is not correctly separated by '-1'" << std::endl;
         }
 
         int n = coord.size();
         for(int j=0; j < numVertices; j++){
             if(polygon[j] >= n){
-                os() << "index " << polygon[j] << " is over the number of vertices" << endl;
+                os() << "index " << polygon[j] << " is over the number of vertices" << std::endl;
             }
         }
 
@@ -1813,7 +1855,7 @@ void VRMLParserImpl::checkIndexedFaceSet(VRMLIndexedFaceSetPtr node)
             for(int l = 0; l < numVertices; l++){
                 os() << polygon[l] << ",";
             }
-            os() << endl;
+            os() << std::endl;
         }
 
         if(isVertexOverlapped){
@@ -1824,20 +1866,21 @@ void VRMLParserImpl::checkIndexedFaceSet(VRMLIndexedFaceSetPtr node)
                 SFVec3s& v = coord[polygon[l]];
                 os() << polygon[l] << " = (" << v[0] << "," << v[1] << "," << v[2] << ") ";
             }
-            os() << endl;
+            os() << std::endl;
         }
     }
 
     if(numUsedVertices < static_cast<int>(coord.size())){
         os() << "There are vertices which are not used in" << scanner->filename << ".\n";
         os() << "Number of vertices is " << coord.size();
-        os() << ", Number of used ones is " << numUsedVertices << endl;
+        os() << ", Number of used ones is " << numUsedVertices << std::endl;
     }
 }
 
 
 VRMLCoordinatePtr VRMLParserImpl::readCoordNode()
 {
+    using namespace detail::vrml_parser;
     VRMLCoordinatePtr node(new VRMLCoordinate);
 
     if(scanner->readSymbol()){
@@ -1853,6 +1896,7 @@ VRMLCoordinatePtr VRMLParserImpl::readCoordNode()
 
 VRMLTextureCoordinatePtr VRMLParserImpl::readTextureCoordinateNode()
 {
+    using namespace detail::vrml_parser;
     VRMLTextureCoordinatePtr node(new VRMLTextureCoordinate);
 
     if(scanner->readSymbol()){
@@ -1868,6 +1912,7 @@ VRMLTextureCoordinatePtr VRMLParserImpl::readTextureCoordinateNode()
 
 VRMLColorPtr VRMLParserImpl::readColorNode()
 {
+    using namespace detail::vrml_parser;
     VRMLColorPtr node(new VRMLColor);
 
     if(scanner->readSymbol()){
@@ -1883,6 +1928,7 @@ VRMLColorPtr VRMLParserImpl::readColorNode()
 
 VRMLNormalPtr VRMLParserImpl::readNormalNode()
 {
+    using namespace detail::vrml_parser;
     VRMLNormalPtr node(new VRMLNormal);
 
     if(scanner->readSymbol()){
@@ -1898,6 +1944,7 @@ VRMLNormalPtr VRMLParserImpl::readNormalNode()
 
 VRMLAppearancePtr VRMLParserImpl::readAppearanceNode()
 {
+    using namespace detail::vrml_parser;
     VRMLAppearancePtr node(new VRMLAppearance);
 
     while(scanner->readSymbol()){
@@ -1927,6 +1974,7 @@ VRMLAppearancePtr VRMLParserImpl::readAppearanceNode()
 
 VRMLMaterialPtr VRMLParserImpl::readMaterialNode()
 {
+    using namespace detail::vrml_parser;
     VRMLMaterialPtr node(new VRMLMaterial);
 
     while(scanner->readSymbol()){
@@ -1948,6 +1996,7 @@ VRMLMaterialPtr VRMLParserImpl::readMaterialNode()
 
 VRMLImageTexturePtr VRMLParserImpl::readImageTextureNode()
 {
+    using namespace detail::vrml_parser;
     VRMLImageTexturePtr node = new VRMLImageTexture;
 
     while(scanner->readSymbol()){
@@ -1968,6 +2017,7 @@ VRMLImageTexturePtr VRMLParserImpl::readImageTextureNode()
 
 VRMLTextureTransformPtr VRMLParserImpl::readTextureTransformNode()
 {
+    using namespace detail::vrml_parser;
     VRMLTextureTransformPtr node(new VRMLTextureTransform);
 
     while(scanner->readSymbol()){
@@ -1994,11 +2044,11 @@ VRMLVariantField& VRMLParserImpl::readProtoField(VRMLFieldTypeId fieldTypeId)
     VRMLProtoFieldMap::iterator p = currentProtoInstance->fields.find(scanner->stringValue);
 
     if(p == currentProtoInstance->fields.end()){
-        string msg = "This field(";
+        std::string msg = "This field(";
         msg += scanner->stringValue +") does not exist in proto node";
         scanner->throwException(msg);
     }
-    if(p->second.which() != fieldTypeId){
+    if(p->second.index() != fieldTypeId){
         scanner->throwException("Unmatched field type");
     }
 
@@ -2008,8 +2058,9 @@ VRMLVariantField& VRMLParserImpl::readProtoField(VRMLFieldTypeId fieldTypeId)
 
 void VRMLParserImpl::readSFInt32(SFInt32& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<SFInt32>(readProtoField(SFINT32));
+        out_value = std::get<SFInt32>(readProtoField(SFINT32));
     } else {
         out_value = scanner->readIntEx("illegal int value");
     }
@@ -2018,8 +2069,9 @@ void VRMLParserImpl::readSFInt32(SFInt32& out_value)
 
 void VRMLParserImpl::readMFInt32(MFInt32& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<MFInt32>(readProtoField(MFINT32));
+        out_value = std::get<MFInt32>(readProtoField(MFINT32));
     } else {
         out_value.clear();
         if(!scanner->readChar('[')){
@@ -2035,8 +2087,9 @@ void VRMLParserImpl::readMFInt32(MFInt32& out_value)
 
 void VRMLParserImpl::readSFFloat(SFFloat& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<SFFloat>(readProtoField(SFFLOAT));
+        out_value = std::get<SFFloat>(readProtoField(SFFLOAT));
     } else {
         out_value = scanner->readDoubleEx("illegal float value");
     }
@@ -2045,8 +2098,9 @@ void VRMLParserImpl::readSFFloat(SFFloat& out_value)
 
 void VRMLParserImpl::readMFFloat(MFFloat& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<MFFloat>(readProtoField(MFFLOAT));
+        out_value = std::get<MFFloat>(readProtoField(MFFLOAT));
     } else {
         out_value.clear();
         if(!scanner->readChar('[')){
@@ -2059,8 +2113,9 @@ void VRMLParserImpl::readMFFloat(MFFloat& out_value)
     }
 }
 
+namespace detail::vrml_parser {
 
-static inline SFColor readSFColor(EasyScanner* scanner)
+inline SFColor readSFColor(EasyScanner* scanner)
 {
     SFColor c;
     for(int i=0; i < 3; ++i){
@@ -2068,29 +2123,32 @@ static inline SFColor readSFColor(EasyScanner* scanner)
     }
     return c;
 }
-    
 
+}   // namespace detail::vrml_parser
+    
 void VRMLParserImpl::readSFColor(SFColor& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<SFColor>(readProtoField(SFCOLOR));
+        out_value = std::get<SFColor>(readProtoField(SFCOLOR));
     } else {
-        out_value = ::readSFColor(scanner);
+        out_value = detail::vrml_parser::readSFColor(scanner);
     }
 }
 
 
 void VRMLParserImpl::readMFColor(MFColor& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<MFColor>(readProtoField(MFCOLOR));
+        out_value = std::get<MFColor>(readProtoField(MFCOLOR));
     } else {
         out_value.clear();
         if(!scanner->readChar('[')){
-            out_value.push_back(::readSFColor(scanner));
+            out_value.push_back(detail::vrml_parser::readSFColor(scanner));
         } else {
             while(!scanner->readChar(']')){
-                out_value.push_back(::readSFColor(scanner));
+                out_value.push_back(detail::vrml_parser::readSFColor(scanner));
             }
         }
     }
@@ -2099,8 +2157,9 @@ void VRMLParserImpl::readMFColor(MFColor& out_value)
 
 void VRMLParserImpl::readSFString(SFString& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<SFString>(readProtoField(SFSTRING));
+        out_value = std::get<SFString>(readProtoField(SFSTRING));
     } else {
         out_value = scanner->readQuotedStringEx("illegal string");
     }
@@ -2109,8 +2168,9 @@ void VRMLParserImpl::readSFString(SFString& out_value)
 
 void VRMLParserImpl::readMFString(MFString& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<MFString>(readProtoField(MFSTRING));
+        out_value = std::get<MFString>(readProtoField(MFSTRING));
     } else {
         out_value.clear();
         if(!scanner->readChar('[')){
@@ -2123,8 +2183,9 @@ void VRMLParserImpl::readMFString(MFString& out_value)
     }
 }
 
+namespace detail::vrml_parser {
 
-static inline SFVec2f readSFVec2f(EasyScanner* scanner)
+inline SFVec2f readSFVec2f(EasyScanner* scanner)
 {
     SFVec2f v;
     for(int i=0; i < 2; ++i){
@@ -2133,35 +2194,39 @@ static inline SFVec2f readSFVec2f(EasyScanner* scanner)
     return v;
 }
 
+}   // namespace detail::vrml_parser
 
 inline void VRMLParserImpl::readSFVec2f(SFVec2f& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<SFVec2f>(readProtoField(SFVEC2F));
+        out_value = std::get<SFVec2f>(readProtoField(SFVEC2F));
     } else {
-        out_value = ::readSFVec2f(scanner);
+        out_value = detail::vrml_parser::readSFVec2f(scanner);
     }
 }
 
 
 void VRMLParserImpl::readMFVec2f(MFVec2f& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<MFVec2f>(readProtoField(MFVEC2F));
+        out_value = std::get<MFVec2f>(readProtoField(MFVEC2F));
     } else {
         out_value.clear();
         if(!scanner->readChar('[')){
-            out_value.push_back(::readSFVec2f(scanner));
+            out_value.push_back(detail::vrml_parser::readSFVec2f(scanner));
         } else {
             while(!scanner->readChar(']')){
-                out_value.push_back(::readSFVec2f(scanner));
+                out_value.push_back(detail::vrml_parser::readSFVec2f(scanner));
             }
         }
     }
 }
 
+namespace detail::vrml_parser {
 
-static inline SFVec2s readSFVec2s(EasyScanner* scanner)
+inline SFVec2s readSFVec2s(EasyScanner* scanner)
 {
     SFVec2s v;
     for(int i=0; i < 2; ++i){
@@ -2170,21 +2235,23 @@ static inline SFVec2s readSFVec2s(EasyScanner* scanner)
     return v;
 }
 
+}   // namespace detail::vrml_parser
 
 inline void VRMLParserImpl::readSFVec2s(SFVec2s& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<SFVec2f>(readProtoField(SFVEC2F)).cast<SFVec2s::Scalar>();
+        out_value = std::get<SFVec2f>(readProtoField(SFVEC2F)).cast<SFVec2s::Scalar>();
     } else {
-        out_value = ::readSFVec2s(scanner);
+        out_value = detail::vrml_parser::readSFVec2s(scanner);
     }
 }
 
-
 void VRMLParserImpl::readMFVec2s(MFVec2s& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        const MFVec2f& value = get<MFVec2f>(readProtoField(MFVEC2F));
+        const MFVec2f& value = std::get<MFVec2f>(readProtoField(MFVEC2F));
         const size_t n = value.size();
         out_value.resize(n);
         for(size_t i=0; i < n; ++i){
@@ -2193,17 +2260,18 @@ void VRMLParserImpl::readMFVec2s(MFVec2s& out_value)
     } else {
         out_value.clear();
         if(!scanner->readChar('[')){
-            out_value.push_back(::readSFVec2s(scanner));
+            out_value.push_back(detail::vrml_parser::readSFVec2s(scanner));
         } else {
             while(!scanner->readChar(']')){
-                out_value.push_back(::readSFVec2s(scanner));
+                out_value.push_back(detail::vrml_parser::readSFVec2s(scanner));
             }
         }
     }
 }
 
+namespace detail::vrml_parser {
 
-static inline SFVec3f readSFVec3f(EasyScanner* scanner)
+inline SFVec3f readSFVec3f(EasyScanner* scanner)
 {
     SFVec3f v;
     for(int i=0; i < 3; ++i){
@@ -2212,35 +2280,39 @@ static inline SFVec3f readSFVec3f(EasyScanner* scanner)
     return v;
 }
 
+}   // namespace detail::vrml_parser
 
 inline void VRMLParserImpl::readSFVec3f(SFVec3f& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<SFVec3f>(readProtoField(SFVEC3F));
+        out_value = std::get<SFVec3f>(readProtoField(SFVEC3F));
     } else {
-        out_value = ::readSFVec3f(scanner);
+        out_value = detail::vrml_parser::readSFVec3f(scanner);
     }
 }
 
 
 void VRMLParserImpl::readMFVec3f(MFVec3f& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<MFVec3f>(readProtoField(MFVEC3F));
+        out_value = std::get<MFVec3f>(readProtoField(MFVEC3F));
     } else {
         out_value.clear();
         if(!scanner->readChar('[')){
-            out_value.push_back(::readSFVec3f(scanner));
+            out_value.push_back(detail::vrml_parser::readSFVec3f(scanner));
         } else {
             while(!scanner->readChar(']')){
-                out_value.push_back(::readSFVec3f(scanner));
+                out_value.push_back(detail::vrml_parser::readSFVec3f(scanner));
             }
         }
     }
 }
 
+namespace detail::vrml_parser {
 
-static inline SFVec3s readSFVec3s(EasyScanner* scanner)
+inline SFVec3s readSFVec3s(EasyScanner* scanner)
 {
     SFVec3s v;
     for(int i=0; i < 3; ++i){
@@ -2249,21 +2321,22 @@ static inline SFVec3s readSFVec3s(EasyScanner* scanner)
     return v;
 }
 
+}   // namespace detail::vrml_parser
 
 inline void VRMLParserImpl::readSFVec3s(SFVec3s& out_value)
 {
-    if(scanner->readSymbol(F_IS)){
-        out_value = get<SFVec3f>(readProtoField(SFVEC3F)).cast<SFVec3s::Scalar>();
+    if(scanner->readSymbol(detail::vrml_parser::F_IS)){
+        out_value = std::get<SFVec3f>(readProtoField(SFVEC3F)).cast<SFVec3s::Scalar>();
     } else {
-        out_value = ::readSFVec3s(scanner);
+        out_value = detail::vrml_parser::readSFVec3s(scanner);
     }
 }
 
 
 void VRMLParserImpl::readMFVec3s(MFVec3s& out_value)
 {
-    if(scanner->readSymbol(F_IS)){
-        const MFVec3f& value = get<MFVec3f>(readProtoField(MFVEC3F));
+    if(scanner->readSymbol(detail::vrml_parser::F_IS)){
+        const MFVec3f& value = std::get<MFVec3f>(readProtoField(MFVEC3F));
         const size_t n = value.size();
         out_value.resize(n);
         for(size_t i=0; i < n; ++i){
@@ -2272,15 +2345,16 @@ void VRMLParserImpl::readMFVec3s(MFVec3s& out_value)
     } else {
         out_value.clear();
         if(!scanner->readChar('[')){
-            out_value.push_back(::readSFVec3s(scanner));
+            out_value.push_back(detail::vrml_parser::readSFVec3s(scanner));
         } else {
             while(!scanner->readChar(']')){
-                out_value.push_back(::readSFVec3s(scanner));
+                out_value.push_back(detail::vrml_parser::readSFVec3s(scanner));
             }
         }
     }
 }
 
+namespace detail::vrml_parser {
 
 static inline SFRotation readSFRotation(EasyScanner* scanner)
 {
@@ -2300,28 +2374,31 @@ static inline SFRotation readSFRotation(EasyScanner* scanner)
     return rotation;
 }
 
+}   // namespace detail::vrml_parser
 
 void VRMLParserImpl::readSFRotation(SFRotation& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<SFRotation>(readProtoField(SFROTATION));
+        out_value = std::get<SFRotation>(readProtoField(SFROTATION));
     } else {
-        out_value = ::readSFRotation(scanner);
+        out_value = detail::vrml_parser::readSFRotation(scanner);
     }
 }
 
 
 void VRMLParserImpl::readMFRotation(MFRotation& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<MFRotation>(readProtoField(MFROTATION));
+        out_value = std::get<MFRotation>(readProtoField(MFROTATION));
     } else {
         out_value.clear();
         if(!scanner->readChar('[')){
-            out_value.push_back(::readSFRotation(scanner));
+            out_value.push_back(detail::vrml_parser::readSFRotation(scanner));
         } else {
             while(!scanner->readChar(']')){
-                out_value.push_back(::readSFRotation(scanner));
+                out_value.push_back(detail::vrml_parser::readSFRotation(scanner));
             }
         }
     }
@@ -2330,8 +2407,9 @@ void VRMLParserImpl::readMFRotation(MFRotation& out_value)
 
 void VRMLParserImpl::readSFBool(SFBool& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<SFBool>(readProtoField(SFBOOL));
+        out_value = std::get<SFBool>(readProtoField(SFBOOL));
     } else {
         switch(scanner->readSymbolEx("no bool value")){
         case V_TRUE:  out_value = true;  break;
@@ -2344,8 +2422,9 @@ void VRMLParserImpl::readSFBool(SFBool& out_value)
 
 void VRMLParserImpl::readSFImage(SFImage& out_image)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_image = get<SFImage>(readProtoField(SFIMAGE));
+        out_image = std::get<SFImage>(readProtoField(SFIMAGE));
     } else {
         readSFInt32(out_image.width);
         readSFInt32(out_image.height);
@@ -2375,8 +2454,9 @@ void VRMLParserImpl::readSFImage(SFImage& out_image)
 
 void VRMLParserImpl::readSFTime(SFTime& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol( F_IS )){
-        out_value = get<SFTime>(readProtoField(SFTIME));
+        out_value = std::get<SFTime>(readProtoField(SFTIME));
     } else {
         out_value = scanner->readDoubleEx("illegal time value");
     }
@@ -2385,8 +2465,9 @@ void VRMLParserImpl::readSFTime(SFTime& out_value)
 
 void VRMLParserImpl::readMFTime(MFTime& out_value)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_value = get<MFTime>(readProtoField(MFTIME));
+        out_value = std::get<MFTime>(readProtoField(MFTIME));
     } else {
         out_value.clear();
         if(!scanner->readChar('[' )){
@@ -2403,8 +2484,9 @@ void VRMLParserImpl::readMFTime(MFTime& out_value)
 // This API should be obsolete
 void VRMLParserImpl::readSFNode(SFNode& out_node, VRMLNodeCategory nodeCategory)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_node = get<SFNode>(readProtoField(SFNODE));
+        out_node = std::get<SFNode>(readProtoField(SFNODE));
     } else if(scanner->readSymbol(V_NULL)){
         out_node = 0;
     } else {
@@ -2415,8 +2497,9 @@ void VRMLParserImpl::readSFNode(SFNode& out_node, VRMLNodeCategory nodeCategory)
 
 SFNode VRMLParserImpl::readSFNode(VRMLNodeCategory nodeCategory)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        return get<SFNode>(readProtoField(SFNODE));
+        return std::get<SFNode>(readProtoField(SFNODE));
     } else if(scanner->readSymbol(V_NULL)){
         return 0;
     } else {
@@ -2427,8 +2510,9 @@ SFNode VRMLParserImpl::readSFNode(VRMLNodeCategory nodeCategory)
 
 void VRMLParserImpl::readMFNode(MFNode& out_nodes, VRMLNodeCategory nodeCategory)
 {
+    using namespace detail::vrml_parser;
     if(scanner->readSymbol(F_IS)){
-        out_nodes = get<MFNode>(readProtoField(MFNODE));
+        out_nodes = std::get<MFNode>(readProtoField(MFNODE));
     } else {
         SFNode sfnode;
         out_nodes.clear();
@@ -2466,9 +2550,10 @@ void VRMLParserImpl::init()
 
 void VRMLParserImpl::setSymbols()
 {
-    static mutex symbolMutex;
-    lock_guard<mutex> lock(symbolMutex);
-    static shared_ptr<unordered_map<string, int>> symbols(new unordered_map<string, int>{
+    using namespace detail::vrml_parser;
+    static std::mutex symbolMutex;
+    std::lock_guard<std::mutex> lock(symbolMutex);
+    static std::shared_ptr<std::unordered_map<std::string, int>> symbols(new std::unordered_map<std::string, int>{
         // values
         { "TRUE", V_TRUE },
         { "FALSE", V_FALSE },
@@ -2721,18 +2806,17 @@ void VRMLParserImpl::setSymbols()
 
 void VRMLParserImpl::convertUrl(MFString& urls)
 {
+    using namespace detail::vrml_parser;
     for(MFString::iterator it=urls.begin(); it!=urls.end(); it++){
-        filesystem::path path;
-        string chkFile("");
+        std::filesystem::path path;
+        std::string chkFile("");
         if(isFileProtocol(*it)){
-            path = filesystem::path(removeURLScheme(*it));
-            path.normalize();
+            path = lexically_normal(removeURLScheme(*it));
 
             // Relative path check & translate to absolute path 
             if(!exists(path)){
-                filesystem::path parentPath(scanner->filename);
-                path = parentPath.parent_path() / path;
-                path.normalize();
+                std::filesystem::path parentPath(scanner->filename);
+                path = lexically_normal(parentPath.parent_path() / path);
             }
             chkFile = getAbsolutePathString(path);
         } else {
@@ -2742,3 +2826,8 @@ void VRMLParserImpl::convertUrl(MFString& urls)
         *it = chkFile;
     }
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_VRML_PARSER_CPP_H

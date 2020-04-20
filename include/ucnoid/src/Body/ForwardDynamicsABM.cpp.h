@@ -3,17 +3,23 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_FORWARD_DYNAMICS_ABM_CPP_H
+#define UCNOID_BODY_FORWARD_DYNAMICS_ABM_CPP_H
+
 #include "ForwardDynamicsABM.h"
 #include "DyBody.h"
 #include "LinkTraverse.h"
-#include <cnoid/EigenUtil>
+#include <ucnoid/EigenUtil>
 
-using namespace std;
-using namespace cnoid;
+namespace cnoid {
+inline namespace ucnoid {
+
+namespace detail::forward_dynamics_abm {
 
 static const bool debugMode = false;
 static const bool rootAttitudeNormalizationEnabled = false;
 
+}   // namespace detail::forward_dynamics_abm
 
 ForwardDynamicsABM::ForwardDynamicsABM(DyBody* body) :
     ForwardDynamics(body),
@@ -76,7 +82,7 @@ void ForwardDynamicsABM::calcNextState()
         break;
     }
 
-    if(rootAttitudeNormalizationEnabled){
+    if(detail::forward_dynamics_abm::rootAttitudeNormalizationEnabled){
         normalizeRotation(body->rootLink()->T());
     }
 
@@ -515,3 +521,8 @@ void ForwardDynamicsABM::updateForceSensors()
         sensor->notifyStateChange();
     }
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_FORWARD_DYNAMICS_ABM_CPP_H

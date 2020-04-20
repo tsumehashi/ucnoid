@@ -3,15 +3,16 @@
    @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_IMAGE_IO_H
-#define CNOID_UTIL_IMAGE_IO_H
+#ifndef UCNOID_UTIL_IMAGE_IO_H
+#define UCNOID_UTIL_IMAGE_IO_H
 
 #include "Image.h"
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT ImageIO
+class UCNOID_EXPORT ImageIO
 {
 public:
     ImageIO();
@@ -28,6 +29,9 @@ private:
     bool isUpsideDown_;
 };
 
+}   // inline namespace ucnoid
 }
+
+#include "ImageIO.cpp.h"
 
 #endif

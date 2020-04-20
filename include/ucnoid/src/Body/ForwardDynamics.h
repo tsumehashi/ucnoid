@@ -3,14 +3,15 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_FORWARD_DYNAMICS_H
-#define CNOID_BODY_FORWARD_DYNAMICS_H
+#ifndef UCNOID_BODY_FORWARD_DYNAMICS_H
+#define UCNOID_BODY_FORWARD_DYNAMICS_H
 
 #include "BasicSensorSimulationHelper.h"
 #include "Link.h"
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class DyBody;
 typedef ref_ptr<DyBody> DyBodyPtr;
@@ -20,7 +21,7 @@ typedef ref_ptr<DyBody> DyBodyPtr;
    by using the Featherstone's articulated body algorithm.
    The class also integrates motion using the Euler method or RungeKutta method.
 */
-class CNOID_EXPORT ForwardDynamics {
+class UCNOID_EXPORT ForwardDynamics {
 
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -65,6 +66,9 @@ protected:
 
 typedef std::shared_ptr<ForwardDynamics> ForwardDynamicsPtr;
 
+}   // inline namespace ucnoid
 }
+
+#include "ForwardDynamics.cpp.h"
 
 #endif

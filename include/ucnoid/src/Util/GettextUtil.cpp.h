@@ -2,18 +2,23 @@
    @file
    @author Shin'ichiro Nakaoka
 */
+#ifndef UCNOID_UTIL_GETTEXT_UTIL_CPP_H
+#define UCNOID_UTIL_GETTEXT_UTIL_CPP_H
+
+#if UCNOID_NOT_SUPPORTED
 
 #include "GettextUtil.h"
-#include <cnoid/ExecutablePath>
-#include <cnoid/FileUtil>
+#include <ucnoid/ExecutablePath>
+#include <ucnoid/FileUtil>
 #include "exportdecl.h"
 
-namespace filesystem = boost::filesystem;
+namespace filesystem = std::filesystem;
 
 namespace cnoid {
+inline namespace ucnoid {
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-# if CNOID_ENABLE_GETTEXT
+# if UCNOID_ENABLE_GETTEXT
 const char* getText(const char* domainname, const char* msgid)
 {
     return dgettext(domainname, msgid);
@@ -28,7 +33,7 @@ const char* getText(const char* domainname, const char* msgid)
 
 void bindGettextDomain(const char* domainname)
 {
-#if CNOID_ENABLE_GETTEXT
+#if UCNOID_ENABLE_GETTEXT
     filesystem::path localePath = filesystem::path(executableTopDirectory()) / "share" / "locale";
     if(filesystem::is_directory(localePath)){
         bindtextdomain(domainname, getPathString(localePath).c_str());
@@ -41,4 +46,9 @@ void bindGettextDomain(const char* domainname)
 #endif
 }
 
+}   // inline namespace ucnoid
 }
+
+#endif  // UCNOID_NOT_SUPPORTED
+
+#endif  // UCNOID_UTIL_GETTEXT_UTIL_CPP_H

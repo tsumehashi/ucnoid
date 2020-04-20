@@ -3,15 +3,16 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_SCENE_EFFECTS_H
-#define CNOID_UTIL_SCENE_EFFECTS_H
+#ifndef UCNOID_UTIL_SCENE_EFFECTS_H
+#define UCNOID_UTIL_SCENE_EFFECTS_H
 
 #include "SceneGraph.h"
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT SgFog : public SgPreprocessed
+class UCNOID_EXPORT SgFog : public SgPreprocessed
 {
 protected:
     SgFog(int polymorhicId);
@@ -35,7 +36,7 @@ private:
 typedef ref_ptr<SgFog> SgFogPtr;
 
 
-class CNOID_EXPORT SgOutlineGroup : public SgGroup
+class UCNOID_EXPORT SgOutlineGroup : public SgGroup
 {
 protected:
     SgOutlineGroup(int polymorhicId);
@@ -56,6 +57,9 @@ private:
 };
 typedef ref_ptr<SgOutlineGroup> SgOutlineGroupPtr;
 
+}   // inline namespace ucnoid
 }
+
+#include "SceneEffects.cpp.h"
 
 #endif

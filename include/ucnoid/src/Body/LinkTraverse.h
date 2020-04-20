@@ -4,17 +4,18 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_LINK_TRAVERSE_H
-#define CNOID_BODY_LINK_TRAVERSE_H
+#ifndef UCNOID_BODY_LINK_TRAVERSE_H
+#define UCNOID_BODY_LINK_TRAVERSE_H
 
 #include <vector>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class Link;
 
-class CNOID_EXPORT LinkTraverse
+class UCNOID_EXPORT LinkTraverse
 {
 public:
     typedef std::vector<Link*>::iterator iterator;
@@ -92,6 +93,9 @@ private:
     void traverse(Link* link, bool doUpward, bool doDownward, bool isUpward, Link* prev);
 };
 
+}   // inline namespace ucnoid
 }
+
+#include "LinkTraverse.cpp.h"
 
 #endif

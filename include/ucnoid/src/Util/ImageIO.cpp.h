@@ -4,6 +4,11 @@
   @author Hisashi Ikari
 */
 
+#ifndef UCNOID_UTIL_IMAGE_IO_CPP_H
+#define UCNOID_UTIL_IMAGE_IO_CPP_H
+
+#if UCNOID_NOT_SUPPORTED
+
 #include "ImageIO.h"
 #include "Exception.h"
 #include <fmt/format.h>
@@ -378,3 +383,48 @@ void ImageIO::save(const Image& image, const std::string& filename)
         throwSaveException(filename, "unsupported image format.");
     }
 }
+
+#else   // UCNOID_NOT_SUPPORTED
+
+#include "ImageIO.h"
+
+namespace cnoid {
+inline namespace ucnoid {
+
+ImageIO::ImageIO()
+{
+    isUpsideDown_ = false;
+}
+
+void ImageIO::load(Image& image, const std::string& filename)
+{
+#if 0
+    if(iends_with(filename, "png")){
+        loadPNG(image, filename, isUpsideDown_);
+    } else if(iends_with(filename, "jpg") || iends_with(filename, "jpeg")) {
+        loadJPEG(image, filename, isUpsideDown_);
+    } else if(iends_with(filename, "tga")){
+        loadTGA(image, filename, isUpsideDown_);
+    } else {
+        throwLoadException(filename, "The image format type is not supported.");
+    }
+#endif
+}
+
+
+void ImageIO::save(const Image& image, const std::string& filename)
+{
+#if 0
+    if(iends_with(filename, "png")){
+        savePNG(image, filename, isUpsideDown_);
+    } else {
+        throwSaveException(filename, "unsupported image format.");
+    }
+#endif
+}
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+#endif  // UCNOID_NOT_SUPPORTED
+
+#endif  // UCNOID_UTIL_IMAGE_IO_CPP_H

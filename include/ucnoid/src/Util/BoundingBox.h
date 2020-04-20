@@ -3,18 +3,19 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_BOUNDING_BOX_H
-#define CNOID_UTIL_BOUNDING_BOX_H
+#ifndef UCNOID_UTIL_BOUNDING_BOX_H
+#define UCNOID_UTIL_BOUNDING_BOX_H
 
 #include "EigenTypes.h"
 #include <iosfwd>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class BoundingBoxf;
 
-class CNOID_EXPORT BoundingBox
+class UCNOID_EXPORT BoundingBox
 {
 public:
     BoundingBox();
@@ -44,12 +45,12 @@ private:
     bool empty_;
 };
 
-CNOID_EXPORT std::ostream& operator<<(std::ostream& os, const BoundingBox& bb);
+UCNOID_EXPORT std::ostream& operator<<(std::ostream& os, const BoundingBox& bb);
 
 /**
    float type version of the BoundingBox class
 */
-class CNOID_EXPORT BoundingBoxf
+class UCNOID_EXPORT BoundingBoxf
 {
 public:
     BoundingBoxf();
@@ -78,8 +79,11 @@ private:
     Vector3f max_;
 };
 
-CNOID_EXPORT std::ostream& operator<<(std::ostream& os, const BoundingBoxf& bb);
+UCNOID_EXPORT std::ostream& operator<<(std::ostream& os, const BoundingBoxf& bb);
 
+}   // inline namespace ucnoid
 }    
+
+#include "BoundingBox.cpp.h"
 
 #endif

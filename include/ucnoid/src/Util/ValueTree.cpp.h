@@ -1,25 +1,26 @@
 /**
    @author Shin'ichiro Nakaoka
 */
+#ifndef UCNOID_UTIL_VALUE_TREE_CPP_H
+#define UCNOID_UTIL_VALUE_TREE_CPP_H
 
 #include "ValueTree.h"
 #include <stack>
 #include <iostream>
-#include <yaml.h>
-#include <boost/lexical_cast.hpp>
+#if UCNOID_NOT_SUPPORTED
 #include <fmt/format.h>
-#include <boost/filesystem.hpp>
+#endif  // UCNOID_NOT_SUPPORTED
+#include <filesystem>
 #include "gettext.h"
 
 #ifdef _WIN32
 #define snprintf _snprintf_s
 #endif
 
-using namespace std;
-using namespace boost;
-using namespace cnoid;
+namespace cnoid {
+inline namespace ucnoid {
 
-namespace {
+namespace detail::value_tree {
 
 const bool debugTrace = false;
 
@@ -35,20 +36,23 @@ const char* getTypeName(int typeBits){
     }
 }
 
-map<string, bool> booleanSymbols;
+inline std::map<std::string, bool> booleanSymbols;
 
-const char* defaultDoubleFormat = "%.6g";
+static const char* defaultDoubleFormat = "%.6g";
 
-ValueNodePtr invalidNode;
-MappingPtr invalidMapping;
-ListingPtr invalidListing;
+inline ValueNodePtr invalidNode;
+inline MappingPtr invalidMapping;
+inline ListingPtr invalidListing;
 
-}
+inline ValueNode::Initializer initializer;
 
-ValueNode::Initializer ValueNode::initializer;
+}   // namespace detail::value_tree
+
+//ValueNode::Initializer ValueNode::initializer;
 
 ValueNode::Initializer::Initializer()
 {
+    using namespace detail::value_tree;
     invalidNode = new ValueNode(INVALID_NODE);
     invalidMapping = new Mapping();
     invalidMapping->typeBits = INVALID_NODE;
@@ -81,15 +85,27 @@ std::string ValueNode::Exception::message() const
 {
     if(!message_.empty()){
         if(line_ >= 0){
+#if UCNOID_NOT_SUPPORTED
             return fmt::format(_("{0} at line {1}, column {2}."), message_, line_, column_);
+#else
+            return ssformat(message_, " at line ", line_, ", column ", column_, ".");
+#endif
         } else {
+#if UCNOID_NOT_SUPPORTED
             return fmt::format("{}.", message_);
+#else
+            return ssformat(message_, ".");
+#endif
         }
     } else {
         if(line_ >= 0){
+#if UCNOID_NOT_SUPPORTED
             return fmt::format(_("Error at line {0}, column {1}."), line_, column_);
+#else
+            return ssformat("Error at line ", line_, ", column ", column_, ".");
+#endif
         } else {
-            return string();
+            return std::string();
         }
     }
 }
@@ -175,7 +191,11 @@ int ValueNode::toInt() const
     if(endptr == nptr){
         ScalarTypeMismatchException ex;
         ex.setPosition(line(), column());
+#if UCNOID_NOT_SUPPORTED
         ex.setMessage(fmt::format(_("The value \"{}\" must be an integer value"), scalar->stringValue_));
+#else
+        ex.setMessage(ssformat("The value \"", scalar->stringValue_, "\" must be an integer value"));
+#endif
         throw ex;
     }
 
@@ -226,7 +246,11 @@ double ValueNode::toDouble() const
     if(endptr == nptr){
         ScalarTypeMismatchException ex;
         ex.setPosition(line(), column());
+#if UCNOID_NOT_SUPPORTED
         ex.setMessage(fmt::format(_("The value \"{}\" must be a double value"), scalar->stringValue_));
+#else
+        ex.setMessage(ssformat("The value \"", scalar->stringValue_, "\" must be a double value"));
+#endif
         throw ex;
     }
 
@@ -236,9 +260,10 @@ double ValueNode::toDouble() const
 
 bool ValueNode::read(bool& out_value) const
 {
+    using namespace detail::value_tree;
     if(isScalar()){
         const ScalarNode* const scalar = static_cast<const ScalarNode* const>(this);
-        map<string, bool>::iterator p = booleanSymbols.find(scalar->stringValue_);
+        std::map<std::string, bool>::iterator p = booleanSymbols.find(scalar->stringValue_);
         if(p != booleanSymbols.end()){
             out_value = p->second;
             return true;
@@ -250,19 +275,24 @@ bool ValueNode::read(bool& out_value) const
 
 bool ValueNode::toBool() const
 {
+    using namespace detail::value_tree;
     if(!isScalar()){
         throwNotScalrException();
     }
 
     const ScalarNode* const scalar = static_cast<const ScalarNode* const>(this);
-    map<string, bool>::iterator p = booleanSymbols.find(scalar->stringValue_);
+    std::map<std::string, bool>::iterator p = booleanSymbols.find(scalar->stringValue_);
     if(p != booleanSymbols.end()){
         return p->second;
     }
     
     ScalarTypeMismatchException ex;
     ex.setPosition(line(), column());
+#if UCNOID_NOT_SUPPORTED
     ex.setMessage(fmt::format(_("The value \"{}\" must be a boolean value"), scalar->stringValue_));
+#else
+    ex.setMessage(ssformat("The value \"", scalar->stringValue_, "\" must be a boolean value"));
+#endif
     throw ex;
 }
 
@@ -339,7 +369,7 @@ ScalarNode::ScalarNode(const char* text, size_t length, StringStyle stringStyle)
 
 
 ScalarNode::ScalarNode(int value)
-    : stringValue_(lexical_cast<string>(value))
+    : stringValue_(std::to_string(value))
 {
     typeBits = SCALAR;
     line_ = -1;
@@ -410,9 +440,14 @@ void ValueNode::throwException(const std::string& message) const
 
 void ValueNode::throwNotScalrException() const
 {
+    using namespace detail::value_tree;
     NotScalarException ex;
     ex.setPosition(line(), column());
+#if UCNOID_NOT_SUPPORTED
     ex.setMessage(fmt::format(_("A {} value must be a scalar value"), getTypeName(typeBits)));
+#else
+    ex.setMessage(ssformat("A ", getTypeName(typeBits), " value must be a scalar value"));
+#endif
     throw ex;
 }
 
@@ -443,7 +478,7 @@ Mapping::Mapping()
     indexCounter = 0;
     keyStringStyle_ = PLAIN_STRING;
     isFlowStyle_ = false;
-    doubleFormat_ = defaultDoubleFormat;
+    doubleFormat_ = detail::value_tree::defaultDoubleFormat;
 }
 
 
@@ -455,7 +490,7 @@ Mapping::Mapping(int line, int column)
     mode = READ_MODE;
     indexCounter = 0;
     isFlowStyle_ = false;
-    doubleFormat_ = defaultDoubleFormat;
+    doubleFormat_ = detail::value_tree::defaultDoubleFormat;
 }
 
 
@@ -517,7 +552,7 @@ ValueNode* Mapping::find(const std::string& key) const
     if(p != values.end()){
         return p->second.get();
     } else {
-        return invalidNode.get();
+        return detail::value_tree::invalidNode.get();
     }
 }
 
@@ -534,7 +569,7 @@ Mapping* Mapping::findMapping(const std::string& key) const
             return static_cast<Mapping*>(node);
         }
     }
-    return invalidMapping.get();
+    return detail::value_tree::invalidMapping.get();
 }
 
 
@@ -550,7 +585,7 @@ Listing* Mapping::findListing(const std::string& key) const
             return static_cast<Listing*>(node);
         }
     }
-    return invalidListing.get();
+    return detail::value_tree::invalidListing.get();
 }
 
 
@@ -609,7 +644,11 @@ void Mapping::throwKeyNotFoundException(const std::string& key) const
     KeyNotFoundException ex;
     ex.setPosition(line(), column());
     ex.setKey(key);
+#if UCNOID_NOT_SUPPORTED
     ex.setMessage(fmt::format(_("Key \"{}\" is not found in the mapping"), key));
+#else
+    ex.setMessage(ssformat("Key \"", key, "\" is not found in the mapping"));
+#endif
     throw ex;
 }
 
@@ -634,7 +673,7 @@ void Mapping::insert(const std::string& key, ValueNode* node)
     if(!node){
         throwException(_("A node to insert into a Mapping is a null node"));
     }
-    const string uKey(key);
+    const std::string uKey(key);
     insertSub(uKey, node);
 }
 
@@ -655,7 +694,7 @@ Mapping* Mapping::openMapping_(const std::string& key, bool doOverwrite)
     }
 
     Mapping* mapping = 0;
-    const string uKey(key);
+    const std::string uKey(key);
     iterator p = values.find(uKey);
     if(p != values.end()){
         ValueNode* node = p->second.get();
@@ -695,7 +734,7 @@ Listing* Mapping::openListing_(const std::string& key, bool doOverwrite)
     }
 
     Listing* sequence = 0;
-    const string uKey(key);
+    const std::string uKey(key);
     iterator p = values.find(uKey);
     if(p != values.end()){
         ValueNode* node = p->second.get();
@@ -812,7 +851,7 @@ void Mapping::writeSub(const std::string &key, const char* text, size_t length, 
         ValueNode* node = p->second.get();
         if(node->isScalar()){
             ScalarNode* scalar = static_cast<ScalarNode*>(node);
-            scalar->stringValue_ = string(text, length);
+            scalar->stringValue_ = std::string(text, length);
             scalar->stringStyle_ = stringStyle;
             scalar->indexInMapping_ = indexCounter++;
         } else {
@@ -851,7 +890,7 @@ void Mapping::write(const std::string &key, double value)
 
 void Mapping::writePath(const std::string &key, const std::string& value)
 {
-    write(key, filesystem::path(value).string(), DOUBLE_QUOTED);
+    write(key, std::filesystem::path(value).string(), DOUBLE_QUOTED);
 }
 
 
@@ -860,7 +899,7 @@ Listing::Listing()
     typeBits = LISTING;
     line_ = -1;
     column_ = -1;
-    doubleFormat_ = defaultDoubleFormat;
+    doubleFormat_ = detail::value_tree::defaultDoubleFormat;
     isFlowStyle_ = false;
     doInsertLFBeforeNextElement = false;
 }
@@ -872,7 +911,7 @@ Listing::Listing(int size)
     typeBits = LISTING;
     line_ = -1;
     column_ = -1;
-    doubleFormat_ = defaultDoubleFormat;
+    doubleFormat_ = detail::value_tree::defaultDoubleFormat;
     isFlowStyle_ = false;
     doInsertLFBeforeNextElement = false;
 }
@@ -883,7 +922,7 @@ Listing::Listing(int line, int column)
     typeBits = LISTING;
     line_ = line;
     column_ = column;
-    doubleFormat_ = defaultDoubleFormat;
+    doubleFormat_ = detail::value_tree::defaultDoubleFormat;
     isFlowStyle_ = false;
     doInsertLFBeforeNextElement = false;
 }
@@ -896,7 +935,7 @@ Listing::Listing(int line, int column, int reservedSize)
     line_ = line;
     column_ = column;
     values.resize(0);
-    doubleFormat_ = defaultDoubleFormat;
+    doubleFormat_ = detail::value_tree::defaultDoubleFormat;
     isFlowStyle_ = false;
     doInsertLFBeforeNextElement = false;
 }
@@ -1044,3 +1083,8 @@ void Listing::write(int i, const std::string& value, StringStyle stringStyle)
 {
     values[i] = new ScalarNode(value, stringStyle);
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_VALUE_TREE_CPP_H

@@ -3,16 +3,16 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_FORWARD_DYNAMICS_CBM_H
-#define CNOID_BODY_FORWARD_DYNAMICS_CBM_H
+#ifndef UCNOID_BODY_FORWARD_DYNAMICS_CBM_H
+#define UCNOID_BODY_FORWARD_DYNAMICS_CBM_H
 
 #include "ForwardDynamics.h"
 #include <Eigen/StdVector>
-#include <boost/dynamic_bitset.hpp>
 #include "exportdecl.h"
 
-namespace cnoid
-{
+namespace cnoid {
+inline namespace ucnoid {
+
 class DyLink;
 class ForceSensorDevice;
 
@@ -23,7 +23,7 @@ class ForceSensorDevice;
    If all the joints of a body are the torque mode, the ForwardDynamicsABM,
    which uses the articulated body method, is more efficient.
 */
-class CNOID_EXPORT ForwardDynamicsCBM : public ForwardDynamics
+class UCNOID_EXPORT ForwardDynamicsCBM : public ForwardDynamics
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -156,6 +156,9 @@ private:
 
 typedef std::shared_ptr<ForwardDynamicsCBM> ForwardDynamicsCBMPtr;
 	
+}   // inline namespace ucnoid
 }
+
+#include "ForwardDynamicsCBM.cpp.h"
 
 #endif

@@ -2,13 +2,14 @@
    @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_POLYMORPHIC_FUNCTION_SET_H
-#define CNOID_UTIL_POLYMORPHIC_FUNCTION_SET_H
+#ifndef UCNOID_UTIL_POLYMORPHIC_FUNCTION_SET_H
+#define UCNOID_UTIL_POLYMORPHIC_FUNCTION_SET_H
 
 #include <functional>
 #include <vector>
 
 namespace cnoid {
+inline namespace ucnoid {
 
 template<class ObjectBase>
 class PolymorphicFunctionSet
@@ -116,6 +117,7 @@ public:
     }
 };
 
+}   // inline namespace ucnoid
 }
 
 #endif

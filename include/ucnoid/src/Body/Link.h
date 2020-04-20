@@ -3,19 +3,20 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_LINK_H
-#define CNOID_BODY_LINK_H
+#ifndef UCNOID_BODY_LINK_H
+#define UCNOID_BODY_LINK_H
 
-#include <cnoid/Referenced>
-#include <cnoid/EigenTypes>
+#include <ucnoid/Referenced>
+#include <ucnoid/EigenTypes>
 #ifdef WIN32
 #include "Link.h"
-#include <cnoid/SceneGraph>
-#include <cnoid/ValueTree>
+#include <ucnoid/SceneGraph>
+#include <ucnoid/ValueTree>
 #endif
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class Body;
 
@@ -28,7 +29,7 @@ typedef ref_ptr<SgNode> SgNodePtr;
 class Mapping;
 typedef ref_ptr<Mapping> MappingPtr;
 
-class CNOID_EXPORT Link : public Referenced
+class UCNOID_EXPORT Link : public Referenced
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -236,7 +237,7 @@ public:
     
     int materialId() const { return materialId_; }
     std::string materialName() const;
-    
+
     SgNode* shape() const { return visualShape_; }
     SgNode* visualShape() const { return visualShape_; }
     SgNode* collisionShape() const { return collisionShape_; }
@@ -308,7 +309,7 @@ public:
 
     void resetInfo(Mapping* info);
 
-#ifdef CNOID_BACKWARD_COMPATIBILITY
+#ifdef UCNOID_BACKWARD_COMPATIBILITY
     // fext, tauext
     const double& ulimit() const { return q_upper_; }  ///< the upper limit of joint values
     const double& llimit() const { return q_lower_; }  ///< the lower limit of joint values
@@ -365,12 +366,14 @@ private:
     void setBodySub(Body* newBody);
 };
 
-template<> CNOID_EXPORT double Link::info(const std::string& key) const;
-template<> CNOID_EXPORT double Link::info(const std::string& key, const double& defaultValue) const;
-template<> CNOID_EXPORT bool Link::info(const std::string& key, const bool& defaultValue) const;
-template<> CNOID_EXPORT void Link::setInfo(const std::string& key, const double& value);
-template<> CNOID_EXPORT void Link::setInfo(const std::string& key, const bool& value);
-
+template<> UCNOID_EXPORT double Link::info(const std::string& key) const;
+template<> UCNOID_EXPORT double Link::info(const std::string& key, const double& defaultValue) const;
+template<> UCNOID_EXPORT bool Link::info(const std::string& key, const bool& defaultValue) const;
+template<> UCNOID_EXPORT void Link::setInfo(const std::string& key, const double& value);
+template<> UCNOID_EXPORT void Link::setInfo(const std::string& key, const bool& value);
+}   // inline namespace ucnoid
 }
+
+#include "Link.cpp.h"
 	
 #endif

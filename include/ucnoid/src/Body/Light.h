@@ -3,15 +3,16 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_LIGHT_H
-#define CNOID_BODY_LIGHT_H
+#ifndef UCNOID_BODY_LIGHT_H
+#define UCNOID_BODY_LIGHT_H
 
 #include "Device.h"
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT Light : public Device
+class UCNOID_EXPORT Light : public Device
 {
 protected:
     Light();
@@ -44,6 +45,9 @@ private:
 
 typedef ref_ptr<Light> LightPtr;
 
+}   // inline namespace ucnoid
 }
+
+#include "Light.cpp.h"
 
 #endif

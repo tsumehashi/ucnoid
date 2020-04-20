@@ -3,28 +3,28 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_SCENE_GRAPH_CPP_H
+#define UCNOID_UTIL_SCENE_GRAPH_CPP_H
+
 #include "SceneGraph.h"
 #include "Exception.h"
 #include <unordered_map>
 #include <typeindex>
 #include <mutex>
 
-using namespace std;
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 SgUpdate::~SgUpdate()
 {
 
 }
 
-namespace {
+namespace detail::scene_graph {
 typedef std::unordered_map<const SgObject*, SgObjectPtr> CloneMap;
 }
 
-namespace cnoid {
-class SgCloneMapImpl : public CloneMap { };
-}
+class SgCloneMapImpl : public detail::scene_graph::CloneMap { };
 
 
 SgCloneMap::SgCloneMap()
@@ -49,7 +49,7 @@ void SgCloneMap::clear()
 
 SgObject* SgCloneMap::findOrCreateClone(const SgObject* org)
 {
-    CloneMap::iterator p = cloneMap->find(org);
+    detail::scene_graph::CloneMap::iterator p = cloneMap->find(org);
     if(p == cloneMap->end()){
         SgObject* clone = org->clone(*this);
         (*cloneMap)[org] = clone;
@@ -131,15 +131,16 @@ void SgObject::removeParent(SgObject* parent)
 }
 
 
-namespace {
-std::mutex polymorphicIdMutex;
+namespace detail::scene_graph {
+inline std::mutex polymorphicIdMutex;
 typedef std::unordered_map<std::type_index, int> PolymorphicIdMap;
-PolymorphicIdMap polymorphicIdMap;
-std::vector<int> superTypePolymorphicIdMap;
+inline PolymorphicIdMap polymorphicIdMap;
+inline std::vector<int> superTypePolymorphicIdMap;
 }
 
 int SgNode::registerNodeType(const std::type_info& nodeType, const std::type_info& superType)
 {
+    using namespace detail::scene_graph;
     std::lock_guard<std::mutex> guard(polymorphicIdMutex);
 
     int superTypeId;
@@ -167,6 +168,7 @@ int SgNode::registerNodeType(const std::type_info& nodeType, const std::type_inf
 
 int SgNode::findPolymorphicId(const std::type_info& nodeType)
 {
+    using namespace detail::scene_graph;
     std::lock_guard<std::mutex> guard(polymorphicIdMutex);
 
     auto iter = polymorphicIdMap.find(nodeType);
@@ -179,6 +181,7 @@ int SgNode::findPolymorphicId(const std::type_info& nodeType)
 
 int SgNode::findSuperTypePolymorphicId(int polymorhicId)
 {
+    using namespace detail::scene_graph;
     std::lock_guard<std::mutex> guard(polymorphicIdMutex);
     return superTypePolymorphicIdMap[polymorhicId];
 }
@@ -186,6 +189,7 @@ int SgNode::findSuperTypePolymorphicId(int polymorhicId)
 
 int SgNode::numPolymorphicTypes()
 {
+    using namespace detail::scene_graph;
     std::lock_guard<std::mutex> guard(polymorphicIdMutex);
     return polymorphicIdMap.size();
 }
@@ -236,11 +240,11 @@ bool SgNode::isGroup() const
     return false;
 }
 
-
+namespace detail::scene_graph {
 /**
    \note The current implementation of this function does not seem to return the correct T value
 */
-static bool findNodeSub(SgNode* node, const std::string& name, SgNodePath& path, Affine3 T, Affine3& out_T)
+inline bool findNodeSub(SgNode* node, const std::string& name, SgNodePath& path, Affine3 T, Affine3& out_T)
 {
     path.push_back(node);
 
@@ -271,12 +275,13 @@ static bool findNodeSub(SgNode* node, const std::string& name, SgNodePath& path,
     return false;
 }
 
+}   // namespace detail::scene_graph
 
 SgNodePath SgNode::findNode(const std::string& name, Affine3& out_T)
 {
     SgNodePath path;
     out_T.setIdentity();
-    findNodeSub(this, name, path, out_T, out_T);
+    detail::scene_graph::findNodeSub(this, name, path, out_T, out_T);
     return path;
 }
 
@@ -844,10 +849,9 @@ SgObject* SgPreprocessed::clone(SgCloneMap&) const
     return new SgPreprocessed(*this);
 }
 
+namespace detail::scene_graph {
 
-namespace {
-
-struct NodeTypeRegistration {
+inline struct NodeTypeRegistration {
     NodeTypeRegistration() {
         SgNode::registerType<SgNode, SgNode>();
         SgNode::registerType<SgGroup, SgNode>();
@@ -862,4 +866,9 @@ struct NodeTypeRegistration {
     }
 } registration;
 
-}
+}   // detail::scene_graph
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_SCENE_GRAPH_CPP_H

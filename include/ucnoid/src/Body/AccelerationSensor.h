@@ -3,16 +3,17 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_ACCELERATION_SENSOR_H
-#define CNOID_BODY_ACCELERATION_SENSOR_H
+#ifndef UCNOID_BODY_ACCELERATION_SENSOR_H
+#define UCNOID_BODY_ACCELERATION_SENSOR_H
 
 #include "Device.h"
 #include <memory>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT AccelerationSensor : public Device
+class UCNOID_EXPORT AccelerationSensor : public Device
 {
     Vector3 dv_;
 
@@ -45,6 +46,9 @@ public:
 
 typedef ref_ptr<AccelerationSensor> AccelerationSensorPtr;
 
+}   // inline namespace ucnoid
 }
+
+#include "AccelerationSensor.cpp.h"
 
 #endif

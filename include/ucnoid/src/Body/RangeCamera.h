@@ -3,15 +3,16 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_RANGE_CAMERA_H
-#define CNOID_BODY_RANGE_CAMERA_H
+#ifndef UCNOID_BODY_RANGE_CAMERA_H
+#define UCNOID_BODY_RANGE_CAMERA_H
 
 #include "Camera.h"
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT RangeCamera : public Camera
+class UCNOID_EXPORT RangeCamera : public Camera
 {
 public:
     RangeCamera();
@@ -61,6 +62,9 @@ private:
 
 typedef ref_ptr<RangeCamera> RangeCameraPtr;
 
+}   // inline namespace ucnoid
 }
+
+#include "RangeCamera.cpp.h"
 
 #endif

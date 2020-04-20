@@ -3,14 +3,15 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_DEVICE_LIST_H
-#define CNOID_BODY_DEVICE_LIST_H
+#ifndef UCNOID_BODY_DEVICE_LIST_H
+#define UCNOID_BODY_DEVICE_LIST_H
 
 #include "Device.h"
-#include <cnoid/PolymorphicReferencedArray>
+#include <ucnoid/PolymorphicReferencedArray>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 template <class DeviceType = Device, class PointerType = ref_ptr<DeviceType> >
 class DeviceList : public PolymorphicReferencedArray<DeviceType, Device, PointerType>
@@ -40,6 +41,7 @@ public:
     }
 };
 
+}   // inline namespace ucnoid
 }
 
 #endif

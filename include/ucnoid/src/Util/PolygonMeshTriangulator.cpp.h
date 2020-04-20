@@ -3,16 +3,18 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_POLYGON_MESH_TRIANGULATOR_CPP_H
+#define UCNOID_UTIL_POLYGON_MESH_TRIANGULATOR_CPP_H
+
 #include "PolygonMeshTriangulator.h"
 #include "Triangulator.h"
 #include "SceneDrawables.h"
+#if UCNOID_NOT_SUPPORTED
 #include <fmt/format.h>
-
-using namespace std;
-using namespace boost;
-using namespace cnoid;
+#endif  // UCNOID_NOT_SUPPORTED
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class PolygonMeshTriangulatorImpl
 {
@@ -43,7 +45,6 @@ public:
         SgIndexArray& indices, int numElements,
         const SgIndexArray& orgIndices, const SgIndexArray& orgPolygonVertices, int elementTypeId);
 };
-}
 
 
 PolygonMeshTriangulator::PolygonMeshTriangulator()
@@ -120,7 +121,11 @@ SgMesh* PolygonMeshTriangulatorImpl::triangulate(SgPolygonMesh* orgMesh)
         const int index = polygonVertices[i];
         if(index >= numVertices){
             if(numInvalidIndices == 0){
+#if UCNOID_NOT_SUPPORTED
                 addErrorMessage(fmt::format("Vertex index {0} is over the number of vertices ({1}).", index, numVertices));
+#else   // UCNOID_NOT_SUPPORTED
+                addErrorMessage("Vertex index " + std::to_string(index) + " is over the number of vertices (" + std::to_string(numVertices) + ").");
+#endif  // UCNOID_NOT_SUPPORTED
             }
             ++numInvalidIndices;
         } else if(index >= 0){
@@ -134,7 +139,7 @@ SgMesh* PolygonMeshTriangulatorImpl::triangulate(SgPolygonMesh* orgMesh)
                 }
             } else {
                 const int numTriangles = triangulator.apply(polygon);
-                const vector<int>& triangles = triangulator.triangles();
+                const std::vector<int>& triangles = triangulator.triangles();
                 for(int j=0; j < numTriangles; ++j){
                     for(int k=0; k < 3; ++k){
                         int localIndex = triangles[j * 3 + k];
@@ -151,8 +156,12 @@ SgMesh* PolygonMeshTriangulatorImpl::triangulate(SgPolygonMesh* orgMesh)
     }
 
     if(numInvalidIndices > 1){
+#if UCNOID_NOT_SUPPORTED
         addErrorMessage(fmt::format("There are {0} invalied vertex indices that are over the number of vertices ({1}).",
                 numInvalidIndices, numVertices));
+#else   // UCNOID_NOT_SUPPORTED
+        addErrorMessage("There are " + std::to_string(numInvalidIndices) + " invalied vertex indices that are over the number of vertices (" + std::to_string(numVertices) + ").");
+#endif  // UCNOID_NOT_SUPPORTED
     }
     if(mesh->numTriangles() == 0){
         addErrorMessage("There is no valid polygons to triangulete.");
@@ -200,7 +209,7 @@ SgMesh* PolygonMeshTriangulatorImpl::triangulate(SgPolygonMesh* orgMesh)
 }
 
 
-namespace {
+namespace detail::polygon_mesh_triangulator {
 const char* message1(int elementTypeId){
     switch(elementTypeId){
     case 0: return "The number of normals is less than the number of vertices.";
@@ -219,6 +228,7 @@ const char* message2(int elementTypeId){
     }
 }
 
+#if UCNOID_NOT_SUPPORTED
 const char* message3(int elementTypeId){
     switch(elementTypeId){
     case 0: return "Normal index {} is over the range of given normals.";
@@ -227,12 +237,25 @@ const char* message3(int elementTypeId){
     default: return 0;
     }
 }
-}        
+#else   // UCNOID_NOT_SUPPORTED
+template <typename T>
+std::string message3(int elementTypeId, const T& t){
+    switch(elementTypeId){
+    case 0: return "Normal index " + std::to_string(t) + " is over the range of given normals.";
+    case 1: return "Color index " + std::to_string(t) + " is over the range of given colors.";
+    case 2: return "TexCoord index " + std::to_string(t) + " is over the range of given texCoords.";
+    default: return "";
+    }
+}
+#endif  // UCNOID_NOT_SUPPORTED
+
+}   // namespace detail::polygon_mesh_triangulator
           
 
 bool PolygonMeshTriangulatorImpl::setIndices
 (SgIndexArray& indices, int numElements, const SgIndexArray& orgIndices, const SgIndexArray& orgPolygonVertices, int elementTypeId)
 {
+    using namespace detail::polygon_mesh_triangulator;
     bool result = true;
     const int numNewIndices = newIndexPositionToOrgPositionMap.size();
     indices.resize(numNewIndices);
@@ -258,7 +281,11 @@ bool PolygonMeshTriangulatorImpl::setIndices
             }
             const int index = orgIndices[orgPos];
             if(index < 0 || index >= numElements){
+#if UCNOID_NOT_SUPPORTED
                 addErrorMessage(fmt::format(message3(elementTypeId), index));
+#else   // UCNOID_NOT_SUPPORTED
+                addErrorMessage(message3(elementTypeId, index));
+#endif  // UCNOID_NOT_SUPPORTEDs
                 result = false;
                 break;
             }
@@ -271,3 +298,8 @@ bool PolygonMeshTriangulatorImpl::setIndices
     }
     return result;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_POLYGON_MESH_TRIANGULATOR_CPP_H

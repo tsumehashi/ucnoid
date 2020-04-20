@@ -3,14 +3,15 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_BASIC_SENSOR_SIMULATION_HELPER_CPP_H
+#define UCNOID_BODY_BASIC_SENSOR_SIMULATION_HELPER_CPP_H
+
 #include "BasicSensorSimulationHelper.h"
 #include "Body.h"
 #include <Eigen/StdVector>
 
-using namespace std;
-using namespace cnoid;
-
 namespace cnoid {
+inline namespace ucnoid {
 
 class BasicSensorSimulationHelperImpl
 {
@@ -34,19 +35,13 @@ public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
         Vector2 x[3];
     };
-    typedef vector<KFState, Eigen::aligned_allocator<KFState> > KFStateArray;
+    typedef std::vector<KFState, Eigen::aligned_allocator<KFState> > KFStateArray;
 
     KFStateArray kfStates;
 
     BasicSensorSimulationHelperImpl(BasicSensorSimulationHelper* self);
     void initialize(Body* body, double timeStep, const Vector3& gravityAcceleration);
 };
-}
-
-namespace {
-typedef BasicSensorSimulationHelperImpl Impl;
-}
-    
 
 BasicSensorSimulationHelper::BasicSensorSimulationHelper()
 {
@@ -94,7 +89,7 @@ void BasicSensorSimulationHelper::initialize(Body* body, double timeStep, const 
 }
 
 
-void Impl::initialize(Body* body, double timeStep, const Vector3& gravityAcceleration)
+void BasicSensorSimulationHelperImpl::initialize(Body* body, double timeStep, const Vector3& gravityAcceleration)
 {
     this->body = body;
     g = gravityAcceleration;
@@ -189,7 +184,7 @@ void BasicSensorSimulationHelper::updateGyroAndAccelerationSensors()
             const Link* link = sensor->link();
             
             // kalman filtering
-            Impl::KFState& s = impl->kfStates[i];
+            BasicSensorSimulationHelperImpl::KFState& s = impl->kfStates[i];
             const Vector3 o_Vgsens = link->R() * (link->R().transpose() * link->w()).cross(sensor->p_local()) + link->v();
             for(int i=0; i < 3; ++i){
                 s.x[i] = A * s.x[i] + o_Vgsens(i) * B;
@@ -203,3 +198,8 @@ void BasicSensorSimulationHelper::updateGyroAndAccelerationSensors()
         }
     }
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_BASIC_SENSOR_SIMULATION_HELPER_CPP_H

@@ -3,16 +3,19 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_SCENE_DRAWABLES_CPP_H
+#define UCNOID_UTIL_SCENE_DRAWABLES_CPP_H
+
 #include "SceneDrawables.h"
 
-using namespace std;
-using namespace cnoid;
+namespace cnoid {
+inline namespace ucnoid {
 
-namespace {
+namespace detail::scene_drawables {
 
-const bool USE_FACES_FOR_BOUNDING_BOX_CALCULATION = true;
+static const bool USE_FACES_FOR_BOUNDING_BOX_CALCULATION = true;
 
-struct NodeTypeRegistration {
+inline struct NodeTypeRegistration {
     NodeTypeRegistration() {
         SgNode::registerType<SgShape, SgNode>();
         SgNode::registerType<SgPlot, SgNode>();
@@ -22,7 +25,7 @@ struct NodeTypeRegistration {
     }
 } registration;
 
-}
+}   // namespace detail::scene_drawables
 
 SgMaterial::SgMaterial()
 {
@@ -446,7 +449,7 @@ SgObject* SgMesh::clone(SgCloneMap& cloneMap) const
 
 void SgMesh::updateBoundingBox()
 {
-    if(!USE_FACES_FOR_BOUNDING_BOX_CALCULATION){
+    if(!detail::scene_drawables::USE_FACES_FOR_BOUNDING_BOX_CALCULATION){
         SgMeshBase::updateBoundingBox();
 
     } else {
@@ -535,7 +538,7 @@ SgObject* SgPolygonMesh::clone(SgCloneMap& cloneMap) const
 
 void SgPolygonMesh::updateBoundingBox()
 {
-    if(!USE_FACES_FOR_BOUNDING_BOX_CALCULATION){
+    if(!detail::scene_drawables::USE_FACES_FOR_BOUNDING_BOX_CALCULATION){
         SgMeshBase::updateBoundingBox();
 
     } else {
@@ -995,3 +998,8 @@ void SgOverlay::calcViewVolume(double /* viewportWidth */, double /* viewportHei
     io_volume.zNear = 1.0;
     io_volume.zFar = -1.0;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_SCENE_DRAWABLES_CPP_H

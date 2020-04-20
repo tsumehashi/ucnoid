@@ -3,21 +3,29 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_FORWARD_DYNAMICS_CBM_CPP_H
+#define UCNOID_BODY_FORWARD_DYNAMICS_CBM_CPP_H
+
 #include "ForwardDynamicsCBM.h"
 #include "DyBody.h"
 #include "LinkTraverse.h"
-#include <cnoid/EigenUtil>
+#include <ucnoid/EigenUtil>
 #include <iostream>
 
-using namespace std;
-using namespace cnoid;
+#if UCNOID_NOT_SUPPORTED
+#include <fmt/format.h>
+#endif  // UCNOID_NOT_SUPPORTED
+
+namespace cnoid {
+inline namespace ucnoid {
+
+namespace detail::forward_dynamics_cbm {
 
 static const bool CALC_ALL_JOINT_TORQUES = false;
 static const bool ROOT_ATT_NORMALIZATION_ENABLED = false;
 
 static const bool debugMode = false;
 
-#include <fmt/format.h>
 
 template<class TMatrix>
 static void putMatrix(TMatrix& M, char* name)
@@ -28,7 +36,11 @@ static void putMatrix(TMatrix& M, char* name)
         std::cout << "Matrix " << name << ": \n";
         for(size_t i=0; i < M.rows(); i++){
             for(size_t j=0; j < M.cols(); j++){
+#if UCNOID_NOT_SUPPORTED
                 std::cout << fmt::format(" {:6.3f} ", M(i, j));
+#else   // UCNOID_NOT_SUPPORTED
+                std::cout << " " << M(i, j) << " ";
+#endif  // UCNOID_NOT_SUPPORTED
             }
             std::cout << std::endl;
         }
@@ -41,6 +53,7 @@ static void putVector(TVector& M, char* name)
     std::cout << "Vector " << name << M << std::endl;
 }
 
+}   // namespace detail::forward_dynamics_cbm
 
 ForwardDynamicsCBM::ForwardDynamicsCBM(DyBody* body) :
     ForwardDynamics(body)
@@ -188,7 +201,7 @@ void ForwardDynamicsCBM::calcNextState()
             break;
         }
 		
-        if(ROOT_ATT_NORMALIZATION_ENABLED && unknown_rootDof){
+        if(detail::forward_dynamics_cbm::ROOT_ATT_NORMALIZATION_ENABLED && unknown_rootDof){
             normalizeRotation(body->rootLink()->T());
         }
 
@@ -769,7 +782,7 @@ void ForwardDynamicsCBM::calcAccelFKandForceSensorValues(DyLink* link, Vector3& 
 
     ForceSensorInfo& info = forceSensorInfo[link->index()];
 
-    if(CALC_ALL_JOINT_TORQUES || info.hasSensorsAbove){
+    if(detail::forward_dynamics_cbm::CALC_ALL_JOINT_TORQUES || info.hasSensorsAbove){
 
         Vector3 fg(link->m() * g);
         Vector3 tg(link->wc().cross(fg));
@@ -783,7 +796,7 @@ void ForwardDynamicsCBM::calcAccelFKandForceSensorValues(DyLink* link, Vector3& 
         out_f  .noalias() += link->m()   * link->dvo() + link->Iwv().transpose() * link->dw();
         out_tau.noalias() += link->Iwv() * link->dvo() + link->Iww()             * link->dw();
 
-        if(CALC_ALL_JOINT_TORQUES && link->actuationMode() == Link::JOINT_DISPLACEMENT){
+        if(detail::forward_dynamics_cbm::CALC_ALL_JOINT_TORQUES && link->actuationMode() == Link::JOINT_DISPLACEMENT){
             link->u() = link->sv().dot(out_f) + link->sw().dot(out_tau);
         }
 
@@ -844,3 +857,8 @@ void ForwardDynamicsCBM::updateForceSensors()
         sensor->notifyStateChange();
     }
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_FORWARD_DYNAMICS_CBM_CPP_H

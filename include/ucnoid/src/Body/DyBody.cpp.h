@@ -3,12 +3,14 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_DYBODY_CPP_H
+#define UCNOID_BODY_DYBODY_CPP_H
+
 #include "DyBody.h"
-#include <cnoid/Exception>
+#include <ucnoid/Exception>
 
-using namespace std;
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 DyLink::DyLink()
 {
@@ -129,3 +131,8 @@ COMMON_CALCS_FOR_ALL_JOINT_TYPES:
         link->wc().noalias() = link->R() * link->c() + link->p();
     }
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_DYBODY_CPP_H

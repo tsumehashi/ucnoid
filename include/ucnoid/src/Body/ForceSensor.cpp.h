@@ -3,10 +3,13 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_FORCE_SENSOR_CPP_H
+#define UCNOID_BODY_FORCE_SENSOR_CPP_H
+
 #include "ForceSensor.h"
 
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 ForceSensor::ForceSensor()
     : spec(new Spec)
@@ -97,3 +100,8 @@ double* ForceSensor::writeState(double* out_buf) const
     Eigen::Map<Vector6>(out_buf) << F_;
     return out_buf + 6;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_FORCE_SENSOR_CPP_H

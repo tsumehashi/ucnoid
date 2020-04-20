@@ -3,11 +3,14 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_DEVICE_CPP_H
+#define UCNOID_BODY_DEVICE_CPP_H
+
 #include "Device.h"
 #include "Link.h"
 
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 Device::Device()
 {
@@ -66,3 +69,8 @@ void Device::on(bool)
 {
 
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_DEVICE_CPP_H

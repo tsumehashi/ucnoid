@@ -3,15 +3,16 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_SCENE_LIGHTS_H
-#define CNOID_UTIL_SCENE_LIGHTS_H
+#ifndef UCNOID_UTIL_SCENE_LIGHTS_H
+#define UCNOID_UTIL_SCENE_LIGHTS_H
 
 #include "SceneGraph.h"
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT SgLight : public SgPreprocessed
+class UCNOID_EXPORT SgLight : public SgPreprocessed
 {
 protected:
     SgLight(int polymorhicId);
@@ -39,7 +40,7 @@ private:
 typedef ref_ptr<SgLight> SgLightPtr;
 
 
-class CNOID_EXPORT SgDirectionalLight : public SgLight
+class UCNOID_EXPORT SgDirectionalLight : public SgLight
 {
 protected:
     SgDirectionalLight(int polymorhicId);
@@ -59,7 +60,7 @@ private:
 typedef ref_ptr<SgDirectionalLight> SgDirectionalLightPtr;
 
 
-class CNOID_EXPORT SgPointLight : public SgLight
+class UCNOID_EXPORT SgPointLight : public SgLight
 {
 protected:
     SgPointLight(int polymorhicId);
@@ -86,7 +87,7 @@ private:
 typedef ref_ptr<SgPointLight> SgPointLightPtr;
 
 
-class CNOID_EXPORT SgSpotLight : public SgPointLight
+class UCNOID_EXPORT SgSpotLight : public SgPointLight
 {
 protected:
     SgSpotLight(int polymorhicId);
@@ -115,6 +116,9 @@ private:
 };
 typedef ref_ptr<SgSpotLight> SgSpotLightPtr;
 
+}   // inline namespace ucnoid
 }
+
+#include "SceneLights.cpp.h"
 
 #endif

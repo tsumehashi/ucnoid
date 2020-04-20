@@ -2,8 +2,8 @@
    @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_REFERENCED_H
-#define CNOID_UTIL_REFERENCED_H
+#ifndef UCNOID_UTIL_REFERENCED_H
+#define UCNOID_UTIL_REFERENCED_H
 
 #include <atomic>
 #include <cassert>
@@ -17,6 +17,7 @@
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class Referenced;
 
@@ -58,7 +59,7 @@ private:
 };
 
     
-class CNOID_EXPORT Referenced
+class UCNOID_EXPORT Referenced
 {
     friend class WeakCounter;
     template<class Y> friend class weak_ref_ptr;
@@ -388,30 +389,33 @@ template<class T> void swap(weak_ref_ptr<T> & a, weak_ref_ptr<T> & b)
     a.swap(b);
 }
 
+}   // inline namespace ucnoid
 }
 
 namespace std {
 
 template<class T>
-struct hash<cnoid::ref_ptr<T>>
+struct hash<cnoid::ucnoid::ref_ptr<T>>
 {
 public:
-    size_t operator()(const cnoid::ref_ptr<T>& p) const
+    size_t operator()(const cnoid::ucnoid::ref_ptr<T>& p) const
     {
         return hash<T*>()(p.px);
     }
 };
 
 template<class T>
-struct hash<cnoid::weak_ref_ptr<T>>
+struct hash<cnoid::ucnoid::weak_ref_ptr<T>>
 {
 public:
-    size_t operator()(const cnoid::weak_ref_ptr<T>& p) const
+    size_t operator()(const cnoid::ucnoid::weak_ref_ptr<T>& p) const
     {
-        return hash<cnoid::WeakCounter*>()(p.counter);
+        return hash<cnoid::ucnoid::WeakCounter*>()(p.counter);
     }
 };
 
 }
+
+#include "Referenced.cpp.h"
 
 #endif

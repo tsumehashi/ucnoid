@@ -2,6 +2,9 @@
    @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_VRML_TO_SG_CONVERTER_CPP_H
+#define UCNOID_UTIL_VRML_TO_SG_CONVERTER_CPP_H
+
 #include "VRMLToSGConverter.h"
 #include "SceneDrawables.h"
 #include "SceneLights.h"
@@ -14,41 +17,43 @@
 #include "SceneLoader.h"
 #include "Exception.h"
 #include "NullOut.h"
+#if UCNOID_NOT_SUPPORTED
 #include <fmt/format.h>
-#include <boost/algorithm/string.hpp>
+#endif  // UCNOID_NOT_SUPPORTED
 #include <tuple>
 
-using namespace std;
-using namespace cnoid;
+#if UCNOID_NOT_SUPPORTED
 using fmt::format;
-
-namespace {
-
-const double PI = 3.14159265358979323846;
-}
+#endif  // UCNOID_NOT_SUPPORTED
 
 namespace cnoid {
+inline namespace ucnoid {
+
+namespace detail::vrml_to_sg_converter {
+
+const double PI = 3.14159265358979323846;
+}   // detail::vrml_to_sg_converter
 
 class VRMLToSGConverterImpl
 {
 public:
     VRMLToSGConverter* self;
 
-    ostream* os_;
-    ostream& os() { return *os_; }
+    std::ostream* os_;
+    std::ostream& os() { return *os_; }
 
     bool isTriangulationEnabled;
     bool isNormalGenerationEnabled;
 
-    vector<int> removedFaceIndices;
-    vector<int> removedFaceVertexIndices;
+    std::vector<int> removedFaceIndices;
+    std::vector<int> removedFaceVertexIndices;
 
     PolygonMeshTriangulator polygonMeshTriangulator;
         
     Triangulator<SgVertexArray> triangulator;
-    vector<int> polygon;
+    std::vector<int> polygon;
 
-    vector<int> newColorPosToOrgColorPosMap;
+    std::vector<int> newColorPosToOrgColorPosMap;
 
     MeshFilter meshFilter;
     MeshGenerator meshGenerator;
@@ -57,36 +62,36 @@ public:
 
     VRMLMaterialPtr defaultMaterial;
 
-    typedef map<VRMLNodePtr, SgNodePtr> VRMLNodeToSgNodeMap;
+    typedef std::map<VRMLNodePtr, SgNodePtr> VRMLNodeToSgNodeMap;
     VRMLNodeToSgNodeMap vrmlNodeToSgNodeMap;
 
-    typedef map<VRMLGeometryPtr, SgMeshPtr> VRMLGeometryToSgMeshMap;
+    typedef std::map<VRMLGeometryPtr, SgMeshPtr> VRMLGeometryToSgMeshMap;
     VRMLGeometryToSgMeshMap vrmlGeometryToSgMeshMap;
 
-    typedef map<VRMLGeometryPtr, SgPlotPtr> VRMLGeometryToSgPlotMap;
+    typedef std::map<VRMLGeometryPtr, SgPlotPtr> VRMLGeometryToSgPlotMap;
     VRMLGeometryToSgPlotMap vrmlGeometryToSgPlotMap;
         
-    typedef map<VRMLMaterialPtr, SgMaterialPtr> VRMLMaterialToSgMaterialMap;
+    typedef std::map<VRMLMaterialPtr, SgMaterialPtr> VRMLMaterialToSgMaterialMap;
     VRMLMaterialToSgMaterialMap vrmlMaterialToSgMaterialMap;
 
-    typedef map<VRMLTexturePtr, SgTexturePtr> VRMLTextureToSgTextureMap;
+    typedef std::map<VRMLTexturePtr, SgTexturePtr> VRMLTextureToSgTextureMap;
     VRMLTextureToSgTextureMap vrmlTextureToSgTextureMap;
 
-    typedef map<VRMLTextureTransformPtr, SgTextureTransformPtr> VRMLTextureTransformToSgTextureTransformMap;
+    typedef std::map<VRMLTextureTransformPtr, SgTextureTransformPtr> VRMLTextureTransformToSgTextureTransformMap;
     VRMLTextureTransformToSgTextureTransformMap vrmlTextureTransformToSgTextureTransformMap;
         
-    typedef map<string, SgImagePtr> ImagePathToSgImageMap;
+    typedef std::map<std::string, SgImagePtr> ImagePathToSgImageMap;
     ImagePathToSgImageMap imagePathToSgImageMap;
         
     enum BoxFaceID { NO_FACE, LEFT_FACE, TOP_FACE, FRONT_FACE, BOTTOM_FACE, RIGHT_FACE, BACK_FACE };
 
-    unique_ptr<SceneLoader> sceneLoader;
+    std::unique_ptr<SceneLoader> sceneLoader;
         
     VRMLToSGConverterImpl(VRMLToSGConverter* self);
     void putMessage(const std::string& message);
     SgNode* convertNode(VRMLNode* vnode);
     SgNode* convertGroupNode(AbstractVRMLGroup* vgroup);
-    pair<SgNode*, SgGroup*> createTransformNodeSet(VRMLTransform* vt);
+    std::pair<SgNode*, SgGroup*> createTransformNodeSet(VRMLTransform* vt);
     SgNode* convertShapeNode(VRMLShape* vshape);
     SgMeshPtr createMeshFromIndexedFaceSet(VRMLIndexedFaceSet* vface);
     bool setIndicesForPerTriangleData(SgIndexArray& indices, int dataSize);
@@ -113,7 +118,6 @@ public:
     SgNode* readNonVrmlInline(VRMLNonVrmlInline* nonVrmlInline);
 };
 
-}
 
 
 VRMLToSGConverter::VRMLToSGConverter()
@@ -208,7 +212,7 @@ SgNodePtr VRMLToSGConverter::convert(VRMLNodePtr vrmlNode)
 
 void VRMLToSGConverterImpl::putMessage(const std::string& message)
 {
-    os() << message << endl;
+    os() << message << std::endl;
 
     /*
       if(!self->sigMessage.empty()){
@@ -283,7 +287,7 @@ SgNode* VRMLToSGConverterImpl::convertGroupNode(AbstractVRMLGroup* vgroup)
 }
 
 
-pair<SgNode*, SgGroup*> VRMLToSGConverterImpl::createTransformNodeSet(VRMLTransform* vt)
+std::pair<SgNode*, SgGroup*> VRMLToSGConverterImpl::createTransformNodeSet(VRMLTransform* vt)
 {
     const Translation3d C(vt->center);
     const AngleAxisd& R = vt->rotation;
@@ -293,14 +297,14 @@ pair<SgNode*, SgGroup*> VRMLToSGConverterImpl::createTransformNodeSet(VRMLTransf
     if(vt->scale.isOnes()){
         // no scaling
         transform->setTransform(T * C * R * C.inverse());
-        return make_pair(transform, transform);
+        return std::make_pair(transform, transform);
     } else {
         SgScaleTransform* scale = new SgScaleTransform;
         scale->setScale(vt->scale);
         transform->addChild(scale);
         if(vt->center.isZero() && !vt->scaleOrientation.angle()){
             transform->setTransform(T * R);
-            return make_pair(transform, scale);
+            return std::make_pair(transform, scale);
         } else {
             SgPosTransform* transform2 = new SgPosTransform;
             const AngleAxisd& SR = vt->scaleOrientation;
@@ -310,7 +314,7 @@ pair<SgNode*, SgGroup*> VRMLToSGConverterImpl::createTransformNodeSet(VRMLTransf
             transform->setTransform(T * C * R * SR);
             transform2->setTransform(SR.inverse() * C.inverse());
             scale->addChild(transform2);
-            return make_pair(transform, transform2);
+            return std::make_pair(transform, transform2);
         }
     }
 }
@@ -338,13 +342,17 @@ SgNode* VRMLToSGConverterImpl::convertShapeNode(VRMLShape* vshape)
                     SgPolygonMeshPtr polygonMesh = createPolygonMeshFromIndexedFaceSet(faceSet);
                     if(polygonMesh){
                         mesh = polygonMeshTriangulator.triangulate(polygonMesh);
-                        const string& errorMessage = polygonMeshTriangulator.errorMessage();
+                        const std::string& errorMessage = polygonMeshTriangulator.errorMessage();
                         if(!errorMessage.empty()){
-                            string message;
+                            std::string message;
                             if(faceSet->defName.empty()){
                                 message = "Error of an IndexedFaceSet node: \n";
                             } else {
+#if UCNOID_NOT_SUPPORTED
                                 message = format("Error of IndexedFaceSet node \"{}\": \n", faceSet->defName);
+#else   // UCNOID_NOT_SUPPORTED
+                                message = "Error of IndexedFaceSet node \"" + faceSet->defName + "\": \n";
+#endif  // UCNOID_NOT_SUPPORTED
                             }
                             putMessage(message + errorMessage);
                         }
@@ -382,7 +390,11 @@ SgNode* VRMLToSGConverterImpl::convertShapeNode(VRMLShape* vshape)
                 converted = convertPointSet(pointSet);
                 
             } else {
+#if UCNOID_NOT_SUPPORTED
                 putMessage(format("VRML {} node is not supported as a geometry.", vrmlGeometry->typeName()));
+#else   // UCNOID_NOT_SUPPORTED
+                putMessage(std::string("VRML ") + vrmlGeometry->typeName() + " node is not supported as a geometry.");
+#endif  // UCNOID_NOT_SUPPORTEDs
             }
             
             if(mesh){
@@ -511,11 +523,19 @@ SgMeshPtr VRMLToSGConverterImpl::createMeshFromIndexedFaceSet(VRMLIndexedFaceSet
 
     if(!removedFaceIndices.empty()){
         if(vface->defName.empty()){
+#if UCNOID_NOT_SUPPORTED
             putMessage(format("An IndexedFaceSet node contains {} non-triangle polygon(s).",
                     removedFaceIndices.size()));
+#else   // UCNOID_NOT_SUPPORTED
+            putMessage("An IndexedFaceSet node contains " + std::to_string(removedFaceIndices.size()) + " non-triangle polygon(s).");
+#endif  // UCNOID_NOT_SUPPORTED
         } else {
+#if UCNOID_NOT_SUPPORTED
             putMessage(format("IndexedFaceSet node \"{0}\" contains {1} non-triangle polygon(s).",
                     vface->defName, removedFaceIndices.size()));
+#else   // UCNOID_NOT_SUPPORTED
+            putMessage("IndexedFaceSet node \"" + vface->defName + "\" contains " + std::to_string(removedFaceIndices.size()) + " non-triangle polygon(s).");
+#endif  // UCNOID_NOT_SUPPORTED
         }
     }
 
@@ -590,7 +610,7 @@ bool VRMLToSGConverterImpl::convertIndicesForTriangles
     bool converted = true;
     
     if(!orgIndices.empty()){
-        vector<int>* indicesToSkip;
+        std::vector<int>* indicesToSkip;
         if(perVertex){
             indicesToSkip = &removedFaceVertexIndices;
             indices.reserve((orgIndices.size() + 1) * 3 / 4);
@@ -1030,7 +1050,7 @@ SgMeshPtr VRMLToSGConverterImpl::createMeshFromExtrusion(VRMLExtrusion* extrusio
             polygon.push_back(i);
         }
         triangulator.apply(polygon);
-        const vector<int>& triangles = triangulator.triangles();
+        const std::vector<int>& triangles = triangulator.triangles();
         for(size_t i=0; i < triangles.size(); i += 3){
             if(extrusion->ccw){
                 mesh->addTriangle(polygon[triangles[i]], polygon[triangles[i+1]], polygon[triangles[i+2]]);
@@ -1047,7 +1067,7 @@ SgMeshPtr VRMLToSGConverterImpl::createMeshFromExtrusion(VRMLExtrusion* extrusio
             polygon.push_back(numcross * (numSpine - 1) + i);
         }
         triangulator.apply(polygon);
-        const vector<int>& triangles = triangulator.triangles();
+        const std::vector<int>& triangles = triangulator.triangles();
         for(size_t i=0; i < triangles.size(); i +=3){
             if(extrusion->ccw){
                 mesh->addTriangle(polygon[triangles[i]], polygon[triangles[i+2]], polygon[triangles[i+1]]);
@@ -1077,8 +1097,8 @@ void VRMLToSGConverterImpl::setDefaultTextureCoordinateForExtrusion(const SgMesh
     mesh->setTexCoords(new SgTexCoordArray());
     SgTexCoordArray& texCoords = *mesh->texCoords();
     
-    vector<double> s;
-    vector<double> t;
+    std::vector<double> s;
+    std::vector<double> t;
     double slen = 0.0;
     s.push_back(0.0);
     for(size_t i=1; i < extrusion->crossSection.size(); ++i){
@@ -1207,7 +1227,7 @@ SgTexture* VRMLToSGConverterImpl::createTexture(VRMLTexture* vt)
         SgImagePtr imageForLoading;
         const MFString& urls = imageTextureNode->url;
         for(size_t i=0; i < urls.size(); ++i){
-            const string& url = urls[i];
+            const std::string& url = urls[i];
             if(!url.empty()){
                 ImagePathToSgImageMap::iterator p = imagePathToSgImageMap.find(url);
                 if(p != imagePathToSgImageMap.end()){
@@ -1223,7 +1243,11 @@ SgTexture* VRMLToSGConverterImpl::createTexture(VRMLTexture* vt)
                         imagePathToSgImageMap[url] = image;
                         break;
                     } catch(const exception_base& ex){
+#if UCNOID_NOT_SUPPORTED
                         putMessage(*boost::get_error_info<error_info_message>(ex));
+#else   // UCNOID_NOT_SUPPORTED
+                        putMessage(ex.message());
+#endif  // UCNOID_NOT_SUPPORTED
                     }
                 }
             }
@@ -1466,3 +1490,8 @@ SgNode* VRMLToSGConverterImpl::readNonVrmlInline(VRMLNonVrmlInline* nonVrmlInlin
     }
     return 0;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_VRML_TO_SG_CONVERTER_CPP_H

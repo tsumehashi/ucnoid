@@ -2,15 +2,19 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_MASS_MATRIX_H
+#define UCNOID_BODY_MASS_MATRIX_H
+
 #include "MassMatrix.h"
 #include "Link.h"
 #include "InverseDynamics.h"
 
-using namespace cnoid;
+namespace cnoid {
+inline namespace ucnoid {
 
-namespace {
+namespace detail {
 
-void setColumnOfMassMatrix(Body* body, MatrixXd& out_M, int column)
+inline void setColumnOfMassMatrix(Body* body, MatrixXd& out_M, int column)
 {
     Link* rootLink = body->rootLink();
     Vector6 f = calcInverseDynamics(rootLink);
@@ -28,7 +32,6 @@ void setColumnOfMassMatrix(Body* body, MatrixXd& out_M, int column)
 }
 
 
-namespace cnoid {
 
 
 /**
@@ -40,7 +43,7 @@ namespace cnoid {
    | out_M | * | dw   | + | b1 | = | tauext    |
    |       |   |ddq   |   |    |   | u         |
 */
-void calcMassMatrix(Body* body, const Vector3& g, Eigen::MatrixXd& out_M)
+inline void calcMassMatrix(Body* body, const Vector3& g, Eigen::MatrixXd& out_M)
 {
     const int nj = body->numJoints();
     Link* rootLink = body->rootLink();
@@ -69,17 +72,17 @@ void calcMassMatrix(Body* body, const Vector3& g, Eigen::MatrixXd& out_M)
 	
     MatrixXd b1(totaldof, 1);
         
-    setColumnOfMassMatrix(body, b1, 0);
+    detail::setColumnOfMassMatrix(body, b1, 0);
 
     if(!rootLink->isFixedJoint()){
         for(int i=0; i < 3; ++i){
             rootLink->dv()[i] += 1.0;
-            setColumnOfMassMatrix(body, out_M, i);
+            detail::setColumnOfMassMatrix(body, out_M, i);
             rootLink->dv()[i] -= 0.0;
         }
         for(int i=0; i < 3; ++i){
             rootLink->dw()[i] = 1.0;
-            setColumnOfMassMatrix(body, out_M, i + 3);
+            detail::setColumnOfMassMatrix(body, out_M, i + 3);
             rootLink->dw()[i] = 0.0;
         }
     }
@@ -88,7 +91,7 @@ void calcMassMatrix(Body* body, const Vector3& g, Eigen::MatrixXd& out_M)
         Link* joint = body->joint(i);
         joint->ddq() = 1.0;
         int j = i + 6;
-        setColumnOfMassMatrix(body, out_M, j);
+        detail::setColumnOfMassMatrix(body, out_M, j);
         out_M(j, j) += joint->Jm2(); // motor inertia
         joint->ddq() = 0.0;
     }
@@ -109,18 +112,20 @@ void calcMassMatrix(Body* body, const Vector3& g, Eigen::MatrixXd& out_M)
 }
 
 
-void calcMassMatrix(const BodyPtr& body, MatrixXd& out_M)
+inline void calcMassMatrix(const BodyPtr& body, MatrixXd& out_M)
 {
     const Vector3 g(0, 0, 9.8);
     calcMassMatrix(body, g, out_M);
 }
 
 
-void calcMassMatrix(Body* body, MatrixXd& out_M)
+inline void calcMassMatrix(Body* body, MatrixXd& out_M)
 {
     const Vector3 g(0, 0, 9.8);
     calcMassMatrix(body, g, out_M);
 }
 
-}
+}   // inline namespace ucnoid
+}   // namespace cnoid
 
+#endif  // UCNOID_BODY_MASS_MATRIX_H

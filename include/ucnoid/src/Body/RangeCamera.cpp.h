@@ -3,10 +3,13 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_RANGE_CAMERA_CPP_H
+#define UCNOID_BODY_RANGE_CAMERA_CPP_H
+
 #include "RangeCamera.h"
 
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 RangeCamera::RangeCamera()
 {
@@ -135,3 +138,8 @@ void RangeCamera::setOrganized(bool on)
     }
     isOrganized_ = on;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_RANGE_CAMERA_CPP_H

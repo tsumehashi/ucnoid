@@ -2,28 +2,32 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_DYWORLD_CPP_H
+#define UCNOID_BODY_DYWORLD_CPP_H
+
 #include "DyWorld.h"
 #include "DyBody.h"
 #include "ForwardDynamicsABM.h"
 #include "ForwardDynamicsCBM.h"
-#include <cnoid/EigenUtil>
+#include <ucnoid/EigenUtil>
 #include <string>
 #include <iostream>
 
-using namespace std;
-using namespace cnoid;
+namespace cnoid {
+inline namespace ucnoid {
 
+namespace detail::dy_world {
 static const double DEFAULT_GRAVITY_ACCELERATION = 9.80665;
 
 static const bool debugMode = false;
-
+}
 
 WorldBase::WorldBase()
 {
     currentTime_ = 0.0;
     timeStep_ = 0.005;
 
-    g << 0.0, 0.0, -DEFAULT_GRAVITY_ACCELERATION;
+    g << 0.0, 0.0, -detail::dy_world::DEFAULT_GRAVITY_ACCELERATION;
 
     isEulerMethod =false;
     sensorsAreEnabled = false;
@@ -133,8 +137,8 @@ void WorldBase::setVirtualJointForces()
 
 void WorldBase::calcNextState()
 {
-    if(debugMode){
-        cout << "World current time = " << currentTime_ << endl;
+    if(detail::dy_world::debugMode){
+        std::cout << "World current time = " << currentTime_ << std::endl;
     }
     const int n = bodyInfoArray.size();
 
@@ -235,3 +239,8 @@ bool WorldBase::LinkPairKey::operator<(const LinkPairKey& pair2) const
         return false;
     }
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_DYWORLD_CPP_H

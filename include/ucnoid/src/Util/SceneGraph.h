@@ -3,23 +3,24 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_SCENE_GRAPH_H
-#define CNOID_UTIL_SCENE_GRAPH_H
+#ifndef UCNOID_UTIL_SCENE_GRAPH_H
+#define UCNOID_UTIL_SCENE_GRAPH_H
 
-#include <cnoid/Referenced>
-#include <cnoid/BoundingBox>
-#include <cnoid/Signal>
+#include <ucnoid/Referenced>
+#include <ucnoid/BoundingBox>
+#include <ucnoid/Signal>
 #include <string>
 #include <vector>
 #include <set>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class SgObject;
 typedef ref_ptr<SgObject> SgObjectPtr;
 
-class CNOID_EXPORT SgUpdate
+class UCNOID_EXPORT SgUpdate
 {
 public:
     enum Action {
@@ -52,7 +53,7 @@ private:
 
 class SgCloneMapImpl;
     
-class CNOID_EXPORT SgCloneMap
+class UCNOID_EXPORT SgCloneMap
 {
 public:
     SgCloneMap();
@@ -75,7 +76,7 @@ private:
 };
 
 
-class CNOID_EXPORT SgObject : public Referenced
+class UCNOID_EXPORT SgObject : public Referenced
 {
 public:
     typedef std::set<SgObject*> ParentContainer;
@@ -138,7 +139,7 @@ class SgNode;
 typedef ref_ptr<SgNode> SgNodePtr;
 typedef std::vector<SgNode*> SgNodePath;
 
-class CNOID_EXPORT SgNode : public SgObject
+class UCNOID_EXPORT SgNode : public SgObject
 {
     static int registerNodeType(const std::type_info& nodeType, const std::type_info& superType);
 
@@ -185,7 +186,7 @@ protected:
 };
 
 
-class CNOID_EXPORT SgGroup : public SgNode
+class UCNOID_EXPORT SgGroup : public SgNode
 {
     typedef std::vector<SgNodePtr> Container;
         
@@ -277,7 +278,7 @@ private:
 typedef ref_ptr<SgGroup> SgGroupPtr;
 
 
-class CNOID_EXPORT SgInvariantGroup : public SgGroup
+class UCNOID_EXPORT SgInvariantGroup : public SgGroup
 {
 public:
     SgInvariantGroup();
@@ -289,7 +290,7 @@ public:
 typedef ref_ptr<SgInvariantGroup> SgInvariantGroupPtr;
     
     
-class CNOID_EXPORT SgTransform : public SgGroup
+class UCNOID_EXPORT SgTransform : public SgGroup
 {
 public:
     const BoundingBox& untransformedBoundingBox() const;
@@ -305,7 +306,7 @@ protected:
 typedef ref_ptr<SgTransform> SgTransformPtr;
 
 
-class CNOID_EXPORT SgPosTransform : public SgTransform
+class UCNOID_EXPORT SgPosTransform : public SgTransform
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -365,7 +366,7 @@ private:
 typedef ref_ptr<SgPosTransform> SgPosTransformPtr;
 
 
-class CNOID_EXPORT SgScaleTransform : public SgTransform
+class UCNOID_EXPORT SgScaleTransform : public SgTransform
 {
 public:
     SgScaleTransform();
@@ -396,7 +397,7 @@ private:
 typedef ref_ptr<SgScaleTransform> SgScaleTransformPtr;
 
 
-class CNOID_EXPORT SgAffineTransform : public SgTransform
+class UCNOID_EXPORT SgAffineTransform : public SgTransform
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -449,7 +450,7 @@ private:
 typedef ref_ptr<SgAffineTransform> SgAffineTransformPtr;
 
 
-class CNOID_EXPORT SgSwitch : public SgGroup
+class UCNOID_EXPORT SgSwitch : public SgGroup
 {
 public:
     SgSwitch();
@@ -471,7 +472,7 @@ public:
 typedef ref_ptr<SgSwitch> SgSwitchPtr;
 
 
-class CNOID_EXPORT SgUnpickableGroup : public SgGroup
+class UCNOID_EXPORT SgUnpickableGroup : public SgGroup
 {
 public:
     SgUnpickableGroup();
@@ -483,7 +484,7 @@ public:
 typedef ref_ptr<SgUnpickableGroup> SgUnpickableGroupPtr;
 
 
-class CNOID_EXPORT SgPreprocessed : public SgNode
+class UCNOID_EXPORT SgPreprocessed : public SgNode
 {
 protected:
     SgPreprocessed(int polymorhicId);
@@ -515,6 +516,9 @@ class SgOrthographicCamera;
 class SgFog;
 class SgOutlineGroup;
 
+}   // inline namespace ucnoid
 }
+
+#include "SceneGraph.cpp.h"
 
 #endif

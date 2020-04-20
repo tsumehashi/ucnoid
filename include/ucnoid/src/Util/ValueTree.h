@@ -2,15 +2,17 @@
    @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_VALUE_TREE_H
-#define CNOID_UTIL_VALUE_TREE_H
+#ifndef UCNOID_UTIL_VALUE_TREE_H
+#define UCNOID_UTIL_VALUE_TREE_H
 
 #include "Referenced.h"
 #include <map>
 #include <vector>
+#include <string>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class YAMLReaderImpl;
 class ValueNode;
@@ -18,7 +20,7 @@ class ScalarNode;
 class Mapping;
 class Listing;
 
-#ifndef CNOID_BACKWARD_COMPATIBILITY
+#ifndef UCNOID_BACKWARD_COMPATIBILITY
 enum StringStyle { PLAIN_STRING, SINGLE_QUOTED, DOUBLE_QUOTED, LITERAL_STRING, FOLDED_STRING };
 #else
 enum StringStyle { PLAIN_STRING, YAML_PLAIN_STRING = PLAIN_STRING,
@@ -29,18 +31,19 @@ enum StringStyle { PLAIN_STRING, YAML_PLAIN_STRING = PLAIN_STRING,
 };
 #endif
 
-class CNOID_EXPORT ValueNode : public Referenced
+class UCNOID_EXPORT ValueNode : public Referenced
 {
+public:
     struct Initializer {
         Initializer();
     };
-    static Initializer initializer;
+//    static Initializer initializer;   // If it is "static inline", a segmentation fault will occur.
         
 public:
 
     virtual ValueNode* clone() const;
 
-#ifndef CNOID_BACKWARD_COMPATIBILITY
+#ifndef UCNOID_BACKWARD_COMPATIBILITY
     enum TypeBit { INVALID_NODE = 0, SCALAR = 1, MAPPING = 2, LISTING = 4, INSERT_LF = 8, APPEND_LF = 16 };
 #else 
     enum TypeBit { INVALID_NODE = 0, SCALAR = 1, MAPPING = 2, LISTING = 4, SEQUENCE = 4, INSERT_LF = 8, APPEND_LF = 16 };
@@ -82,7 +85,7 @@ public:
     const Listing* toListing() const;
     Listing* toListing();
         
-#ifdef CNOID_BACKWARD_COMPATIBILITY
+#ifdef UCNOID_BACKWARD_COMPATIBILITY
     bool isSequence() const { return typeBits & LISTING; }
     const Listing* toSequence() const { return toListing(); }
     Listing* toSequence() { return toListing(); }
@@ -103,7 +106,7 @@ public:
     /**
        \todo integrate the exception classes with the common ones defined in Exception.h
     */
-    class CNOID_EXPORT Exception {
+    class UCNOID_EXPORT Exception {
 public:
         Exception();
         virtual ~Exception();
@@ -198,7 +201,7 @@ template<> inline std::string ValueNode::to<std::string>() const { return toStri
 typedef ref_ptr<ValueNode> ValueNodePtr;
 
     
-class CNOID_EXPORT ScalarNode : public ValueNode
+class UCNOID_EXPORT ScalarNode : public ValueNode
 {
 public:
     ScalarNode(const std::string& value, StringStyle stringStyle = PLAIN_STRING);
@@ -224,7 +227,7 @@ private:
 };
 
 
-class CNOID_EXPORT Mapping : public ValueNode
+class UCNOID_EXPORT Mapping : public ValueNode
 {
     typedef std::map<std::string, ValueNodePtr> Container;
         
@@ -380,7 +383,7 @@ public:
     //! \deprecated
     template <class T> T read(const std::string& key) const { return get<T>(key); }
 
-#ifdef CNOID_BACKWARD_COMPATIBILITY
+#ifdef UCNOID_BACKWARD_COMPATIBILITY
     Listing* findSequence(const std::string& key) const { return findListing(key); }
     Listing* openSequence(const std::string& key) { return openListing(key); }
     Listing* openFlowStyleSequence(const std::string& key){ return openFlowStyleListing(key); }
@@ -421,7 +424,7 @@ typedef ref_ptr<Mapping> MappingPtr;
    @note The name "Sequence" should not be used for this class
    because it confilcts with the name defined in the boost's concept check library.
 */
-class CNOID_EXPORT Listing : public ValueNode
+class UCNOID_EXPORT Listing : public ValueNode
 {
     typedef std::vector<ValueNodePtr> Container;
 
@@ -565,7 +568,7 @@ private:
 
 typedef ref_ptr<Listing> ListingPtr;
 
-#ifdef CNOID_BACKWARD_COMPATIBILITY
+#ifdef UCNOID_BACKWARD_COMPATIBILITY
 typedef ValueNode YamlNode;
 typedef ValueNodePtr YamlNodePtr;
 typedef ScalarNode YamlScalar;
@@ -576,6 +579,10 @@ typedef ListingPtr YamlSequencePtr;
 typedef Listing Sequence;
 typedef ListingPtr SequencePtr;
 #endif
+
+}   // inline namespace ucnoid
 }
+
+#include "ValueTree.cpp.h"
 
 #endif

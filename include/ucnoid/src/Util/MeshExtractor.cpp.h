@@ -3,13 +3,15 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_MESH_EXTRACTOR_CPP_H
+#define UCNOID_UTIL_MESH_EXTRACTOR_CPP_H
+
 #include "MeshExtractor.h"
 #include "SceneDrawables.h"
 #include "PolymorphicFunctionSet.h"
 
-using namespace cnoid;
-
 namespace cnoid {
+inline namespace ucnoid {
 
 class MeshExtractorImpl
 {
@@ -34,9 +36,6 @@ public:
     void visitShape(SgShape* shape);
     bool extract(SgNode* node);
 };
-
-}
-
 
 MeshExtractor::MeshExtractor()
 {
@@ -178,8 +177,9 @@ bool MeshExtractorImpl::extract(SgNode* node)
     return meshFound;
 }
 
+namespace detail::mesh_extractor {
 
-static void integrateMesh(MeshExtractor* extractor, SgMesh* mesh)
+inline void integrateMesh(MeshExtractor* extractor, SgMesh* mesh)
 {
     SgMesh* srcMesh = extractor->currentMesh();
     const Affine3f T = extractor->currentTransform().cast<Affine3f::Scalar>();
@@ -226,6 +226,7 @@ static void integrateMesh(MeshExtractor* extractor, SgMesh* mesh)
     }
 }
 
+}   // namespace detail::mesh_extractor
 
 /**
    \todo take into acount the case where some meshes have normals or colors
@@ -234,6 +235,11 @@ static void integrateMesh(MeshExtractor* extractor, SgMesh* mesh)
 SgMesh* MeshExtractor::integrate(SgNode* node)
 {
     SgMesh* integrated = new SgMesh;
-    extract(node, [&](){ integrateMesh(this, integrated); });
+    extract(node, [&](){ detail::mesh_extractor::integrateMesh(this, integrated); });
     return integrated;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_MESH_EXTRACTOR_CPP_H

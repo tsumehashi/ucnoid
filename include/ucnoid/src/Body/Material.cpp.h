@@ -3,19 +3,22 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_MATERIAL_CPP_H
+#define UCNOID_BODY_MATERIAL_CPP_H
+
 #include "Material.h"
 #include <mutex>
 #include <unordered_map>
 #include <vector>
 
-using namespace std;
-using namespace cnoid;
+namespace cnoid {
+inline namespace ucnoid {
 
-namespace {
+namespace detail::material  {
 
-std::mutex idMutex;
-std::unordered_map<std::string, int> nameToIdMap;
-std::vector<std::string> idToNameMap;
+inline std::mutex idMutex;
+inline std::unordered_map<std::string, int> nameToIdMap;
+inline std::vector<std::string> idToNameMap;
 
 // register "default" material as id = 0
 struct DefaultIdIntialization {
@@ -26,11 +29,12 @@ struct DefaultIdIntialization {
     }
 };
 
-}
+}   // namespace detail::material
 
 
 int Material::id(const std::string name)
 {
+    using namespace detail::material;
     std::lock_guard<std::mutex> guard(idMutex);
 
     static DefaultIdIntialization defaultIdInitialization;
@@ -54,6 +58,7 @@ int Material::id(const std::string name)
 
 std::string Material::name(int id)
 {
+    using namespace detail::material;
     std::lock_guard<std::mutex> guard(idMutex);
     if(id < static_cast<int>(idToNameMap.size())){
         return idToNameMap[id];
@@ -115,3 +120,8 @@ template<> bool Material::info(const std::string& key, const bool& defaultValue)
     }
     return defaultValue;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_MATERIAL_CPP_H

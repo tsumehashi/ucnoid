@@ -2,8 +2,8 @@
    @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_EIGEN_UTIL_H
-#define CNOID_UTIL_EIGEN_UTIL_H
+#ifndef UCNOID_UTIL_EIGEN_UTIL_H
+#define UCNOID_UTIL_EIGEN_UTIL_H
 
 #include "EigenTypes.h"
 #include <memory>
@@ -18,6 +18,7 @@
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 const double PI = 3.14159265358979323846;
 const double PI_2 = 1.57079632679489661923;
@@ -46,15 +47,15 @@ inline double radian(int deg) { return TO_RADIAN * deg; }
   }
 */
 
-CNOID_EXPORT Vector3 rpyFromRot(const Matrix3& R);
+UCNOID_EXPORT Vector3 rpyFromRot(const Matrix3& R);
 
-CNOID_EXPORT Matrix3 rotFromRpy(double r, double p, double y);
+UCNOID_EXPORT Matrix3 rotFromRpy(double r, double p, double y);
 
 inline Matrix3 rotFromRpy(const Vector3& rpy) {
     return rotFromRpy(rpy[0], rpy[1], rpy[2]);
 }
 
-CNOID_EXPORT Vector3 omegaFromRot(const Matrix3& R);
+UCNOID_EXPORT Vector3 omegaFromRot(const Matrix3& R);
 
 inline Matrix3 hat(const Vector3& x) {
     Matrix3 M;
@@ -64,17 +65,17 @@ inline Matrix3 hat(const Vector3& x) {
     return M;
 }
 
-CNOID_EXPORT std::string str(const Vector3& v);
-CNOID_EXPORT std::string str(const Vector3f& v);
-CNOID_EXPORT std::string str(const Vector2& v);
-CNOID_EXPORT std::string str(const AngleAxis& a);
-CNOID_EXPORT bool toVector3(const std::string& s, Vector3& out_v);
-CNOID_EXPORT bool toVector3(const std::string& s, Vector3f& out_v);
+UCNOID_EXPORT std::string str(const Vector3& v);
+UCNOID_EXPORT std::string str(const Vector3f& v);
+UCNOID_EXPORT std::string str(const Vector2& v);
+UCNOID_EXPORT std::string str(const AngleAxis& a);
+UCNOID_EXPORT bool toVector3(const std::string& s, Vector3& out_v);
+UCNOID_EXPORT bool toVector3(const std::string& s, Vector3f& out_v);
 
 
-CNOID_EXPORT void normalizeRotation(Matrix3& R);
-CNOID_EXPORT void normalizeRotation(Position& T);
-CNOID_EXPORT void normalizeRotation(Affine3& T);
+UCNOID_EXPORT void normalizeRotation(Matrix3& R);
+UCNOID_EXPORT void normalizeRotation(Position& T);
+UCNOID_EXPORT void normalizeRotation(Affine3& T);
 
 template<class T, typename... Args>
 std::shared_ptr<T> make_shared_aligned(Args&&... args)
@@ -82,6 +83,9 @@ std::shared_ptr<T> make_shared_aligned(Args&&... args)
   return std::allocate_shared<T>(Eigen::aligned_allocator<T>(), std::forward<Args>(args)...);
 }
 
+}   // inline namespace ucnoid
 }
+
+#include "EigenUtil.cpp.h"
 
 #endif

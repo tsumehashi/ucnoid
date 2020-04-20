@@ -3,6 +3,9 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_EASYSCANNER_CPP_H_INCLUDED
+#define UCNOID_UTIL_EASYSCANNER_CPP_H_INCLUDED
+
 #include "EasyScanner.h"
 #include <cstdio>
 #include <cctype>
@@ -10,16 +13,20 @@
 #include <cmath>
 #include <cstring>
 #include <iostream>
+#if UCNOID_NOT_SUPPORTED
 #include <fmt/format.h>
+#endif  // UCNOID_NOT_SUPPORTED
 #include <errno.h>
 #include "gettext.h"
 
-using namespace std;
-using namespace cnoid;
+#if UCNOID_NOT_SUPPORTED
 using fmt::format;
+#endif  // UCNOID_NOT_SUPPORTED
 
+namespace cnoid {
+inline namespace ucnoid {
 
-namespace {
+namespace detail::easy_scanner {
 // Replacement for 'strtod()' function in Visual C++
 // This is neccessary because the implementation of VC++6.0 uses 'strlen()' in the function,
 // so that it becomes too slow for a string buffer which has long length.
@@ -98,19 +105,27 @@ inline double mystrtod(const char* nptr, char** endptr) {
     return strtod(nptr, endptr);
 }
 #endif
-}
+}   // namespace detail::easy_scanner
 
 
 std::string EasyScanner::Exception::getFullMessage() const
 {
-    string m(message);
+    std::string m(message);
     
     if(lineNumber > 0){
+#if UCNOID_NOT_SUPPORTED
         m += format(" at line {}", lineNumber);
+#else   // UCNOID_NOT_SUPPORTED
+        m += " at line " + std::to_string(lineNumber);
+#endif  // UCNOID_NOT_SUPPORTED
     }
 	
     if(!filename.empty()){
+#if UCNOID_NOT_SUPPORTED
         m += format(" of {}", filename);
+#else   // UCNOID_NOT_SUPPORTED
+        m += " of " + filename;
+#endif  // UCNOID_NOT_SUPPORTED
     }
     
     return m;
@@ -126,7 +141,7 @@ EasyScanner::EasyScanner()
 /**
    @param filename file to read.
 */
-EasyScanner::EasyScanner(string filename)
+EasyScanner::EasyScanner(std::string filename)
 {
     init();
     loadFile(filename);
@@ -224,7 +239,7 @@ void EasyScanner::putSymbols()
 {
     SymbolMap::iterator p = symbols->begin();
     while(p != symbols->end()){
-        cout << p->first << " = " << p->second << std::endl;
+        std::cout << p->first << " = " << p->second << std::endl;
         p++;
     }
 }
@@ -283,7 +298,7 @@ void EasyScanner::setQuoteChar(char qs)
    This function loads a text from a given file.
    The function thorws EasyScanner::Exception when the file cannot be loaded.
 */
-void EasyScanner::loadFile(const string& filename)
+void EasyScanner::loadFile(const std::string& filename)
 {
     lineNumber = 0;
     this->filename.clear();
@@ -291,13 +306,21 @@ void EasyScanner::loadFile(const string& filename)
     FILE* file = fopen(filename.c_str(), "rb");
 
     if(!file){
-        string message;
+        std::string message;
         switch(errno){
         case ENOENT:
+#if UCNOID_NOT_SUPPORTED
             message = format(_("\"{}\" is not found."), filename);
+#else   // UCNOID_NOT_SUPPORTED
+            message = _("\"" + filename + "\" is not found.");
+#endif  // UCNOID_NOT_SUPPORTED
             break;
         default:
+#if UCNOID_NOT_SUPPORTED
             message = format(_("I/O error in accessing \"{}\"."), filename);
+#else   // UCNOID_NOT_SUPPORTED
+            message = _("I/O error in accessing \"" + filename + "\".");
+#endif  // UCNOID_NOT_SUPPORTED
             break;
         }
         throwException(message.c_str());
@@ -407,7 +430,7 @@ int EasyScanner::readToken()
             text = tail;
             return T_INTEGER;
         }
-        doubleValue = mystrtod(text, &tail);
+        doubleValue = detail::easy_scanner::mystrtod(text, &tail);
         if(tail != text){
             text = tail;
             return T_DOUBLE;
@@ -499,7 +522,7 @@ bool EasyScanner::readFloat()
 
     if(checkLF()) return false;
 
-    floatValue = mystrtof(text, &tail);
+    floatValue = detail::easy_scanner::mystrtof(text, &tail);
 
     if(tail != text){
         text = tail;
@@ -516,7 +539,7 @@ bool EasyScanner::readDouble()
 
     if(checkLF()) return false;
 
-    doubleValue = mystrtod(text, &tail);
+    doubleValue = detail::easy_scanner::mystrtod(text, &tail);
 
     if(tail != text){
         text = tail;
@@ -758,7 +781,7 @@ bool EasyScanner::skipBlankLines()
 
 // operators
 
-EasyScanner& cnoid::operator>>(EasyScanner& scanner, double& value)
+EasyScanner& operator>>(EasyScanner& scanner, double& value)
 {
     if(!scanner.readDouble()){
         scanner.throwException("scan error: can't read double value");
@@ -768,7 +791,7 @@ EasyScanner& cnoid::operator>>(EasyScanner& scanner, double& value)
 }
 
 
-EasyScanner& cnoid::operator>>(EasyScanner& scanner, int& value)
+EasyScanner& operator>>(EasyScanner& scanner, int& value)
 {
     if(!scanner.readInt()){
         scanner.throwException("scan error: can't read int value");
@@ -779,7 +802,7 @@ EasyScanner& cnoid::operator>>(EasyScanner& scanner, int& value)
 }
 
 
-EasyScanner& cnoid::operator>>(EasyScanner& scanner, const char* matchString)
+EasyScanner& operator>>(EasyScanner& scanner, const char* matchString)
 {
     scanner.skipSpace();
     while(*matchString != '\0'){
@@ -791,7 +814,7 @@ EasyScanner& cnoid::operator>>(EasyScanner& scanner, const char* matchString)
 }
 
 
-EasyScanner& cnoid::operator>>(EasyScanner& scanner, char matchChar)
+EasyScanner& operator>>(EasyScanner& scanner, char matchChar)
 {
     scanner.skipSpace();
     if(*scanner.text++ != matchChar){
@@ -801,7 +824,7 @@ EasyScanner& cnoid::operator>>(EasyScanner& scanner, char matchChar)
 }
 
 
-EasyScanner& cnoid::operator>>(EasyScanner& scanner, string& str)
+EasyScanner& operator>>(EasyScanner& scanner, std::string& str)
 {
     scanner.skipSpace();
     if(!scanner.readQuotedString(true)){
@@ -812,10 +835,15 @@ EasyScanner& cnoid::operator>>(EasyScanner& scanner, string& str)
 }
 
 
-EasyScanner& cnoid::operator>>(EasyScanner& scanner, EasyScanner::Endl)
+EasyScanner& operator>>(EasyScanner& scanner, EasyScanner::Endl)
 {
     if(!scanner.readLF()){
         scanner.throwException("scan error: end of line unmatched");
     }
     return scanner;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_EASYSCANNER_CPP_H_INCLUDED

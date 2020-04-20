@@ -3,16 +3,17 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_RATE_GYRO_SENSOR_H
-#define CNOID_BODY_RATE_GYRO_SENSOR_H
+#ifndef UCNOID_BODY_RATE_GYRO_SENSOR_H
+#define UCNOID_BODY_RATE_GYRO_SENSOR_H
 
 #include "Device.h"
 #include <memory>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT RateGyroSensor : public Device
+class UCNOID_EXPORT RateGyroSensor : public Device
 {
     Vector3 w_; // w = omega = angular velocity
         
@@ -45,6 +46,9 @@ public:
 
 typedef ref_ptr<RateGyroSensor> RateGyroSensorPtr;
     
+}   // inline namespace ucnoid
 }
+
+#include "RateGyroSensor.cpp.h"
 
 #endif

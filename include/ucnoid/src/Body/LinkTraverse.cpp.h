@@ -3,13 +3,15 @@
     \brief Implementations of the LinkTraverse class
     \author Shin'ichiro Nakaoka
 */
+
+#ifndef UCNOID_BODY_LINK_TRAVERSE_CPP_H
+#define UCNOID_BODY_LINK_TRAVERSE_CPP_H
   
 #include "LinkTraverse.h"
 #include "Link.h"
 
-using namespace std;
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 LinkTraverse::LinkTraverse()
 {
@@ -217,3 +219,8 @@ void LinkTraverse::calcForwardKinematics(bool calcVelocity, bool calcAcceleratio
         }
     }
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_LINK_TRAVERSE_CPP_H

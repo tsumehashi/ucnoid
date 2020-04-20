@@ -3,12 +3,15 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_TRIANGULATOR_H_INCLUDED
-#define CNOID_UTIL_TRIANGULATOR_H_INCLUDED
+#ifndef UCNOID_UTIL_TRIANGULATOR_H_INCLUDED
+#define UCNOID_UTIL_TRIANGULATOR_H_INCLUDED
 
+#if UCNOID_NOT_SUPPORTED
 #include <boost/dynamic_bitset.hpp>
+#endif  // UCNOID_NOT_SUPPORTED
 
 namespace cnoid {
+inline namespace ucnoid {
 
 template<class TVector3Array> class Triangulator
 {
@@ -21,7 +24,11 @@ template<class TVector3Array> class Triangulator
     std::vector<int> triangles_;
     std::vector<int> workPolygon;
     TVector3 ccs; // cyclic cross sum
+#if UCNOID_NOT_SUPPORTED
     boost::dynamic_bitset<> earMask;
+#else   // UCNOID_NOT_SUPPORTED
+    std::vector<bool> earMask;
+#endif  // UCNOID_NOT_SUPPORTED
 
     const TVector3& vertex(int localIndex)
         {
@@ -178,6 +185,8 @@ public:
             return triangles_;
         }
 };
+
+}   // inline namespace ucnoid
 }
 
 #endif

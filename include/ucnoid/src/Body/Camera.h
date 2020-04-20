@@ -3,17 +3,18 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_CAMERA_H
-#define CNOID_BODY_CAMERA_H
+#ifndef UCNOID_BODY_CAMERA_H
+#define UCNOID_BODY_CAMERA_H
 
 #include "Device.h"
-#include <cnoid/Image>
+#include <ucnoid/Image>
 #include <memory>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT Camera : public Device
+class UCNOID_EXPORT Camera : public Device
 {
 public:
     Camera();
@@ -114,6 +115,9 @@ private:
 
 typedef ref_ptr<Camera> CameraPtr;
 
+}   // inline namespace ucnoid
 }
+
+#include "Camera.cpp.h"
 
 #endif

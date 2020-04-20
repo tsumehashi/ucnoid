@@ -3,15 +3,16 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_POINT_LIGHT_H
-#define CNOID_BODY_POINT_LIGHT_H
+#ifndef UCNOID_BODY_POINT_LIGHT_H
+#define UCNOID_BODY_POINT_LIGHT_H
 
 #include "Light.h"
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT PointLight : public Light
+class UCNOID_EXPORT PointLight : public Light
 {
 public:
     PointLight();
@@ -46,6 +47,9 @@ private:
 
 typedef ref_ptr<PointLight> PointLightPtr;
 
+}   // inline namespace ucnoid
 }
+
+#include "PointLight.cpp.h"
 
 #endif

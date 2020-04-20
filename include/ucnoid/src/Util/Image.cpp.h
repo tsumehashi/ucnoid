@@ -3,14 +3,18 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_IMAGE_CPP_H
+#define UCNOID_UTIL_IMAGE_CPP_H
+
 #include "Image.h"
 #include "ImageIO.h"
 #include "Exception.h"
+#if UCNOID_NOT_SUPPORTED
 #include <fmt/format.h>
+#endif  // UCNOID_NOT_SUPPORTED
 
-using namespace std;
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 Image::Image()
 {
@@ -59,9 +63,14 @@ void Image::setSize(int width, int height, int nComponents)
         numComponents_ = nComponents;
     } else {
         exception_base exception;
+#if UCNOID_NOT_SUPPORTED
         exception << error_info_message(
             fmt::format("Invalid number ({}) of image components", nComponents));
         BOOST_THROW_EXCEPTION(exception);
+#else   // UCNOID_NOT_SUPPORTED
+        exception << "error_info_message : " << "Invalid number (" << std::to_string(nComponents) << ") of image components\n";
+        UCNOID_THROW_EXCEPTION(exception);
+#endif  // UCNOID_NOT_SUPPORTED
     }
     setSize(width, height);
 }
@@ -110,3 +119,8 @@ void Image::save(const std::string& filename) const
     ImageIO iio;
     iio.save(*this, filename);
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_IMAGE_CPP_H

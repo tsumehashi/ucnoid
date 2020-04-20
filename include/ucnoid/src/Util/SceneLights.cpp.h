@@ -3,11 +3,13 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_SCENE_LIGHTS_CPP_H
+#define UCNOID_UTIL_SCENE_LIGHTS_CPP_H
+
 #include "SceneLights.h"
 
-using namespace std;
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 SgLight::SgLight(int polymorhicId)
     : SgPreprocessed(polymorhicId)
@@ -125,10 +127,9 @@ SgObject* SgSpotLight::clone(SgCloneMap&) const
     return new SgSpotLight(*this);
 }
 
+namespace detail::scene_light {
 
-namespace {
-
-struct NodeTypeRegistration {
+inline struct NodeTypeRegistration {
     NodeTypeRegistration() {
         SgNode::registerType<SgLight, SgPreprocessed>();
         SgNode::registerType<SgDirectionalLight, SgLight>();
@@ -138,3 +139,8 @@ struct NodeTypeRegistration {
 } registration;
 
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_SCENE_LIGHTS_CPP_H

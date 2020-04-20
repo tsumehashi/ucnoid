@@ -3,19 +3,20 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_DEVICE_H
-#define CNOID_BODY_DEVICE_H
+#ifndef UCNOID_BODY_DEVICE_H
+#define UCNOID_BODY_DEVICE_H
 
-#include <cnoid/EigenTypes>
-#include <cnoid/Signal>
+#include <ucnoid/EigenTypes>
+#include <ucnoid/Signal>
 #include <string>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class Link;
 
-class CNOID_EXPORT DeviceState : public Referenced
+class UCNOID_EXPORT DeviceState : public Referenced
 {
 protected:
     DeviceState() { }
@@ -49,7 +50,7 @@ public:
 typedef ref_ptr<DeviceState> DeviceStatePtr;
 
 
-class CNOID_EXPORT Device : public DeviceState
+class UCNOID_EXPORT Device : public DeviceState
 {
     struct NonState {
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -138,6 +139,9 @@ public:
 
 typedef ref_ptr<Device> DevicePtr;
 
+}   // inline namespace ucnoid
 }
+
+#include "Device.cpp.h"
 
 #endif

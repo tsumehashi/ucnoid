@@ -3,18 +3,19 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_BODY_LOADER_H
-#define CNOID_BODY_BODY_LOADER_H
+#ifndef UCNOID_BODY_BODY_LOADER_H
+#define UCNOID_BODY_BODY_LOADER_H
 
 #include "AbstractBodyLoader.h"
 #include <functional>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class BodyLoaderImpl;
 
-class CNOID_EXPORT BodyLoader : public AbstractBodyLoader
+class UCNOID_EXPORT BodyLoader : public AbstractBodyLoader
 {
 public:
     static bool registerLoader(const std::string& extension, std::function<AbstractBodyLoaderPtr()> factory);
@@ -34,6 +35,9 @@ private:
     BodyLoaderImpl* impl;
 };
 
+}   // inline namespace ucnoid
 }
+
+#include "BodyLoader.cpp.h"
 
 #endif

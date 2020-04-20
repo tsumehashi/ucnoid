@@ -2,18 +2,19 @@
  @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_SCENE_LOADER_H
-#define CNOID_UTIL_SCENE_LOADER_H
+#ifndef UCNOID_UTIL_SCENE_LOADER_H
+#define UCNOID_UTIL_SCENE_LOADER_H
 
 #include "AbstractSceneLoader.h"
 #include <memory>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class SceneLoaderImpl;
 
-class CNOID_EXPORT SceneLoader : public AbstractSceneLoader
+class UCNOID_EXPORT SceneLoader : public AbstractSceneLoader
 {
 public:
     //! @param extensions semi-colon separated extension list
@@ -33,6 +34,9 @@ private:
     SceneLoaderImpl* impl;
 };
 
+}   // inline namespace ucnoid
 }
+
+#include "SceneLoader.cpp.h"
 
 #endif

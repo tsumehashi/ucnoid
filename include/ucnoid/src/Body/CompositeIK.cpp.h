@@ -3,12 +3,14 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_COMPOSITE_IK_CPP_H
+#define UCNOID_BODY_COMPOSITE_IK_CPP_H
+
 #include "CompositeIK.h"
 #include "Link.h"
 
-using namespace std;
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 CompositeIK::CompositeIK()
 {
@@ -97,3 +99,8 @@ bool CompositeIK::calcInverseKinematics(const Position& T)
 
     return solved;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_COMPOSITE_IK_CPP_H

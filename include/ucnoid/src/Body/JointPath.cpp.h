@@ -2,17 +2,21 @@
    \file
    \author Shin'ichiro Nakaoka
 */
+
+#ifndef UCNOID_BODY_JOINT_PATH_CPP_H
+#define UCNOID_BODY_JOINT_PATH_CPP_H
   
 #include "JointPath.h"
 #include "Jacobian.h"
 #include "Body.h"
+#if UCNOID_NOT_SUPPORTED
 #include "BodyCustomizerInterface.h"
-#include <cnoid/EigenUtil>
-#include <cnoid/TruncatedSVD>
+#endif  // UCNOID_NOT_SUPPORTED
+#include <ucnoid/EigenUtil>
+#include <ucnoid/TruncatedSVD>
 
-using namespace std;
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 double JointPath::numericalIKdefaultDeltaScale()
 {
@@ -40,8 +44,6 @@ double JointPath::numericalIKdefaultDampingConstant()
 }
 
 
-namespace cnoid {
-
 class JointPathIkImpl
 {
 public:
@@ -54,7 +56,7 @@ public:
     MatrixXd J;
     VectorXd dTask;
     VectorXd dq;
-    vector<double> q0;
+    std::vector<double> q0;
     MatrixXd JJ;
     Eigen::ColPivHouseholderQR<MatrixXd> QR;
     TruncatedSVD<MatrixXd> svd;
@@ -78,8 +80,6 @@ public:
         dq.resize(numJoints);
     }
 };
-
-}
 
 
 JointPath::JointPath()
@@ -513,7 +513,7 @@ std::ostream& operator<<(std::ostream& os, JointPath& path)
     return os;
 }
 
-
+#if UCNOID_NOT_SUPPORTED
 namespace {
 
 class CustomJointPath : public JointPath
@@ -595,13 +595,22 @@ bool CustomJointPath::calcInverseKinematics(const Position& T)
 
     return solved;
 }
+#endif  // UCNOID_NOT_SUPPORTED
 
-
-JointPathPtr cnoid::getCustomJointPath(Body* body, Link* baseLink, Link* targetLink)
+JointPathPtr getCustomJointPath(Body* body, Link* baseLink, Link* targetLink)
 {
+#if UCNOID_NOT_SUPPORTED
     if(body->customizerInterface() && body->customizerInterface()->initializeAnalyticIk){
         return std::make_shared<CustomJointPath>(body, baseLink, targetLink);
     } else {
         return std::make_shared<JointPath>(baseLink, targetLink);
     }
+#else   // UCNOID_NOT_SUPPORTED
+    return std::make_shared<JointPath>(baseLink, targetLink);
+#endif  // UCNOID_NOT_SUPPORTED
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_JOINT_PATH_CPP_H

@@ -3,6 +3,9 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_UTF8_CPP_H_INCLUDED
+#define UCNOID_UTIL_UTF8_CPP_H_INCLUDED
+
 #include "UTF8.h"
 #include <vector>
 
@@ -13,6 +16,7 @@
 
 
 namespace cnoid {
+inline namespace ucnoid {
 
 #ifdef _MSC_VER
 const std::string fromUTF8(const std::string& text)
@@ -89,4 +93,7 @@ const std::string toUTF8(const char* text)
 }
 #endif
     
+}   // inline namespace ucnoid
 }
+
+#endif  // UCNOID_UTIL_UTF8_CPP_H_INCLUDED

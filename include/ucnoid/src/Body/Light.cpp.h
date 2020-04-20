@@ -3,10 +3,13 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_LIGHT_CPP_H
+#define UCNOID_BODY_LIGHT_CPP_H
+
 #include "Light.h"
 
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 Light::Light()
 {
@@ -75,3 +78,8 @@ double* Light::writeState(double* out_buf) const
     out_buf[4] = intensity_;
     return out_buf + 5;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_LIGHT_CPP_H

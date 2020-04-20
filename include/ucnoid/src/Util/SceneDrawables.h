@@ -3,19 +3,20 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_SCENE_DRAWABLES_H
-#define CNOID_UTIL_SCENE_DRAWABLES_H
+#ifndef UCNOID_UTIL_SCENE_DRAWABLES_H
+#define UCNOID_UTIL_SCENE_DRAWABLES_H
 
 #include "SceneGraph.h"
 #include "Image.h"
-#include <boost/variant.hpp>
+#include <variant>
 #include <memory>
 #include <initializer_list>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT SgMaterial : public SgObject
+class UCNOID_EXPORT SgMaterial : public SgObject
 {
 public:
     SgMaterial();
@@ -49,7 +50,7 @@ private:
 typedef ref_ptr<SgMaterial> SgMaterialPtr;
 
 
-class CNOID_EXPORT SgImage : public SgObject
+class UCNOID_EXPORT SgImage : public SgObject
 {
 public:
     SgImage();
@@ -81,7 +82,7 @@ private:
 typedef ref_ptr<SgImage> SgImagePtr;
 
 
-class CNOID_EXPORT SgTextureTransform : public SgObject
+class UCNOID_EXPORT SgTextureTransform : public SgObject
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -111,7 +112,7 @@ private:
 typedef ref_ptr<SgTextureTransform> SgTextureTransformPtr;
 
 
-class CNOID_EXPORT SgTexture : public SgObject
+class UCNOID_EXPORT SgTexture : public SgObject
 {
 public:
     SgTexture();
@@ -225,7 +226,7 @@ typedef ref_ptr<SgTexCoordArray> SgTexCoordArrayPtr;
 typedef std::vector<int> SgIndexArray;
 
 
-class CNOID_EXPORT SgMeshBase : public SgObject
+class UCNOID_EXPORT SgMeshBase : public SgObject
 {
 protected:
     SgMeshBase();
@@ -296,7 +297,7 @@ private:
 typedef ref_ptr<SgMeshBase> SgMeshBasePtr;
 
 
-class CNOID_EXPORT SgMesh : public SgMeshBase
+class UCNOID_EXPORT SgMesh : public SgMeshBase
 {
 public:
     SgMesh();
@@ -392,10 +393,10 @@ public:
             double height;
         };
 
-    typedef boost::variant<Mesh, Box, Sphere, Cylinder, Cone, Capsule> Primitive;
+    typedef std::variant<Mesh, Box, Sphere, Cylinder, Cone, Capsule> Primitive;
 
-    const int primitiveType() const { return primitive_.which(); }
-    template<class TPrimitive> const TPrimitive& primitive() const { return boost::get<TPrimitive>(primitive_); }
+    const int primitiveType() const { return primitive_.index(); }
+    template<class TPrimitive> const TPrimitive& primitive() const { return std::get<TPrimitive>(primitive_); }
     template<class TPrimitive> void setPrimitive(const TPrimitive& prim) { primitive_ = prim; }
 
     void transform(const Affine3f& T);
@@ -412,7 +413,7 @@ private:
 typedef ref_ptr<SgMesh> SgMeshPtr;
 
 
-class CNOID_EXPORT SgPolygonMesh : public SgMeshBase
+class UCNOID_EXPORT SgPolygonMesh : public SgMeshBase
 {
 public:
     SgPolygonMesh();
@@ -440,7 +441,7 @@ private:
 typedef ref_ptr<SgPolygonMesh> SgPolygonMeshPtr;
 
 
-class CNOID_EXPORT SgShape : public SgNode
+class UCNOID_EXPORT SgShape : public SgNode
 {
 public:
     SgShape();
@@ -478,7 +479,7 @@ private:
 typedef ref_ptr<SgShape> SgShapePtr;
 
 
-class CNOID_EXPORT SgPlot : public SgNode
+class UCNOID_EXPORT SgPlot : public SgNode
 {
 protected:
     SgPlot(int polymorhicId);
@@ -535,7 +536,7 @@ private:
 typedef ref_ptr<SgPlot> SgPlotPtr;
 
 
-class CNOID_EXPORT SgPointSet : public SgPlot
+class UCNOID_EXPORT SgPointSet : public SgPlot
 {
 public:
     SgPointSet();
@@ -558,7 +559,7 @@ private:
 typedef ref_ptr<SgPointSet> SgPointSetPtr;
 
 
-class CNOID_EXPORT SgLineSet : public SgPlot
+class UCNOID_EXPORT SgLineSet : public SgPlot
 {
 public:
     SgLineSet();
@@ -617,7 +618,7 @@ private:
 typedef ref_ptr<SgLineSet> SgLineSetPtr;
 
 
-class CNOID_EXPORT SgOverlay : public SgGroup
+class UCNOID_EXPORT SgOverlay : public SgGroup
 {
 public:
     SgOverlay();
@@ -641,6 +642,9 @@ protected:
     SgOverlay(const SgOverlay& org, SgCloneMap& cloneMap);
 };
 
+}   // inline namespace ucnoid
 }
+
+#include "SceneDrawables.cpp.h"
 
 #endif

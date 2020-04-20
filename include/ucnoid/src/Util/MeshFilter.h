@@ -3,18 +3,19 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_MESH_FILTER_H
-#define CNOID_UTIL_MESH_FILTER_H
+#ifndef UCNOID_UTIL_MESH_FILTER_H
+#define UCNOID_UTIL_MESH_FILTER_H
 
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class SgNode;
 class SgMesh;
 class MeshFilterImpl;
 
-class CNOID_EXPORT MeshFilter
+class UCNOID_EXPORT MeshFilter
 {
 public:
     MeshFilter();
@@ -56,6 +57,9 @@ private:
 // for the backward compatibility
 typedef MeshFilter MeshNormalGenerator;
 
+}   // inline namespace ucnoid
 }
+
+#include "MeshFilter.cpp.h"
 
 #endif

@@ -3,16 +3,17 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_UTIL_IMAGE_H
-#define CNOID_UTIL_IMAGE_H
+#ifndef UCNOID_UTIL_IMAGE_H
+#define UCNOID_UTIL_IMAGE_H
 
 #include <string>
 #include <vector>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT Image
+class UCNOID_EXPORT Image
 {
 public:
     Image();
@@ -48,6 +49,9 @@ private:
     int numComponents_;
 };
 
+}   // inline namespace ucnoid
 }
+
+#include "Image.cpp.h"
 
 #endif

@@ -3,11 +3,13 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_CAMERA_CPP_H
+#define UCNOID_BODY_CAMERA_CPP_H
+
 #include "Camera.h"
 
-using namespace std;
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 const char* Camera::typeName()
 {
@@ -190,3 +192,8 @@ double* Camera::writeState(double* out_buf) const
     out_buf[7] = delay_;
     return out_buf + 8;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_CAMERA_CPP_H

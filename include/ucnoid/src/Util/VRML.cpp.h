@@ -3,13 +3,15 @@
   @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_UTIL_VRML_CPP_H
+#define UCNOID_UTIL_VRML_CPP_H
+
 #include "VRML.h"
-#include <boost/assign/std/vector.hpp>
 
-using namespace cnoid;
-using namespace boost::assign;
+namespace cnoid {
+inline namespace ucnoid {
 
-const char* cnoid::labelOfVRMLfieldTypeId(const std::type_info& fieldType)
+const char* labelOfVRMLfieldTypeId(const std::type_info& fieldType)
 {
     if(fieldType == typeid(SFInt32)){
         return "SFInt32";
@@ -858,3 +860,8 @@ const char* VRMLProtoInstance::typeName() const
 {
     return "ProtoInstance";
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_UTIL_VRML_CPP_H

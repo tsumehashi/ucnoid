@@ -2,18 +2,21 @@
    @author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_INVERSE_DYNAMICS_CPP_H_INCLUDED
+#define UCNOID_BODY_INVERSE_DYNAMICS_CPP_H_INCLUDED
+
 #include "InverseDynamics.h"
 #include "Link.h"
-#include <cnoid/EigenUtil>
+#include <ucnoid/EigenUtil>
 
-using namespace cnoid;
-
-namespace {
+namespace cnoid {
+inline namespace ucnoid {
+namespace detail::nverse_dynamics {
 
 /**
    see Kajita et al. Humanoid Robot Ohm-sha,  p.210
 */
-Vector6 calcInverseDynamicsSub(Link* link, const Vector3& vo_parent, const Vector3& dvo_parent)
+inline Vector6 calcInverseDynamicsSub(Link* link, const Vector3& vo_parent, const Vector3& dvo_parent)
 {
     Vector3 dvo, sv, sw;
 
@@ -66,11 +69,10 @@ Vector6 calcInverseDynamicsSub(Link* link, const Vector3& vo_parent, const Vecto
 
     return f;
 }
-}
+}   // namespace detail::nverse_dynamics
     
-namespace cnoid {
 
-Vector6 calcInverseDynamics(Link* link)
+inline Vector6 calcInverseDynamics(Link* link)
 {
     // spatial velocity and acceleration of the parent link
     Vector3 vo, dvo;
@@ -84,6 +86,10 @@ Vector6 calcInverseDynamics(Link* link)
         vo = parent->v() - parent->w().cross(parent->p());
         dvo = parent->dv() - parent->dw().cross(parent->p()) - parent->w().cross(parent->v());
     }
-    return calcInverseDynamicsSub(link, vo, dvo);
+    return detail::nverse_dynamics::calcInverseDynamicsSub(link, vo, dvo);
 }
+
+}   // inline namespace ucnoid
 }
+
+#endif  // UCNOID_BODY_INVERSE_DYNAMICS_CPP_H_INCLUDED

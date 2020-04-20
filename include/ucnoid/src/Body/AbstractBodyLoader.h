@@ -3,8 +3,8 @@
    \author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_ABSTRACT_BODY_LOADER_H
-#define CNOID_BODY_ABSTRACT_BODY_LOADER_H
+#ifndef UCNOID_BODY_ABSTRACT_BODY_LOADER_H
+#define UCNOID_BODY_ABSTRACT_BODY_LOADER_H
 
 #include <string>
 #include <memory>
@@ -12,10 +12,11 @@
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class Body;
 
-class CNOID_EXPORT AbstractBodyLoader
+class UCNOID_EXPORT AbstractBodyLoader
 {
 public:
     AbstractBodyLoader();
@@ -30,6 +31,9 @@ public:
 
 typedef std::shared_ptr<AbstractBodyLoader> AbstractBodyLoaderPtr;
 
+}    // inline namespace ucnoid
 }
+
+#include "AbstractBodyLoader.cpp.h"
 
 #endif

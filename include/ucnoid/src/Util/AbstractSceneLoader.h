@@ -1,16 +1,17 @@
 /**
  @author Shin'ichiro Nakaoka
 */
-#ifndef CNOID_UTIL_ABSTRACT_SCENE_LOADER_H
-#define CNOID_UTIL_ABSTRACT_SCENE_LOADER_H
+#ifndef UCNOID_UTIL_ABSTRACT_SCENE_LOADER_H
+#define UCNOID_UTIL_ABSTRACT_SCENE_LOADER_H
 
 #include "SceneGraph.h"
 #include <iosfwd>
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
-class CNOID_EXPORT AbstractSceneLoader
+class UCNOID_EXPORT AbstractSceneLoader
 {
 public:
     virtual ~AbstractSceneLoader();
@@ -20,6 +21,9 @@ public:
     virtual SgNode* load(const std::string& filename) = 0;
 };
 
+}   // inline namespace ucnoid
 }
+
+#include "AbstractSceneLoader.cpp.h"
 
 #endif

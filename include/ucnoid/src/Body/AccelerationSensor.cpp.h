@@ -3,10 +3,13 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_ACCELERATION_SENSOR_CPP_H
+#define UCNOID_BODY_ACCELERATION_SENSOR_CPP_H
+
 #include "AccelerationSensor.h"
 
-using namespace cnoid;
-
+namespace cnoid {
+inline namespace ucnoid {
 
 AccelerationSensor::AccelerationSensor()
     : spec(new Spec)
@@ -97,3 +100,8 @@ double* AccelerationSensor::writeState(double* out_buf) const
     Eigen::Map<Vector3>(out_buf) << dv_;
     return out_buf + 3;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_ACCELERATION_SENSOR_CPP_H

@@ -1,6 +1,6 @@
 
-#ifndef CNOID_UTIL_TIME_MEASURE_H
-#define CNOID_UTIL_TIME_MEASURE_H
+#ifndef UCNOID_UTIL_TIME_MEASURE_H
+#define UCNOID_UTIL_TIME_MEASURE_H
 
 #ifndef _WIN32
 
@@ -11,7 +11,10 @@
 #endif
 #endif
 
+#define USE_GETTIME
+
 namespace cnoid {
+inline namespace ucnoid {
 
 class TimeMeasure
 {
@@ -63,12 +66,15 @@ public:
     inline double avarageTime() { return totalTime_ / numCalls; }
 
 };
+
+}   // inline namespace ucnoid
 }
 
 #else
 #include <windows.h>
 
 namespace cnoid {
+inline namespace ucnoid {
     
 typedef unsigned __int64    ulonglong;
 
@@ -113,6 +119,7 @@ public:
     inline double avarageTime() { return totalTime_ / numCalls; }
 };
 
+}   // inline namespace ucnoid
 }
 
 #endif

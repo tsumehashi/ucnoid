@@ -3,19 +3,20 @@
   @author Shin'ichiro Nakaoka
 */
 
-#ifndef CNOID_BODY_PIN_DRAG_IK_H
-#define CNOID_BODY_PIN_DRAG_IK_H
+#ifndef UCNOID_BODY_PIN_DRAG_IK_H
+#define UCNOID_BODY_PIN_DRAG_IK_H
 
 #include "InverseKinematics.h"
 #include "exportdecl.h"
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class Body;
 class Link;
 class PinDragIKImpl;
 
-class CNOID_EXPORT PinDragIK : public InverseKinematics
+class UCNOID_EXPORT PinDragIK : public InverseKinematics
 {
 public:
     PinDragIK(Body* body);
@@ -53,6 +54,9 @@ private:
 
 typedef std::shared_ptr<PinDragIK> PinDragIKptr;
 
+}   // inline namespace ucnoid
 }
+
+#include "PinDragIK.cpp.h"
 
 #endif

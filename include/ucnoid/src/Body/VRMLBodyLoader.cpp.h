@@ -3,6 +3,9 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_VRML_BODY_LOADER_CPP_H
+#define UCNOID_BODY_VRML_BODY_LOADER_CPP_H
+
 #include "VRMLBodyLoader.h"
 #include "Body.h"
 #include "ForceSensor.h"
@@ -13,22 +16,25 @@
 #include "RangeSensor.h"
 #include "PointLight.h"
 #include "SpotLight.h"
-#include <cnoid/FileUtil>
-#include <cnoid/Exception>
-#include <cnoid/EasyScanner>
-#include <cnoid/VRMLParser>
-#include <cnoid/VRMLToSGConverter>
-#include <cnoid/ValueTree>
-#include <cnoid/NullOut>
+#include <ucnoid/FileUtil>
+#include <ucnoid/Exception>
+#include <ucnoid/EasyScanner>
+#include <ucnoid/VRMLParser>
+#include <ucnoid/VRMLToSGConverter>
+#include <ucnoid/ValueTree>
+#include <ucnoid/NullOut>
+#if UCNOID_NOT_SUPPORTED
 #include <fmt/format.h>
 #include <boost/dynamic_bitset.hpp>
+#endif  // UCNOID_NOT_SUPPORTED
 #include "gettext.h"
 
-using namespace std;
-using namespace cnoid;
+#if UCNOID_NOT_SUPPORTED
 using fmt::format;
+#endif  // UCNOID_NOT_SUPPORTED
 
 namespace cnoid {
+inline namespace ucnoid {
 
 class VRMLBodyLoaderImpl
 {
@@ -58,7 +64,7 @@ public:
         double m;
         Vector3 c;
         Matrix3 I;
-        vector<SegmentInfo> segments;
+        std::vector<SegmentInfo> segments;
         SgGroupPtr visualShape;
         SgGroupPtr collisionShape;
         bool isSurfaceNodeUsed;
@@ -68,25 +74,29 @@ public:
     Body* body;
     VRMLProtoInstancePtr rootJointNode;
     std::vector<VRMLProtoInstancePtr> extraJointNodes;
+#if UCNOID_NOT_SUPPORTED
     boost::dynamic_bitset<> validJointIdSet;
+#else   // UCNOID_NOT_SUPPORTED
+    std::vector<bool> validJointIdSet;
+#endif  // UCNOID_NOT_SUPPORTED
     size_t numValidJointIds;
     VRMLToSGConverter sgConverter;
     int divisionNumber;
-    ostream* os_;
+    std::ostream* os_;
     bool isVerbose;
     int messageIndent;
 
     typedef std::function<DevicePtr(VRMLProtoInstance* node)> DeviceFactory;
-    typedef map<string, DeviceFactory> DeviceFactoryMap;
+    typedef std::map<std::string, DeviceFactory> DeviceFactoryMap;
     static DeviceFactoryMap deviceFactories;
 
-    typedef map<Link*, VRMLNodePtr> LinkOriginalMap;
+    typedef std::map<Link*, VRMLNodePtr> LinkOriginalMap;
     LinkOriginalMap linkOriginalMap;
 
-    ostream& os() { return *os_; }
+    std::ostream& os() { return *os_; }
 
     void putMessage(const std::string& message){
-        os() << string(messageIndent, ' ') + message + "\n";
+        os() << std::string(messageIndent, ' ') + message + "\n";
     }
         
     VRMLBodyLoaderImpl();
@@ -124,9 +134,8 @@ public:
 
 VRMLBodyLoaderImpl::DeviceFactoryMap VRMLBodyLoaderImpl::deviceFactories;
 
-}
 
-namespace {
+namespace detail::vrml_body_loader {
 
 typedef void (VRMLBodyLoaderImpl::*ProtoCheckFunc)(VRMLProto* proto);
     
@@ -138,19 +147,24 @@ struct ProtoInfo
     ProtoCheckFunc protoCheckFunc;
 };
     
-typedef map<string, ProtoInfo> ProtoInfoMap;
-ProtoInfoMap protoInfoMap;
+typedef std::map<std::string, ProtoInfo> ProtoInfoMap;
+inline ProtoInfoMap protoInfoMap;
 
-void throwExceptionOfIllegalField(VRMLProto* proto, const std::string& name, const char* label)
+inline void throwExceptionOfIllegalField(VRMLProto* proto, const std::string& name, const char* label)
 {
-    throw invalid_argument(
+#if UCNOID_NOT_SUPPORTED
+    throw std::invalid_argument(
         format(_("Proto \"{0}\" must have the \"{1}\" field of {2} type"), proto->protoName, name, label));
+#else   // UCNOID_NOT_SUPPORTED
+    throw std::invalid_argument(
+        ssformat("Proto \"", proto->protoName, "\" must have the \"", name, "\" field of ", label, " type"));
+#endif  // UCNOID_NOT_SUPPORTED
 }
 
 template <typename TValue>
 void requireField(VRMLProto* proto, const std::string& name){
     VRMLVariantField* field = proto->findField(name);
-    if(!field || field->type() != typeid(TValue)){
+    if(!field || !std::holds_alternative<TValue>(*field)){
         throwExceptionOfIllegalField(proto, name, labelOfVRMLfieldType<TValue>());
     }
 }
@@ -161,7 +175,7 @@ VRMLVariantField* addField(VRMLProto* proto, const std::string& name, const TVal
     if(!field){
         field = &proto->field(name);
         (*field) = defaultValue;
-    } else if(field->type() != typeid(TValue)){
+    } else if(!std::holds_alternative<TValue>(*field)){
         throwExceptionOfIllegalField(proto, name, labelOfVRMLfieldType<TValue>());
     }
     return field;
@@ -172,9 +186,9 @@ VRMLVariantField* addField(VRMLProto* proto, const std::string& name) {
     return addField(proto, name, TValue());
 }
 
-double getLimitValue(VRMLVariantField& field, double defaultValue)
+inline double getLimitValue(VRMLVariantField& field, double defaultValue)
 {
-    MFFloat& values = get<MFFloat>(field);
+    MFFloat& values = std::get<MFFloat>(field);
     if(values.empty()){
         return defaultValue;
     }
@@ -185,25 +199,33 @@ template<class ValueType> ValueType getValue(VRMLProtoInstance* node, const char
 {
     VRMLProtoFieldMap::const_iterator p = node->fields.find(fieldName);
     if(p == node->fields.end()){
+
+#if UCNOID_NOT_SUPPORTED
         BOOST_THROW_EXCEPTION(
             nonexistent_key_error()
             << error_info_key(fieldName)
             << error_info_message(
                 format(_("Node \"{0}\" should have the field \"{1}\""),
                        node->proto->protoName, fieldName)));
+#else   // UCNOID_NOT_SUPPORTED
+        nonexistent_key_error e;
+        e << "error_info_key : " << fieldName << "\n";
+        e << "error_info_message : " << ssformat("Node \"", node->proto->protoName, "\" should have the field \"", fieldName, "\"") << "\n";
+        UCNOID_THROW_EXCEPTION(e);
+#endif  // UCNOID_NOT_SUPPORTED
     }
-    return boost::get<ValueType>(p->second);
+    return std::get<ValueType>(p->second);
 }
        
-void readVRMLfield(VRMLVariantField& field, string& out_s)
+inline void readVRMLfield(VRMLVariantField& field, std::string& out_s)
 {
-    switch(field.which()){
+    switch(field.index()){
     case SFSTRING:
-        out_s = get<SFString>(field);
+        out_s = std::get<SFString>(field);
         break;
     case MFSTRING:
     {
-        MFString& strings = get<MFString>(field);
+        MFString& strings = std::get<MFString>(field);
         out_s = "";
         for(size_t i=0; i < strings.size(); i++){
             out_s += strings[i] + "\n";
@@ -215,53 +237,53 @@ void readVRMLfield(VRMLVariantField& field, string& out_s)
     }
 }
 
-bool checkAndReadVRMLfield(VRMLProtoInstance* node, const char* key, bool& out_value)
+inline bool checkAndReadVRMLfield(VRMLProtoInstance* node, const char* key, bool& out_value)
 {
     VRMLVariantField* field = node->findField(key);
-    if(field && field->which() == SFBOOL){
-        out_value = get<SFBool>(*field);
+    if(field && field->index() == SFBOOL){
+        out_value = std::get<SFBool>(*field);
         return true;
     }
     return false;
 }
 
-bool checkAndReadVRMLfield(VRMLProtoInstance* node, const char* key, int& out_value)
+inline bool checkAndReadVRMLfield(VRMLProtoInstance* node, const char* key, int& out_value)
 {
     VRMLVariantField* field = node->findField(key);
-    if(field && field->which() == SFINT32){
-        out_value = get<SFInt32>(*field);
+    if(field && field->index() == SFINT32){
+        out_value = std::get<SFInt32>(*field);
         return true;
     }
     return false;
 }
 
-void readVRMLfield(VRMLVariantField& field, double& out_value)
+inline void readVRMLfield(VRMLVariantField& field, double& out_value)
 {
-    out_value = get<SFFloat>(field);
+    out_value = std::get<SFFloat>(field);
 }
 
-bool checkAndReadVRMLfield(VRMLProtoInstance* node, const char* key, SFVec3f& out_value)
+inline bool checkAndReadVRMLfield(VRMLProtoInstance* node, const char* key, SFVec3f& out_value)
 {
     VRMLVariantField* field = node->findField(key);
-    if(field && field->which() == SFVEC3F){
-        out_value = get<SFVec3f>(*field);
+    if(field && field->index() == SFVEC3F){
+        out_value = std::get<SFVec3f>(*field);
         return true;
     }
     return false;
 }
    
-void readVRMLfield(VRMLVariantField& field, Vector3& out_v)
+inline void readVRMLfield(VRMLVariantField& field, Vector3& out_v)
 {
-    out_v = get<SFVec3f>(field);
+    out_v = std::get<SFVec3f>(field);
 }
 
-void readVRMLfield(VRMLVariantField& field, Matrix3& out_R)
+inline void readVRMLfield(VRMLVariantField& field, Matrix3& out_R)
 {
-    if(field.which() == SFROTATION){
-        out_R = get<SFRotation>(field).toRotationMatrix();
+    if(field.index() == SFROTATION){
+        out_R = std::get<SFRotation>(field).toRotationMatrix();
 
-    } else if(field.which() == MFFLOAT){
-        MFFloat& mf = get<MFFloat>(field);
+    } else if(field.index() == MFFLOAT){
+        MFFloat& mf = std::get<MFFloat>(field);
         if(mf.size() >= 9){
             out_R <<
                 mf[0], mf[1], mf[2],
@@ -271,7 +293,7 @@ void readVRMLfield(VRMLVariantField& field, Matrix3& out_R)
     }
 }
 
-}
+}   // namespace detail::vrml_body_loader
 
 
 VRMLBodyLoader::VRMLBodyLoader()
@@ -282,6 +304,7 @@ VRMLBodyLoader::VRMLBodyLoader()
 
 VRMLBodyLoaderImpl::VRMLBodyLoaderImpl()
 {
+    using namespace detail::vrml_body_loader;
     divisionNumber = sgConverter.divisionNumber();
     isVerbose = false;
     body = 0;
@@ -405,15 +428,19 @@ bool VRMLBodyLoaderImpl::load(Body* body, const std::string& filename)
         os().flush();
         
     } catch(const ValueNode::Exception& ex){
-        os() << ex.message() << endl;
+        os() << ex.message() << std::endl;
     } catch(EasyScanner::Exception & ex){
-        os() << ex.getFullMessage() << endl;
+        os() << ex.getFullMessage() << std::endl;
     } catch(const nonexistent_key_error& error){
+#if UCNOID_NOT_SUPPORTED
         if(const std::string* message = boost::get_error_info<error_info_message>(error)){
-            os() << *message << endl;
+            os() << *message << std::endl;
         }
+#else   // UCNOID_NOT_SUPPORTED
+        os() << error.message() << std::endl;
+#endif  // UCNOID_NOT_SUPPORTED
     } catch(const std::exception& ex){
-        os() << ex.what() << endl;
+        os() << ex.what() << std::endl;
     }
     
     return result;
@@ -422,6 +449,7 @@ bool VRMLBodyLoaderImpl::load(Body* body, const std::string& filename)
 
 void VRMLBodyLoaderImpl::readTopNodes()
 {
+    using namespace detail::vrml_body_loader;
     bool humanoidNodeLoaded = false;
 
     VRMLGroupPtr nonHumanoidNodeGroup;
@@ -439,7 +467,7 @@ void VRMLBodyLoaderImpl::readTopNodes()
             VRMLProtoInstance* instance = static_cast<VRMLProtoInstance*>(node.get());
             if(instance->proto->protoName == "Humanoid") {
                 if(humanoidNodeLoaded){
-                    throw invalid_argument(_("Humanoid nodes more than one are defined."));
+                    throw std::invalid_argument(_("Humanoid nodes more than one are defined."));
                 }
                 readHumanoidNode(instance);
                 humanoidNodeLoaded = true;
@@ -473,13 +501,14 @@ void VRMLBodyLoaderImpl::readTopNodes()
         }
     }
     if(!loaded){
-        throw invalid_argument(_("There are no VRML nodes which can be loaded as a Body."));
+        throw std::invalid_argument(_("There are no VRML nodes which can be loaded as a Body."));
     }
 }
 
 
 void VRMLBodyLoaderImpl::checkHumanoidProto(VRMLProto* proto)
 {
+    using namespace detail::vrml_body_loader;
     // required fields
     requireField<SFVec3f>(proto, "center");
     requireField<MFNode>(proto, "humanoidBody");
@@ -497,6 +526,7 @@ void VRMLBodyLoaderImpl::checkHumanoidProto(VRMLProto* proto)
 
 void VRMLBodyLoaderImpl::checkJointProto(VRMLProto* proto)
 {
+    using namespace detail::vrml_body_loader;
     // required fields
     requireField<SFVec3f>(proto, "center");
     requireField<MFNode>(proto, "children");
@@ -509,10 +539,10 @@ void VRMLBodyLoaderImpl::checkJointProto(VRMLProto* proto)
 
     field = proto->findField("jointAxis");
     if(!field){
-        throw invalid_argument(_("Prototype of Humanoid must have the \"jointAxis\" field"));
+        throw std::invalid_argument(_("Prototype of Humanoid must have the \"jointAxis\" field"));
     }
-    if(field->type() != typeid(SFString) && field->type() != typeid(SFVec3f)){
-        throw invalid_argument(_("The type of \"jointAxis\" field in \"Humanoid\" prototype must be SFString or SFVec3f"));
+    if(!std::holds_alternative<SFString>(*field) && !std::holds_alternative<SFVec3f>(*field)){
+        throw std::invalid_argument(_("The type of \"jointAxis\" field in \"Humanoid\" prototype must be SFString or SFVec3f"));
     }
 
     // optional fields
@@ -534,13 +564,14 @@ void VRMLBodyLoaderImpl::checkJointProto(VRMLProto* proto)
     addField<SFVec3f>(proto, "scale", SFVec3f::Constant(1.0));
 
     if(proto->findField("equivalentInertia")){
-        os() << _("The \"equivalentInertia\" field of the Joint node is obsolete.") << endl;
+        os() << _("The \"equivalentInertia\" field of the Joint node is obsolete.") << std::endl;
     }
 }
 
 
 void VRMLBodyLoaderImpl::checkSegmentProto(VRMLProto* proto)
 {
+    using namespace detail::vrml_body_loader;
     requireField<SFVec3f>(proto, "centerOfMass");
     requireField<SFFloat>(proto, "mass");
     requireField<MFFloat>(proto, "momentsOfInertia");
@@ -550,6 +581,7 @@ void VRMLBodyLoaderImpl::checkSegmentProto(VRMLProto* proto)
 
 void VRMLBodyLoaderImpl::checkSurfaceProto(VRMLProto* proto)
 {
+    using namespace detail::vrml_body_loader;
     requireField<MFNode>(proto, "visual");
     requireField<MFNode>(proto, "collision");
 }
@@ -557,6 +589,7 @@ void VRMLBodyLoaderImpl::checkSurfaceProto(VRMLProto* proto)
 
 void VRMLBodyLoaderImpl::checkSensorProtoCommon(VRMLProto* proto)
 {
+    using namespace detail::vrml_body_loader;
     requireField<SFInt32>(proto, "sensorId");
     requireField<SFVec3f>(proto, "translation");
     requireField<SFRotation>(proto, "rotation");
@@ -565,6 +598,7 @@ void VRMLBodyLoaderImpl::checkSensorProtoCommon(VRMLProto* proto)
 
 void VRMLBodyLoaderImpl::checkDeviceProtoCommon(VRMLProto* proto)
 {
+    using namespace detail::vrml_body_loader;
     requireField<SFVec3f>(proto, "translation");
     requireField<SFRotation>(proto, "rotation");
 }
@@ -572,6 +606,7 @@ void VRMLBodyLoaderImpl::checkDeviceProtoCommon(VRMLProto* proto)
 
 void VRMLBodyLoaderImpl::checkVisionSensorProto(VRMLProto* proto)
 {
+    using namespace detail::vrml_body_loader;
     checkDeviceProtoCommon(proto);
 
     requireField<SFString>(proto, "type");
@@ -586,6 +621,7 @@ void VRMLBodyLoaderImpl::checkVisionSensorProto(VRMLProto* proto)
 
 void VRMLBodyLoaderImpl::checkRangeSensorProto(VRMLProto* proto)
 {
+    using namespace detail::vrml_body_loader;
     checkDeviceProtoCommon(proto);
 
     requireField<SFFloat>(proto, "scanAngle");
@@ -598,6 +634,7 @@ void VRMLBodyLoaderImpl::checkRangeSensorProto(VRMLProto* proto)
 
 void VRMLBodyLoaderImpl::checkSpotLightDeviceProto(VRMLProto* proto)
 {
+    using namespace detail::vrml_body_loader;
     checkDeviceProtoCommon(proto);
 
     requireField<SFVec3f>(proto, "attenuation");
@@ -613,6 +650,7 @@ void VRMLBodyLoaderImpl::checkSpotLightDeviceProto(VRMLProto* proto)
 
 void VRMLBodyLoaderImpl::checkExtraJointProto(VRMLProto* proto)
 {
+    using namespace detail::vrml_body_loader;
     requireField<SFString>(proto, "link1Name");
     requireField<SFString>(proto, "link2Name");
     requireField<SFVec3f>(proto, "link1LocalPos");
@@ -624,19 +662,20 @@ void VRMLBodyLoaderImpl::checkExtraJointProto(VRMLProto* proto)
         
 void VRMLBodyLoaderImpl::readHumanoidNode(VRMLProtoInstance* humanoidNode)
 {
+    using namespace detail::vrml_body_loader;
     if(isVerbose) putMessage("Humanoid node");
     
     body->setModelName(humanoidNode->defName);
 
-    MFNode& nodes = get<MFNode>(humanoidNode->fields["humanoidBody"]);
+    MFNode& nodes = std::get<MFNode>(humanoidNode->fields["humanoidBody"]);
 
     if(nodes.size() == 0){
-        throw invalid_argument(_("The Humanoid node does not have a Joint node in its \"humanoidBody\" field."));
+        throw std::invalid_argument(_("The Humanoid node does not have a Joint node in its \"humanoidBody\" field."));
     } else if(nodes.size() > 1){
-        throw invalid_argument(_("The Humanoid node must have a unique Joint node in its \"humanoidBody\" field."));
+        throw std::invalid_argument(_("The Humanoid node must have a unique Joint node in its \"humanoidBody\" field."));
     } 
 
-    string info;
+    std::string info;
     readVRMLfield(humanoidNode->fields["info"], info);
     body->info()->write( "humanoid info", info );
 
@@ -662,7 +701,11 @@ void VRMLBodyLoaderImpl::readHumanoidNode(VRMLProtoInstance* humanoidNode)
             if(numValidJointIds < validJointIdSet.size()){
                 for(size_t i=0; i < validJointIdSet.size(); ++i){
                     if(!validJointIdSet[i]){
-                        os() << format(_("Warning: Joint ID {} is not specified."), i) << endl;
+#if UCNOID_NOT_SUPPORTED
+                        os() << format(_("Warning: Joint ID {} is not specified."), i) << std::endl;
+#else   // UCNOID_NOT_SUPPORTED
+                        os() << "Warning: Joint ID " << i << " is not specified." << std::endl;
+#endif  // UCNOID_NOT_SUPPORTED
                     }
                 }
             }
@@ -702,7 +745,7 @@ static void setShape(Link* link, SgGroup* shape, bool isVisual)
 
 Link* VRMLBodyLoaderImpl::readJointNode(VRMLProtoInstance* jointNode, const Matrix3& parentRs)
 {
-    if(isVerbose) putMessage(string("Joint node") + jointNode->defName);
+    if(isVerbose) putMessage(std::string("Joint node") + jointNode->defName);
 
     Link* link = createLink(jointNode, parentRs);
 
@@ -717,7 +760,7 @@ Link* VRMLBodyLoaderImpl::readJointNode(VRMLProtoInstance* jointNode, const Matr
     iLink.collisionShape = new SgGroup;
     iLink.isSurfaceNodeUsed = false;
 
-    MFNode& childNodes = get<MFNode>(jointNode->fields["children"]);
+    MFNode& childNodes = std::get<MFNode>(jointNode->fields["children"]);
     Affine3 T(Affine3::Identity());
     ProtoIdSet acceptableProtoIds;
     acceptableProtoIds.set(PROTO_JOINT);
@@ -762,20 +805,29 @@ Link* VRMLBodyLoaderImpl::readJointNode(VRMLProtoInstance* jointNode, const Matr
 
 Link* VRMLBodyLoaderImpl::createLink(VRMLProtoInstance* jointNode, const Matrix3& parentRs)
 {
+    using namespace detail::vrml_body_loader;
     Link* link = body->createLink();
     link->setName(jointNode->defName);
     VRMLProtoFieldMap& jf = jointNode->fields;
     
-    link->setJointId(get<SFInt32>(jf["jointId"]));
+    link->setJointId(std::get<SFInt32>(jf["jointId"]));
     if(link->jointId() >= 0){
         if(link->jointId() >= static_cast<int>(validJointIdSet.size())){
             validJointIdSet.resize(link->jointId() + 1);
         }
         if(!validJointIdSet[link->jointId()]){
             ++numValidJointIds;
+#if UCNOID_NOT_SUPPORTED
             validJointIdSet.set(link->jointId());
+#else   // UCNOID_NOT_SUPPORTED
+            validJointIdSet[link->jointId()] = 1;
+#endif  // UCNOID_NOT_SUPPORTED
         } else {
-            os() << format(_("Warning: Joint ID {} is duplicated."), link->jointId()) << endl;
+#if UCNOID_NOT_SUPPORTED
+            os() << format(_("Warning: Joint ID {} is duplicated."), link->jointId()) << std::endl;
+#else   // UCNOID_NOT_SUPPORTED
+            os() << "Warning: Joint ID " << link->jointId() << " is duplicated." << std::endl;
+#endif  // UCNOID_NOT_SUPPORTED
         }
     }
 
@@ -788,7 +840,7 @@ Link* VRMLBodyLoaderImpl::createLink(VRMLProtoInstance* jointNode, const Matrix3
         link->setAccumulatedSegmentRotation(parentRs * R);
     }
 
-    string jointType;
+    std::string jointType;
     readVRMLfield(jf["jointType"], jointType);
     
     if(jointType == "fixed" ){
@@ -802,11 +854,19 @@ Link* VRMLBodyLoaderImpl::createLink(VRMLProtoInstance* jointNode, const Matrix3
     } else if(jointType == "pseudoContinuousTrack"){
         link->setJointType(Link::PSEUDO_CONTINUOUS_TRACK);
         link->setActuationMode(Link::JOINT_SURFACE_VELOCITY);
+#if UCNOID_NOT_SUPPORTED
         os() << format(
             _("Warning: A deprecated joint type 'pseudoContinousTrack'is specified for {}."), link->name())
-             << endl;
+             << std::endl;
+#else   // UCNOID_NOT_SUPPORTED
+        os() << "Warning: A deprecated joint type 'pseudoContinousTrack'is specified for "<< link->name() << "." << std::endl;
+#endif  // UCNOID_NOT_SUPPORTED
     } else {
-        throw invalid_argument(format(_("JointType \"{}\" is not supported."), jointType));
+#if UCNOID_NOT_SUPPORTED
+        throw std::invalid_argument(format(_("JointType \"{}\" is not supported."), jointType));
+#else   // UCNOID_NOT_SUPPORTED
+        throw std::invalid_argument(ssformat("JointType \"", jointType, "\" is not supported."));
+#endif  // UCNOID_NOT_SUPPORTED
     }
 
     if(link->jointType() == Link::FREE_JOINT || link->jointType() == Link::FIXED_JOINT){
@@ -815,10 +875,10 @@ Link* VRMLBodyLoaderImpl::createLink(VRMLProtoInstance* jointNode, const Matrix3
     } else {
         Vector3 jointAxis;
         VRMLVariantField& jointAxisField = jf["jointAxis"];
-        switch(jointAxisField.which()){
+        switch(jointAxisField.index()){
         case SFSTRING:
         {
-            SFString& axisLabel = get<SFString>(jointAxisField);
+            SFString& axisLabel = std::get<SFString>(jointAxisField);
             if(axisLabel == "X"){
                 jointAxis = Vector3::UnitX();
             } else if(axisLabel == "Y"){
@@ -848,7 +908,7 @@ Link* VRMLBodyLoaderImpl::createLink(VRMLProtoInstance* jointNode, const Matrix3
     double equivalentInertia = 0.0;
     VRMLVariantField* field = jointNode->findField("equivalentInertia");
     if(field){
-      equivalentInertia = get<SFFloat>(*field);
+      equivalentInertia = std::get<SFFloat>(*field);
     }
     
     if( equivalentInertia == 0.0 ){
@@ -863,7 +923,7 @@ Link* VRMLBodyLoaderImpl::createLink(VRMLProtoInstance* jointNode, const Matrix3
     link->setInfo("encoderPulse", encoderPulse);
     link->setInfo("rotorResistor", rotorResistor);
 
-    double maxlimit = numeric_limits<double>::max();
+    double maxlimit = std::numeric_limits<double>::max();
 
     link->setJointRange(
         getLimitValue(jf["llimit"],  -maxlimit),
@@ -882,6 +942,7 @@ Link* VRMLBodyLoaderImpl::createLink(VRMLProtoInstance* jointNode, const Matrix3
 
 void VRMLBodyLoaderImpl::readJointSubNodes(LinkInfo& iLink, MFNode& childNodes, const ProtoIdSet& acceptableProtoIds, const Affine3& T)
 {
+    using namespace detail::vrml_body_loader;
     for(size_t i = 0; i < childNodes.size(); ++i){
         bool doTraverse = false;
         VRMLNode* childNode = childNodes[i].get();
@@ -890,7 +951,7 @@ void VRMLBodyLoaderImpl::readJointSubNodes(LinkInfo& iLink, MFNode& childNodes, 
         } else {
             VRMLProtoInstance* protoInstance = static_cast<VRMLProtoInstance*>(childNode);
             int id = PROTO_UNDEFINED;
-            const string& protoName = protoInstance->proto->protoName;
+            const std::string& protoName = protoInstance->proto->protoName;
             ProtoInfoMap::iterator p = protoInfoMap.find(protoName);
             if(p == protoInfoMap.end()){
                 doTraverse = true;
@@ -898,7 +959,11 @@ void VRMLBodyLoaderImpl::readJointSubNodes(LinkInfo& iLink, MFNode& childNodes, 
             } else {
                 id = p->second.id;
                 if(!acceptableProtoIds.test(id)){
-                    throw invalid_argument(format(_("{} node is not in a correct place."), protoName));
+#if UCNOID_NOT_SUPPORTED
+                    throw std::invalid_argument(format(_("{} node is not in a correct place."), protoName));
+#else   // UCNOID_NOT_SUPPORTED
+                    throw std::invalid_argument(ssformat(protoName, " node is not in a correct place."));
+#endif  // UCNOID_NOT_SUPPORTED
                 }
                 if(isVerbose){
                     messageIndent += 2;
@@ -906,8 +971,13 @@ void VRMLBodyLoaderImpl::readJointSubNodes(LinkInfo& iLink, MFNode& childNodes, 
                 switch(id){
                 case PROTO_JOINT:
                     if(!T.matrix().isApprox(Affine3::MatrixType::Identity())){
-                        throw invalid_argument(
+#if UCNOID_NOT_SUPPORTED
+                        throw std::invalid_argument(
                             format(_("Joint node \"{}\" is not in a correct place."), protoInstance->defName));
+#else   // UCNOID_NOT_SUPPORTED
+                        throw std::invalid_argument(
+                            ssformat("Joint node \"", protoInstance->defName, "\" is not in a correct place."));
+#endif  // UCNOID_NOT_SUPPORTED
                     }
                     iLink.link->appendChild(readJointNode(protoInstance, iLink.link->Rs()));
                     break;
@@ -944,7 +1014,8 @@ void VRMLBodyLoaderImpl::readJointSubNodes(LinkInfo& iLink, MFNode& childNodes, 
 
 void VRMLBodyLoaderImpl::readSegmentNode(LinkInfo& iLink, VRMLProtoInstance* segmentNode, const Affine3& T)
 {
-    if(isVerbose) putMessage(string("Segment node ") + segmentNode->defName);
+    using namespace detail::vrml_body_loader;
+    if(isVerbose) putMessage(std::string("Segment node ") + segmentNode->defName);
     
     /*
       Mass = Sigma mass 
@@ -971,7 +1042,7 @@ void VRMLBodyLoaderImpl::readSegmentNode(LinkInfo& iLink, VRMLProtoInstance* seg
     readVRMLfield(sf["momentsOfInertia"], I);
     iLink.I.noalias() += T.linear() * I * T.linear().transpose();
 
-    MFNode& childNodes = get<MFNode>(segmentNode->fields["children"]);
+    MFNode& childNodes = std::get<MFNode>(segmentNode->fields["children"]);
     ProtoIdSet acceptableProtoIds;
     acceptableProtoIds.set(PROTO_SURFACE);
     acceptableProtoIds.set(PROTO_DEVICE);
@@ -998,15 +1069,15 @@ void VRMLBodyLoaderImpl::readSegmentNode(LinkInfo& iLink, VRMLProtoInstance* seg
 
 void VRMLBodyLoaderImpl::readSurfaceNode(LinkInfo& iLink, VRMLProtoInstance* segmentShapeNode, const Affine3& T)
 {
-    if(isVerbose) putMessage(string("Surface node ") + segmentShapeNode->defName);
+    if(isVerbose) putMessage(std::string("Surface node ") + segmentShapeNode->defName);
     
     iLink.isSurfaceNodeUsed = true;
 
     // check if another Surface node does not appear in the subtree
-    MFNode& visualNodes = get<MFNode>(segmentShapeNode->fields["visual"]);
+    MFNode& visualNodes = std::get<MFNode>(segmentShapeNode->fields["visual"]);
     ProtoIdSet acceptableProtoIds;
     readJointSubNodes(iLink, visualNodes, acceptableProtoIds, T);
-    MFNode& collisionNodes = get<MFNode>(segmentShapeNode->fields["collision"]);
+    MFNode& collisionNodes = std::get<MFNode>(segmentShapeNode->fields["collision"]);
     readJointSubNodes(iLink, collisionNodes, acceptableProtoIds, T);
 
     SgGroup* group;
@@ -1032,12 +1103,16 @@ void VRMLBodyLoaderImpl::readSurfaceNode(LinkInfo& iLink, VRMLProtoInstance* seg
 
 void VRMLBodyLoaderImpl::readDeviceNode(LinkInfo& iLink, VRMLProtoInstance* deviceNode, const Affine3& T)
 {
-    const string& typeName = deviceNode->proto->protoName;
+    const std::string& typeName = deviceNode->proto->protoName;
     if(isVerbose) putMessage(typeName + " node " + deviceNode->defName);
     
     DeviceFactoryMap::iterator p = deviceFactories.find(typeName);
     if(p == deviceFactories.end()){
-        os() << format(_("Sensor type {} is not supported.\n"), typeName) << endl;
+#if UCNOID_NOT_SUPPORTED
+        os() << format(_("Sensor type {} is not supported.\n"), typeName) << std::endl;
+#else   // UCNOID_NOT_SUPPORTED
+        os() << "Sensor type " << typeName << " is not supported.\n" << std::endl;
+#endif  // UCNOID_NOT_SUPPORTED
     } else {
         DeviceFactory& factory = p->second;
         DevicePtr device = factory(deviceNode);
@@ -1059,6 +1134,7 @@ void VRMLBodyLoaderImpl::readDeviceNode(LinkInfo& iLink, VRMLProtoInstance* devi
 
 void VRMLBodyLoaderImpl::readDeviceCommonParameters(Device& device, VRMLProtoInstance* node)
 {
+    using namespace detail::vrml_body_loader;
     device.setName(node->defName);
             
     int id = -1;
@@ -1077,6 +1153,7 @@ void VRMLBodyLoaderImpl::readDeviceCommonParameters(Device& device, VRMLProtoIns
 
 ForceSensorPtr VRMLBodyLoaderImpl::createForceSensor(VRMLProtoInstance* node)
 {
+    using namespace detail::vrml_body_loader;
     ForceSensorPtr sensor = new ForceSensor();
     readDeviceCommonParameters(*sensor, node);
 
@@ -1093,6 +1170,7 @@ ForceSensorPtr VRMLBodyLoaderImpl::createForceSensor(VRMLProtoInstance* node)
 
 RateGyroSensorPtr VRMLBodyLoaderImpl::createRateGyroSensor(VRMLProtoInstance* node)
 {
+    using namespace detail::vrml_body_loader;
     RateGyroSensorPtr sensor = new RateGyroSensor();
     readDeviceCommonParameters(*sensor, node);
 
@@ -1106,6 +1184,7 @@ RateGyroSensorPtr VRMLBodyLoaderImpl::createRateGyroSensor(VRMLProtoInstance* no
 
 AccelerationSensorPtr VRMLBodyLoaderImpl::createAccelerationSensor(VRMLProtoInstance* node)
 {
+    using namespace detail::vrml_body_loader;
     AccelerationSensorPtr sensor = new AccelerationSensor();
     readDeviceCommonParameters(*sensor, node);
 
@@ -1119,10 +1198,11 @@ AccelerationSensorPtr VRMLBodyLoaderImpl::createAccelerationSensor(VRMLProtoInst
 
 CameraPtr VRMLBodyLoaderImpl::createCamera(VRMLProtoInstance* node)
 {
+    using namespace detail::vrml_body_loader;
     CameraPtr camera;
     RangeCamera* range = 0;
     
-    const SFString& type = get<SFString>(node->fields["type"]);
+    const SFString& type = std::get<SFString>(node->fields["type"]);
     if(type == "COLOR"){
         camera = new Camera;
         camera->setImageType(Camera::COLOR_IMAGE);
@@ -1168,6 +1248,7 @@ CameraPtr VRMLBodyLoaderImpl::createCamera(VRMLProtoInstance* node)
 
 RangeSensorPtr VRMLBodyLoaderImpl::createRangeSensor(VRMLProtoInstance* node)
 {
+    using namespace detail::vrml_body_loader;
     RangeSensorPtr rangeSensor = new RangeSensor;
     
     readDeviceCommonParameters(*rangeSensor, node);
@@ -1190,6 +1271,7 @@ RangeSensorPtr VRMLBodyLoaderImpl::createRangeSensor(VRMLProtoInstance* node)
 
 void VRMLBodyLoaderImpl::readLightDeviceCommonParameters(Light& light, VRMLProtoInstance* node)
 {
+    using namespace detail::vrml_body_loader;
     readDeviceCommonParameters(light, node);
     
     light.on(getValue<SFBool>(node, "on"));
@@ -1200,6 +1282,7 @@ void VRMLBodyLoaderImpl::readLightDeviceCommonParameters(Light& light, VRMLProto
 
 SpotLightPtr VRMLBodyLoaderImpl::createSpotLight(VRMLProtoInstance* node)
 {
+    using namespace detail::vrml_body_loader;
     SpotLightPtr light = new SpotLight();
     
     readLightDeviceCommonParameters(*light, node);
@@ -1219,12 +1302,13 @@ SpotLightPtr VRMLBodyLoaderImpl::createSpotLight(VRMLProtoInstance* node)
 
 void VRMLBodyLoaderImpl::setExtraJoints()
 {
+    using namespace detail::vrml_body_loader;
     for(size_t i=0; i < extraJointNodes.size(); ++i){
 
         VRMLProtoFieldMap& f = extraJointNodes[i]->fields;
         ExtraJoint joint;
 
-        string link1Name, link2Name;
+        std::string link1Name, link2Name;
         readVRMLfield(f["link1Name"], link1Name);
         readVRMLfield(f["link2Name"], link2Name);
         joint.link[0] = body->link(link1Name);
@@ -1233,19 +1317,28 @@ void VRMLBodyLoaderImpl::setExtraJoints()
 
         for(int j=0; j < 2; ++j){
             if(!joint.link[j]){
-                throw invalid_argument(
+#if UCNOID_NOT_SUPPORTED
+                throw std::invalid_argument(
                     format(_("Field \"link{}Name\" of a ExtraJoint node does not specify a valid link name"), (j+1)));
+#else   // UCNOID_NOT_SUPPORTED
+                throw std::invalid_argument(
+                    ssformat("Field \"link", (j+1), "Name\" of a ExtraJoint node does not specify a valid link name"));
+#endif  // UCNOID_NOT_SUPPORTED
             }
         }
 
-        SFString& jointType = get<SFString>(f["jointType"]);
+        SFString& jointType = std::get<SFString>(f["jointType"]);
         if(jointType == "piston"){
             joint.type = ExtraJoint::EJ_PISTON;
-            joint.axis = get<SFVec3f>(f["jointAxis"]);
+            joint.axis = std::get<SFVec3f>(f["jointAxis"]);
         } else if(jointType == "ball"){
             joint.type = ExtraJoint::EJ_BALL;
         } else {
-            throw invalid_argument(format(_("JointType \"{}\" is not supported."), jointType));
+#if UCNOID_NOT_SUPPORTED
+            throw std::invalid_argument(format(_("JointType \"{}\" is not supported."), jointType));
+#else   // UCNOID_NOT_SUPPORTED
+            throw std::invalid_argument(ssformat("JointType \"", jointType, "\" is not supported."));
+#endif  // UCNOID_NOT_SUPPORTED
         }
             
         readVRMLfield(f["link1LocalPos"], joint.point[0]);
@@ -1254,3 +1347,8 @@ void VRMLBodyLoaderImpl::setExtraJoints()
         body->addExtraJoint(joint);
     }
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_VRML_BODY_LOADER_CPP_H

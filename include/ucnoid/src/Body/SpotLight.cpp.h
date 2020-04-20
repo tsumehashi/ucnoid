@@ -3,13 +3,17 @@
    \author Shin'ichiro Nakaoka
 */
 
+#ifndef UCNOID_BODY_SPOT_LIGHT_CPP_H
+#define UCNOID_BODY_SPOT_LIGHT_CPP_H
+
 #include "SpotLight.h"
 
-using namespace cnoid;
+namespace cnoid {
+inline namespace ucnoid {
 
-namespace {
+namespace detail::spot_light {
 
-const int PointLightStateSize = PointLight::pointLightStateSize();
+static const int PointLightStateSize = PointLight::pointLightStateSize();
 
 }
 
@@ -77,7 +81,7 @@ void SpotLight::forEachActualType(std::function<bool(const std::type_info& type)
 
 int SpotLight::stateSize() const
 {
-    return PointLightStateSize + 6;
+    return detail::spot_light::PointLightStateSize + 6;
 }
 
 
@@ -101,3 +105,8 @@ double* SpotLight::writeState(double* out_buf) const
     out_buf[5] = cutOffExponent_;
     return out_buf + 6;
 }
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
+
+#endif  // UCNOID_BODY_SPOT_LIGHT_CPP_H

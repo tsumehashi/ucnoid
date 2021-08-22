@@ -28,7 +28,7 @@ static const bool debugMode = false;
 
 
 template<class TMatrix>
-static void putMatrix(TMatrix& M, char* name)
+inline static void putMatrix(TMatrix& M, char* name)
 {
     if(M.cols() == 1){
         std::cout << "Vector " << name << M << std::endl;
@@ -48,33 +48,33 @@ static void putMatrix(TMatrix& M, char* name)
 }
 
 template<class TVector>
-static void putVector(TVector& M, char* name)
+inline static void putVector(TVector& M, char* name)
 {
     std::cout << "Vector " << name << M << std::endl;
 }
 
 }   // namespace detail::forward_dynamics_cbm
 
-ForwardDynamicsCBM::ForwardDynamicsCBM(DyBody* body) :
+inline ForwardDynamicsCBM::ForwardDynamicsCBM(DyBody* body) :
     ForwardDynamics(body)
 {
 
 }
 
 
-ForwardDynamicsCBM::~ForwardDynamicsCBM()
+inline ForwardDynamicsCBM::~ForwardDynamicsCBM()
 {
 
 }
 
 
-void ForwardDynamicsCBM::setHighGainModeForAllJoints()
+inline void ForwardDynamicsCBM::setHighGainModeForAllJoints()
 {
     for(auto link : body->joints()) link->setActuationMode(Link::JOINT_DISPLACEMENT);
 }
 
 
-void ForwardDynamicsCBM::setHighGainMode(int linkIndex, bool on)
+inline void ForwardDynamicsCBM::setHighGainMode(int linkIndex, bool on)
 {
     if(linkIndex == 0){
         body->rootLink()->setActuationMode(on ? Link::LINK_POSITION : Link::NO_ACTUATION);
@@ -84,7 +84,7 @@ void ForwardDynamicsCBM::setHighGainMode(int linkIndex, bool on)
 }
 
 
-void ForwardDynamicsCBM::initialize()
+inline void ForwardDynamicsCBM::initialize()
 {
     DyLink* root = body->rootLink();
     bool isRootActuated = root->actuationMode() == Link::LINK_POSITION;
@@ -149,7 +149,7 @@ void ForwardDynamicsCBM::initialize()
 }
 
 
-void ForwardDynamicsCBM::complementHighGainModeCommandValues()
+inline void ForwardDynamicsCBM::complementHighGainModeCommandValues()
 {
     for(size_t i=0; i < highGainModeJoints.size(); ++i){
         Link* joint = highGainModeJoints[i];
@@ -166,7 +166,7 @@ void ForwardDynamicsCBM::complementHighGainModeCommandValues()
 }
 
 
-void ForwardDynamicsCBM::solveUnknownAccels()
+inline void ForwardDynamicsCBM::solveUnknownAccels()
 {
     if(!isNoUnknownAccelMode){
         initializeAccelSolver();
@@ -182,7 +182,7 @@ inline void ForwardDynamicsCBM::calcAccelFKandForceSensorValues()
 }
 
 
-void ForwardDynamicsCBM::calcNextState()
+inline void ForwardDynamicsCBM::calcNextState()
 {
     if(isNoUnknownAccelMode && !sensorHelper.isActive()){
 
@@ -217,7 +217,7 @@ void ForwardDynamicsCBM::calcNextState()
 }
 
 
-void ForwardDynamicsCBM::calcMotionWithEulerMethod()
+inline void ForwardDynamicsCBM::calcMotionWithEulerMethod()
 {
     sumExternalForces();
     solveUnknownAccels();
@@ -245,7 +245,7 @@ void ForwardDynamicsCBM::calcMotionWithEulerMethod()
 }
 
 
-void ForwardDynamicsCBM::calcMotionWithRungeKuttaMethod()
+inline void ForwardDynamicsCBM::calcMotionWithRungeKuttaMethod()
 {
     const int numHighGainJoints = highGainModeJoints.size();
     DyLink* root = body->rootLink();
@@ -341,7 +341,7 @@ void ForwardDynamicsCBM::calcMotionWithRungeKuttaMethod()
 }
 
 
-void ForwardDynamicsCBM::integrateRungeKuttaOneStep(double r, double dt)
+inline void ForwardDynamicsCBM::integrateRungeKuttaOneStep(double r, double dt)
 {
     DyLink* root = body->rootLink();
 
@@ -367,7 +367,7 @@ void ForwardDynamicsCBM::integrateRungeKuttaOneStep(double r, double dt)
 }
 
 
-void ForwardDynamicsCBM::preserveHighGainModeJointState()
+inline void ForwardDynamicsCBM::preserveHighGainModeJointState()
 {
     if(given_rootDof){
         const DyLink* root = body->rootLink();
@@ -384,7 +384,7 @@ void ForwardDynamicsCBM::preserveHighGainModeJointState()
 }
 
 
-void ForwardDynamicsCBM::calcPositionAndVelocityFK()
+inline void ForwardDynamicsCBM::calcPositionAndVelocityFK()
 {
     DyLink* root = body->rootLink();
     root_w_x_v = root->w().cross(root->vo() + root->w().cross(root->p()));
@@ -465,7 +465,7 @@ COMMON_CALCS_FOR_ALL_JOINT_TYPES:
    \todo replace the unit vector method here with
    a more efficient method that only requires O(n) computation time
 */
-void ForwardDynamicsCBM::calcMassMatrix()
+inline void ForwardDynamicsCBM::calcMassMatrix()
 {
     DyLink* root = body->rootLink();
     const int numLinks = body->numLinks();
@@ -553,7 +553,7 @@ void ForwardDynamicsCBM::calcMassMatrix()
 }
 
 
-void ForwardDynamicsCBM::setColumnOfMassMatrix(MatrixXd& M, int column)
+inline void ForwardDynamicsCBM::setColumnOfMassMatrix(MatrixXd& M, int column)
 {
     Vector3 f;
     Vector3 tau;
@@ -577,7 +577,7 @@ void ForwardDynamicsCBM::setColumnOfMassMatrix(MatrixXd& M, int column)
 }
 
 
-void ForwardDynamicsCBM::calcInverseDynamics(DyLink* link, Vector3& out_f, Vector3& out_tau)
+inline void ForwardDynamicsCBM::calcInverseDynamics(DyLink* link, Vector3& out_f, Vector3& out_tau)
 {
     const DyLink* parent = link->parent();
     if(parent){
@@ -611,7 +611,7 @@ void ForwardDynamicsCBM::calcInverseDynamics(DyLink* link, Vector3& out_f, Vecto
 }
 
 
-void ForwardDynamicsCBM::sumExternalForces()
+inline void ForwardDynamicsCBM::sumExternalForces()
 {
     fextTotal.setZero();
     tauextTotal.setZero();
@@ -626,7 +626,7 @@ void ForwardDynamicsCBM::sumExternalForces()
     tauextTotal -= body->rootLink()->p().cross(fextTotal);
 }
 
-void ForwardDynamicsCBM::calcd1(DyLink* link, Vector3& out_f, Vector3& out_tau)
+inline void ForwardDynamicsCBM::calcd1(DyLink* link, Vector3& out_f, Vector3& out_tau)
 {
     out_f = -link->f_ext();
     out_tau = -link->tau_ext();
@@ -650,7 +650,7 @@ void ForwardDynamicsCBM::calcd1(DyLink* link, Vector3& out_f, Vector3& out_tau)
     }
 }
 
-void ForwardDynamicsCBM::initializeAccelSolver()
+inline void ForwardDynamicsCBM::initializeAccelSolver()
 {
     if(!accelSolverInitialized){
 
@@ -696,7 +696,7 @@ void ForwardDynamicsCBM::initializeAccelSolver()
    @return This function returns true if the accelerations can be calculated for the axes of unkown motion.
    If there is no axis of unkown motion, the function returns false.
 */
-bool ForwardDynamicsCBM::solveUnknownAccels
+inline bool ForwardDynamicsCBM::solveUnknownAccels
 (DyLink* link, const Vector3& fext, const Vector3& tauext, const Vector3& rootfext, const Vector3& roottauext)
 {
     if(isNoUnknownAccelMode){
@@ -732,7 +732,7 @@ bool ForwardDynamicsCBM::solveUnknownAccels
     return true;
 }
 
-void ForwardDynamicsCBM::solveUnknownAccels(const Vector3& fext, const Vector3& tauext)
+inline void ForwardDynamicsCBM::solveUnknownAccels(const Vector3& fext, const Vector3& tauext)
 {
     if(unknown_rootDof){
         c1.head(3) = fext;
@@ -762,7 +762,7 @@ void ForwardDynamicsCBM::solveUnknownAccels(const Vector3& fext, const Vector3& 
 }
 
 
-void ForwardDynamicsCBM::calcAccelFKandForceSensorValues(DyLink* link, Vector3& out_f, Vector3& out_tau)
+inline void ForwardDynamicsCBM::calcAccelFKandForceSensorValues(DyLink* link, Vector3& out_f, Vector3& out_tau)
 {
     const DyLink* parent = link->parent();
     if(parent){
@@ -808,7 +808,7 @@ void ForwardDynamicsCBM::calcAccelFKandForceSensorValues(DyLink* link, Vector3& 
 }
 
 
-void ForwardDynamicsCBM::initializeSensors()
+inline void ForwardDynamicsCBM::initializeSensors()
 {
     ForwardDynamics::initializeSensors();
 
@@ -827,7 +827,7 @@ void ForwardDynamicsCBM::initializeSensors()
 }
 
 
-void ForwardDynamicsCBM::updateForceSensorInfo(DyLink* link, bool hasSensorsAbove)
+inline void ForwardDynamicsCBM::updateForceSensorInfo(DyLink* link, bool hasSensorsAbove)
 {
     ForceSensorInfo& info = forceSensorInfo[link->index()];
     hasSensorsAbove |= info.hasSensor;
@@ -839,7 +839,7 @@ void ForwardDynamicsCBM::updateForceSensorInfo(DyLink* link, bool hasSensorsAbov
 }
 
 
-void ForwardDynamicsCBM::updateForceSensors()
+inline void ForwardDynamicsCBM::updateForceSensors()
 {
     const DeviceList<ForceSensor>& sensors = sensorHelper.forceSensors();
 

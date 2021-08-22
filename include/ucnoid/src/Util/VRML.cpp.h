@@ -11,7 +11,7 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-const char* labelOfVRMLfieldTypeId(const std::type_info& fieldType)
+inline const char* labelOfVRMLfieldTypeId(const std::type_info& fieldType)
 {
     if(fieldType == typeid(SFInt32)){
         return "SFInt32";
@@ -59,26 +59,26 @@ const char* labelOfVRMLfieldTypeId(const std::type_info& fieldType)
 }
 
 
-VRMLNode::VRMLNode()
+inline VRMLNode::VRMLNode()
 {
 
 }
 
 
-VRMLNode::~VRMLNode()
+inline VRMLNode::~VRMLNode()
 {
 
 }
 
 
-bool VRMLNode::isCategoryOf(VRMLNodeCategory category)
+inline bool VRMLNode::isCategoryOf(VRMLNodeCategory category)
 {
     return (category == ANY_NODE) ? true : categorySet.test(category);
 }
 
 
 
-VRMLUnsupportedNode::VRMLUnsupportedNode(const std::string& nodeTypeName) :
+inline VRMLUnsupportedNode::VRMLUnsupportedNode(const std::string& nodeTypeName) :
     nodeTypeName(nodeTypeName)
 {
     categorySet.set(TOP_NODE);
@@ -86,13 +86,13 @@ VRMLUnsupportedNode::VRMLUnsupportedNode(const std::string& nodeTypeName) :
 }
 
 
-const char* VRMLUnsupportedNode::typeName() const
+inline const char* VRMLUnsupportedNode::typeName() const
 {
     return "Unknown";
 }
 
 
-VRMLViewpoint::VRMLViewpoint()
+inline VRMLViewpoint::VRMLViewpoint()
 {
     categorySet.set(TOP_NODE);
     categorySet.set(BINDABLE_NODE);
@@ -106,13 +106,13 @@ VRMLViewpoint::VRMLViewpoint()
 }
 
 
-const char* VRMLViewpoint::typeName() const
+inline const char* VRMLViewpoint::typeName() const
 {
     return "Viewpoint";
 }
 
 
-VRMLNavigationInfo::VRMLNavigationInfo() :
+inline VRMLNavigationInfo::VRMLNavigationInfo() :
     avatarSize(3)
 {
     categorySet.set(TOP_NODE);
@@ -131,13 +131,13 @@ VRMLNavigationInfo::VRMLNavigationInfo() :
 }
 
 
-const char* VRMLNavigationInfo::typeName() const
+inline const char* VRMLNavigationInfo::typeName() const
 {
     return "NavigationInfo";
 }
 
 
-VRMLBackground::VRMLBackground()
+inline VRMLBackground::VRMLBackground()
 {
     categorySet.set(TOP_NODE);
     categorySet.set(BINDABLE_NODE);
@@ -145,13 +145,13 @@ VRMLBackground::VRMLBackground()
 }
 
 
-const char* VRMLBackground::typeName() const
+inline const char* VRMLBackground::typeName() const
 {
     return "Background";
 }
 
 
-AbstractVRMLGroup::AbstractVRMLGroup()
+inline AbstractVRMLGroup::AbstractVRMLGroup()
 {
     categorySet.set(TOP_NODE);
     categorySet.set(GROUPING_NODE);
@@ -159,44 +159,44 @@ AbstractVRMLGroup::AbstractVRMLGroup()
 }
 
 
-void AbstractVRMLGroup::removeChild(int childIndex)
+inline void AbstractVRMLGroup::removeChild(int childIndex)
 {
     replaceChild(childIndex, 0);
 }
 
 
-VRMLGroup::VRMLGroup()
+inline VRMLGroup::VRMLGroup()
 {
     bboxCenter.setZero();
     bboxSize.fill(-1.0);
 }
 
 
-const char* VRMLGroup::typeName() const
+inline const char* VRMLGroup::typeName() const
 {
     return "Group";
 }
 
 
-MFNode& VRMLGroup::getChildren()
+inline MFNode& VRMLGroup::getChildren()
 {
     return children;
 }
 
 
-int VRMLGroup::countChildren()
+inline int VRMLGroup::countChildren()
 {
     return children.size();
 }
 
 
-VRMLNode* VRMLGroup::getChild(int index)
+inline VRMLNode* VRMLGroup::getChild(int index)
 {
     return children[index].get();
 }
 
 
-void VRMLGroup::replaceChild(int childIndex, VRMLNode* childNode)
+inline void VRMLGroup::replaceChild(int childIndex, VRMLNode* childNode)
 {
     if(!childNode){
         children.erase(children.begin() + childIndex);
@@ -206,7 +206,7 @@ void VRMLGroup::replaceChild(int childIndex, VRMLNode* childNode)
 }
 
 
-VRMLTransform::VRMLTransform()
+inline VRMLTransform::VRMLTransform()
 {
     center.setZero();
     rotation.axis() = SFVec3f::UnitZ();
@@ -218,13 +218,13 @@ VRMLTransform::VRMLTransform()
 }
 
 
-const char* VRMLTransform::typeName() const
+inline const char* VRMLTransform::typeName() const
 {
     return "Transform";
 }
 
 
-Eigen::Affine3d VRMLTransform::toAffine3d()
+inline Eigen::Affine3d VRMLTransform::toAffine3d()
 {
     const Eigen::Translation3d C(center);
     const SFRotation& SR = scaleOrientation;
@@ -236,32 +236,32 @@ Eigen::Affine3d VRMLTransform::toAffine3d()
 }
 
 
-VRMLInline::VRMLInline()
+inline VRMLInline::VRMLInline()
 {
     categorySet.set(INLINE_NODE);
 }
 
 
-const char* VRMLInline::typeName() const
+inline const char* VRMLInline::typeName() const
 {
     return "Inline";
 }
 
 
-VRMLNonVrmlInline::VRMLNonVrmlInline()
+inline VRMLNonVrmlInline::VRMLNonVrmlInline()
 {
     categorySet.set(TOP_NODE);
     categorySet.set(CHILD_NODE);
 }
 
 
-const char* VRMLNonVrmlInline::typeName() const
+inline const char* VRMLNonVrmlInline::typeName() const
 {
     return "NonVRML";
 }
 
 
-VRMLShape::VRMLShape()
+inline VRMLShape::VRMLShape()
 {
     categorySet.set(TOP_NODE);
     categorySet.set(CHILD_NODE);
@@ -269,25 +269,25 @@ VRMLShape::VRMLShape()
 }
 
 
-const char* VRMLShape::typeName() const
+inline const char* VRMLShape::typeName() const
 {
     return "Shape";
 }
 
 
-VRMLAppearance::VRMLAppearance()
+inline VRMLAppearance::VRMLAppearance()
 {
     categorySet.set(APPEARANCE_NODE);
 }
 
 
-const char* VRMLAppearance::typeName() const
+inline const char* VRMLAppearance::typeName() const
 {
     return "Appearance";
 }
 
 
-VRMLMaterial::VRMLMaterial()
+inline VRMLMaterial::VRMLMaterial()
 {
     categorySet.set(MATERIAL_NODE);
 
@@ -300,32 +300,32 @@ VRMLMaterial::VRMLMaterial()
 }
 
 
-const char* VRMLMaterial::typeName() const
+inline const char* VRMLMaterial::typeName() const
 {
     return "Material";
 }
 
 
-VRMLTexture::VRMLTexture()
+inline VRMLTexture::VRMLTexture()
 {
     categorySet.set(TEXTURE_NODE);
 }
 
 
-VRMLImageTexture::VRMLImageTexture()
+inline VRMLImageTexture::VRMLImageTexture()
 {
     repeatS = true; 
     repeatT = true; 
 }
 
 
-const char* VRMLImageTexture::typeName() const
+inline const char* VRMLImageTexture::typeName() const
 {
     return "ImageTexture";
 }
 
 
-VRMLTextureTransform::VRMLTextureTransform()
+inline VRMLTextureTransform::VRMLTextureTransform()
 {
     categorySet.set(TEXTURE_TRANSFORM_NODE);
 
@@ -336,31 +336,31 @@ VRMLTextureTransform::VRMLTextureTransform()
 }
 
 
-const char* VRMLTextureTransform::typeName() const
+inline const char* VRMLTextureTransform::typeName() const
 {
     return "TextureTransform";
 }
 
 
-VRMLGeometry::VRMLGeometry()
+inline VRMLGeometry::VRMLGeometry()
 {
     categorySet.set(GEOMETRY_NODE);
 }
 
 
-VRMLBox::VRMLBox()
+inline VRMLBox::VRMLBox()
 {
     size.fill(2.0);
 }
 
 
-const char* VRMLBox::typeName() const
+inline const char* VRMLBox::typeName() const
 {
     return "Box";
 }
 
 
-VRMLCone::VRMLCone()
+inline VRMLCone::VRMLCone()
 {
     bottom = true;
     bottomRadius = 1.0;
@@ -369,13 +369,13 @@ VRMLCone::VRMLCone()
 }
 
 
-const char* VRMLCone::typeName() const
+inline const char* VRMLCone::typeName() const
 {
     return "Cone";
 }
 
 
-VRMLCylinder::VRMLCylinder()
+inline VRMLCylinder::VRMLCylinder()
 {
     height = 2.0;
     radius = 1.0;
@@ -385,25 +385,25 @@ VRMLCylinder::VRMLCylinder()
 }
 
 
-const char* VRMLCylinder::typeName() const
+inline const char* VRMLCylinder::typeName() const
 {
     return "Cylinder";
 }
 
 
-VRMLSphere::VRMLSphere()
+inline VRMLSphere::VRMLSphere()
 {
     radius = 1.0; 
 }
 
 
-const char* VRMLSphere::typeName() const
+inline const char* VRMLSphere::typeName() const
 {
     return "Sphere";
 }
 
 
-VRMLFontStyle::VRMLFontStyle()
+inline VRMLFontStyle::VRMLFontStyle()
 {
     categorySet.set(FONT_STYLE_NODE);
   
@@ -418,37 +418,37 @@ VRMLFontStyle::VRMLFontStyle()
 }
 
 
-const char* VRMLFontStyle::typeName() const
+inline const char* VRMLFontStyle::typeName() const
 {
     return "FontStyle";
 }
 
 
-VRMLText::VRMLText()
+inline VRMLText::VRMLText()
 {
     maxExtent = 0.0;
 }
 
 
-const char* VRMLText::typeName() const
+inline const char* VRMLText::typeName() const
 {
     return "Text";
 }
 
 
-VRMLIndexedLineSet::VRMLIndexedLineSet()
+inline VRMLIndexedLineSet::VRMLIndexedLineSet()
 {
     colorPerVertex = true;
 }
 
 
-const char* VRMLIndexedLineSet::typeName() const
+inline const char* VRMLIndexedLineSet::typeName() const
 {
     return "IndexedLineSet";
 }
 
 
-VRMLIndexedFaceSet::VRMLIndexedFaceSet()
+inline VRMLIndexedFaceSet::VRMLIndexedFaceSet()
 {
     ccw = true;
     convex = true;
@@ -458,61 +458,61 @@ VRMLIndexedFaceSet::VRMLIndexedFaceSet()
 }
 
 
-const char* VRMLIndexedFaceSet::typeName() const
+inline const char* VRMLIndexedFaceSet::typeName() const
 {
     return "IndexedFaseSet";
 }
 
 
-VRMLColor::VRMLColor()
+inline VRMLColor::VRMLColor()
 {
     categorySet.set(COLOR_NODE);
 }
 
 
-const char* VRMLColor::typeName() const
+inline const char* VRMLColor::typeName() const
 {
     return "Color";
 }
 
 
-VRMLCoordinate::VRMLCoordinate()
+inline VRMLCoordinate::VRMLCoordinate()
 {
     categorySet.set(COORDINATE_NODE);
 }
 
 
-const char* VRMLCoordinate::typeName() const
+inline const char* VRMLCoordinate::typeName() const
 {
     return "Coordinate";
 }
 
 
-VRMLTextureCoordinate::VRMLTextureCoordinate()
+inline VRMLTextureCoordinate::VRMLTextureCoordinate()
 {
     categorySet.set(TEXTURE_COORDINATE_NODE);
 }
 
 
-const char* VRMLTextureCoordinate::typeName() const
+inline const char* VRMLTextureCoordinate::typeName() const
 {
     return "TextureCoordinate";
 }
 
 
-VRMLNormal::VRMLNormal()
+inline VRMLNormal::VRMLNormal()
 {
     categorySet.set(NORMAL_NODE);
 }
 
 
-const char* VRMLNormal::typeName() const
+inline const char* VRMLNormal::typeName() const
 {
     return "Normal";
 }
 
 
-VRMLCylinderSensor::VRMLCylinderSensor()
+inline VRMLCylinderSensor::VRMLCylinderSensor()
 {
     categorySet.set(CHILD_NODE);
     categorySet.set(SENSOR_NODE);
@@ -526,26 +526,26 @@ VRMLCylinderSensor::VRMLCylinderSensor()
 }
 
 
-const char* VRMLCylinderSensor::typeName() const
+inline const char* VRMLCylinderSensor::typeName() const
 {
     return "CylinderSensor";
 }
 
 
-VRMLPointSet::VRMLPointSet()
+inline VRMLPointSet::VRMLPointSet()
 {
     coord = NULL;
     color = NULL;
 }
 
 
-const char* VRMLPointSet::typeName() const
+inline const char* VRMLPointSet::typeName() const
 {
     return "PointSet";
 }
 
 
-VRMLPixelTexture::VRMLPixelTexture()
+inline VRMLPixelTexture::VRMLPixelTexture()
 {
     image.width  = 0;
     image.height = 0;
@@ -557,13 +557,13 @@ VRMLPixelTexture::VRMLPixelTexture()
 }
 
 
-const char* VRMLPixelTexture::typeName() const
+inline const char* VRMLPixelTexture::typeName() const
 {
     return "PixelTexture";
 }
 
 
-VRMLMovieTexture::VRMLMovieTexture()
+inline VRMLMovieTexture::VRMLMovieTexture()
 {
     // url
     loop = false;
@@ -575,13 +575,13 @@ VRMLMovieTexture::VRMLMovieTexture()
 }
 
 
-const char* VRMLMovieTexture::typeName() const
+inline const char* VRMLMovieTexture::typeName() const
 {
     return "MovieTexture";
 }
 
 
-VRMLElevationGrid::VRMLElevationGrid()
+inline VRMLElevationGrid::VRMLElevationGrid()
 {
     xDimension = 0;
     zDimension = 0;
@@ -599,13 +599,13 @@ VRMLElevationGrid::VRMLElevationGrid()
 }
 
 
-const char* VRMLElevationGrid::typeName() const
+inline const char* VRMLElevationGrid::typeName() const
 {
     return "ElevationGrid";
 }
 
 
-VRMLExtrusion::VRMLExtrusion()
+inline VRMLExtrusion::VRMLExtrusion()
 {
     // crossSection
     // spine
@@ -620,43 +620,43 @@ VRMLExtrusion::VRMLExtrusion()
 }
 
 
-const char* VRMLExtrusion::typeName() const
+inline const char* VRMLExtrusion::typeName() const
 {
     return "Extrusion";
 }
 
 
-VRMLSwitch::VRMLSwitch()
+inline VRMLSwitch::VRMLSwitch()
 {
     whichChoice = -1;
 }
 
 
-const char* VRMLSwitch::typeName() const
+inline const char* VRMLSwitch::typeName() const
 {
     return "Switch";
 }
 
 
-MFNode& VRMLSwitch::getChildren()
+inline MFNode& VRMLSwitch::getChildren()
 {
     return choice;
 }
 
 
-int VRMLSwitch::countChildren()
+inline int VRMLSwitch::countChildren()
 {
     return choice.size();
 }
 
 
-VRMLNode* VRMLSwitch::getChild(int index)
+inline VRMLNode* VRMLSwitch::getChild(int index)
 {
     return choice[index].get();
 }
 
 
-void VRMLSwitch::replaceChild(int childIndex, VRMLNode* childNode)
+inline void VRMLSwitch::replaceChild(int childIndex, VRMLNode* childNode)
 {
     if(!childNode){
         choice.erase(choice.begin() + childIndex);
@@ -671,37 +671,37 @@ void VRMLSwitch::replaceChild(int childIndex, VRMLNode* childNode)
 }
 
 
-VRMLLOD::VRMLLOD()
+inline VRMLLOD::VRMLLOD()
 {
     center.setZero();
 }
 
 
-const char* VRMLLOD::typeName() const
+inline const char* VRMLLOD::typeName() const
 {
     return "LOD";
 }
 
 
-MFNode& VRMLLOD::getChildren()
+inline MFNode& VRMLLOD::getChildren()
 {
     return level;
 }
 
 
-int VRMLLOD::countChildren()
+inline int VRMLLOD::countChildren()
 {
     return level.size();
 }
 
 
-VRMLNode* VRMLLOD::getChild(int index)
+inline VRMLNode* VRMLLOD::getChild(int index)
 {
     return level[index].get();
 }
 
 
-void VRMLLOD::replaceChild(int childIndex, VRMLNode* childNode)
+inline void VRMLLOD::replaceChild(int childIndex, VRMLNode* childNode)
 {
     if(!childNode){
         level.erase(level.begin() + childIndex);
@@ -715,43 +715,43 @@ void VRMLLOD::replaceChild(int childIndex, VRMLNode* childNode)
 }
 
 
-VRMLCollision::VRMLCollision()
+inline VRMLCollision::VRMLCollision()
 {
     collide = true;
 }
 
 
-const char* VRMLCollision::typeName() const
+inline const char* VRMLCollision::typeName() const
 {
     return "Collision";
 }
 
 
-VRMLAnchor::VRMLAnchor()
+inline VRMLAnchor::VRMLAnchor()
 {
 
 }
 
 
-const char* VRMLAnchor::typeName() const
+inline const char* VRMLAnchor::typeName() const
 {
     return "Anchor";
 }
 
 
-VRMLBillboard::VRMLBillboard()
+inline VRMLBillboard::VRMLBillboard()
 {
     axisOfRotation.setZero();
 }
 
 
-const char* VRMLBillboard::typeName() const
+inline const char* VRMLBillboard::typeName() const
 {
     return "Billboard";
 }
 
 
-VRMLFog::VRMLFog()
+inline VRMLFog::VRMLFog()
 {
     categorySet.set(TOP_NODE);    
     categorySet.set(CHILD_NODE);
@@ -761,26 +761,26 @@ VRMLFog::VRMLFog()
 }
 
 
-const char* VRMLFog::typeName() const
+inline const char* VRMLFog::typeName() const
 {
     return "Fog";
 }
 
 
-VRMLWorldInfo::VRMLWorldInfo()
+inline VRMLWorldInfo::VRMLWorldInfo()
 {
     categorySet.set(TOP_NODE);
     categorySet.set(CHILD_NODE);
 }
 
 
-const char* VRMLWorldInfo::typeName() const
+inline const char* VRMLWorldInfo::typeName() const
 {
     return "WorldInfo";
 }
 
 
-VRMLLight::VRMLLight()
+inline VRMLLight::VRMLLight()
 {
     categorySet.set(TOP_NODE);
     categorySet.set(CHILD_NODE);
@@ -793,7 +793,7 @@ VRMLLight::VRMLLight()
 }
 
 
-VRMLPointLight::VRMLPointLight()
+inline VRMLPointLight::VRMLPointLight()
 {
     location.setZero();
     radius = 100.0;
@@ -801,25 +801,25 @@ VRMLPointLight::VRMLPointLight()
 }
 
 
-const char* VRMLPointLight::typeName() const
+inline const char* VRMLPointLight::typeName() const
 {
     return "PointLight";
 }
 
 
-VRMLDirectionalLight::VRMLDirectionalLight()
+inline VRMLDirectionalLight::VRMLDirectionalLight()
 {
     direction << 0.0, 0.0, -1.0;
 }
 
 
-const char* VRMLDirectionalLight::typeName() const
+inline const char* VRMLDirectionalLight::typeName() const
 {
     return "DirectionalLight";
 }
 
 
-VRMLSpotLight::VRMLSpotLight()
+inline VRMLSpotLight::VRMLSpotLight()
 {
     direction << 0.0, 0.0, -1.0;
     beamWidth = 1.570796;
@@ -827,26 +827,26 @@ VRMLSpotLight::VRMLSpotLight()
 }
 
 
-const char* VRMLSpotLight::typeName() const
+inline const char* VRMLSpotLight::typeName() const
 {
     return "SpotLight";
 }
 
 
-VRMLProto::VRMLProto(const std::string& n) : protoName(n)
+inline VRMLProto::VRMLProto(const std::string& n) : protoName(n)
 {
     categorySet.set(TOP_NODE);
     categorySet.set(PROTO_DEF_NODE);
 }
 
 
-const char* VRMLProto::typeName() const
+inline const char* VRMLProto::typeName() const
 {
     return "Proto";
 }
 
 
-VRMLProtoInstance::VRMLProtoInstance(VRMLProtoPtr proto0) :
+inline VRMLProtoInstance::VRMLProtoInstance(VRMLProtoPtr proto0) :
     proto(proto0),
     fields(proto0->fields) 
 {
@@ -856,7 +856,7 @@ VRMLProtoInstance::VRMLProtoInstance(VRMLProtoPtr proto0) :
 }
 
 
-const char* VRMLProtoInstance::typeName() const
+inline const char* VRMLProtoInstance::typeName() const
 {
     return "ProtoInstance";
 }

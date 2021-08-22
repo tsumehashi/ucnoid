@@ -93,13 +93,13 @@ inline namespace ucnoid {
 #include <string>
 #include <sstream>
 
-const std::string& _(const std::string& str)
+inline const std::string& _(const std::string& str)
 {
     return str;
 }
 
 template <class... Args>
-std::string ssformat(const Args&... args)
+inline std::string ssformat(const Args&... args)
 {
     std::stringstream ss;
     auto t = std::make_tuple(args...);

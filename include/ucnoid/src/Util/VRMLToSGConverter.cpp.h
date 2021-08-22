@@ -120,13 +120,13 @@ public:
 
 
 
-VRMLToSGConverter::VRMLToSGConverter()
+inline VRMLToSGConverter::VRMLToSGConverter()
 {
     impl = new VRMLToSGConverterImpl(this);
 }
 
 
-VRMLToSGConverterImpl::VRMLToSGConverterImpl(VRMLToSGConverter* self)
+inline VRMLToSGConverterImpl::VRMLToSGConverterImpl(VRMLToSGConverter* self)
     : self(self)
 {
     os_ = &nullout();
@@ -137,13 +137,13 @@ VRMLToSGConverterImpl::VRMLToSGConverterImpl(VRMLToSGConverter* self)
 }
 
 
-VRMLToSGConverter::~VRMLToSGConverter()
+inline VRMLToSGConverter::~VRMLToSGConverter()
 {
     delete impl;
 }
 
 
-void VRMLToSGConverter::setMessageSink(std::ostream& os)
+inline void VRMLToSGConverter::setMessageSink(std::ostream& os)
 {
     impl->os_ = &os;
     if(impl->sceneLoader){
@@ -152,19 +152,19 @@ void VRMLToSGConverter::setMessageSink(std::ostream& os)
 }
 
 
-void VRMLToSGConverter::setTriangulationEnabled(bool on)
+inline void VRMLToSGConverter::setTriangulationEnabled(bool on)
 {
     impl->isTriangulationEnabled = on;
 }
 
 
-void VRMLToSGConverter::setDivisionNumber(int divisionNumber)
+inline void VRMLToSGConverter::setDivisionNumber(int divisionNumber)
 {
     impl->meshGenerator.setDivisionNumber(divisionNumber);
 }
 
 
-int VRMLToSGConverter::divisionNumber() const
+inline int VRMLToSGConverter::divisionNumber() const
 {
     return impl->meshGenerator.divisionNumber();
 }
@@ -177,19 +177,19 @@ void VRMLToSGConverter::setNormalGenerationEnabled(bool on, bool doOverwrite)
 }
 
 
-void VRMLToSGConverter::setMinCreaseAngle(double angle)
+inline void VRMLToSGConverter::setMinCreaseAngle(double angle)
 {
     impl->meshFilter.setMinCreaseAngle(angle);
 }
 
 
-void VRMLToSGConverter::setMaxCreaseAngle(double angle)
+inline void VRMLToSGConverter::setMaxCreaseAngle(double angle)
 {
     impl->meshFilter.setMaxCreaseAngle(angle);
 }
 
 
-void VRMLToSGConverter::clearConvertedNodeMap()
+inline void VRMLToSGConverter::clearConvertedNodeMap()
 {
     impl->vrmlNodeToSgNodeMap.clear();
     impl->vrmlGeometryToSgMeshMap.clear();
@@ -201,7 +201,7 @@ void VRMLToSGConverter::clearConvertedNodeMap()
 }
 
 
-SgNodePtr VRMLToSGConverter::convert(VRMLNodePtr vrmlNode)
+inline SgNodePtr VRMLToSGConverter::convert(VRMLNodePtr vrmlNode)
 {
     if(vrmlNode){
         return impl->convertNode(vrmlNode.get());
@@ -210,7 +210,7 @@ SgNodePtr VRMLToSGConverter::convert(VRMLNodePtr vrmlNode)
 }
 
 
-void VRMLToSGConverterImpl::putMessage(const std::string& message)
+inline void VRMLToSGConverterImpl::putMessage(const std::string& message)
 {
     os() << message << std::endl;
 
@@ -222,7 +222,7 @@ void VRMLToSGConverterImpl::putMessage(const std::string& message)
 }
 
 
-SgNode* VRMLToSGConverterImpl::convertNode(VRMLNode* vnode)
+inline SgNode* VRMLToSGConverterImpl::convertNode(VRMLNode* vnode)
 {
     SgNode* node = 0;
 
@@ -258,7 +258,7 @@ SgNode* VRMLToSGConverterImpl::convertNode(VRMLNode* vnode)
 }
 
 
-SgNode* VRMLToSGConverterImpl::convertGroupNode(AbstractVRMLGroup* vgroup)
+inline SgNode* VRMLToSGConverterImpl::convertGroupNode(AbstractVRMLGroup* vgroup)
 {
     SgNode* top;
     SgGroup* group;
@@ -287,7 +287,7 @@ SgNode* VRMLToSGConverterImpl::convertGroupNode(AbstractVRMLGroup* vgroup)
 }
 
 
-std::pair<SgNode*, SgGroup*> VRMLToSGConverterImpl::createTransformNodeSet(VRMLTransform* vt)
+inline std::pair<SgNode*, SgGroup*> VRMLToSGConverterImpl::createTransformNodeSet(VRMLTransform* vt)
 {
     const Translation3d C(vt->center);
     const AngleAxisd& R = vt->rotation;
@@ -320,7 +320,7 @@ std::pair<SgNode*, SgGroup*> VRMLToSGConverterImpl::createTransformNodeSet(VRMLT
 }
 
 
-SgNode* VRMLToSGConverterImpl::convertShapeNode(VRMLShape* vshape)
+inline SgNode* VRMLToSGConverterImpl::convertShapeNode(VRMLShape* vshape)
 {
     SgNode* converted = nullptr;
 
@@ -469,7 +469,7 @@ SgNode* VRMLToSGConverterImpl::convertShapeNode(VRMLShape* vshape)
 }
 
 
-SgMeshPtr VRMLToSGConverterImpl::createMeshFromIndexedFaceSet(VRMLIndexedFaceSet* vface)
+inline SgMeshPtr VRMLToSGConverterImpl::createMeshFromIndexedFaceSet(VRMLIndexedFaceSet* vface)
 {
     if(!vface->coord || vface->coord->point.empty() || vface->coordIndex.empty()){
         return nullptr;
@@ -581,7 +581,7 @@ SgMeshPtr VRMLToSGConverterImpl::createMeshFromIndexedFaceSet(VRMLIndexedFaceSet
 }
 
 
-bool VRMLToSGConverterImpl::setIndicesForPerTriangleData(SgIndexArray& indices, int dataSize)
+inline bool VRMLToSGConverterImpl::setIndicesForPerTriangleData(SgIndexArray& indices, int dataSize)
 {
     const int numIndices = (dataSize - removedFaceIndices.size()) * 3;
     if(numIndices > 0){
@@ -604,7 +604,7 @@ bool VRMLToSGConverterImpl::setIndicesForPerTriangleData(SgIndexArray& indices, 
 }
 
 
-bool VRMLToSGConverterImpl::convertIndicesForTriangles
+inline bool VRMLToSGConverterImpl::convertIndicesForTriangles
 (SgIndexArray& indices, const MFInt32& orgIndices, const bool perVertex, const bool ccw)
 {
     bool converted = true;
@@ -670,7 +670,7 @@ bool VRMLToSGConverterImpl::convertIndicesForTriangles
 }
 
 
-SgPolygonMeshPtr VRMLToSGConverterImpl::createPolygonMeshFromIndexedFaceSet(VRMLIndexedFaceSet* vface)
+inline SgPolygonMeshPtr VRMLToSGConverterImpl::createPolygonMeshFromIndexedFaceSet(VRMLIndexedFaceSet* vface)
 {
     if(!vface->coord){
         putMessage("VRMLIndexedFaceSet: The coord field is not defined." );
@@ -751,7 +751,7 @@ SgPolygonMeshPtr VRMLToSGConverterImpl::createPolygonMeshFromIndexedFaceSet(VRML
 }
 
 
-void VRMLToSGConverterImpl::setIndicesForPerPolygonData(SgIndexArray& indices, int dataSize, const MFInt32& orgCoordIndices)
+inline void VRMLToSGConverterImpl::setIndicesForPerPolygonData(SgIndexArray& indices, int dataSize, const MFInt32& orgCoordIndices)
 {
     indices.reserve(orgCoordIndices.size());
     size_t indexInOrgCoordIndices = 0;
@@ -768,7 +768,7 @@ void VRMLToSGConverterImpl::setIndicesForPerPolygonData(SgIndexArray& indices, i
 }
 
 
-void VRMLToSGConverterImpl::convertIndicesForPolygons
+inline void VRMLToSGConverterImpl::convertIndicesForPolygons
 (SgIndexArray& indices, const MFInt32& orgIndices, const MFInt32& orgCoordIndices, const bool perVertex, const bool ccw)
 {
     if(perVertex){
@@ -811,7 +811,7 @@ void VRMLToSGConverterImpl::convertIndicesForPolygons
 }
 
 
-SgMeshPtr VRMLToSGConverterImpl::createMeshFromElevationGrid(VRMLElevationGrid* grid)
+inline SgMeshPtr VRMLToSGConverterImpl::createMeshFromElevationGrid(VRMLElevationGrid* grid)
 {
     if(grid->xDimension * grid->zDimension != static_cast<SFInt32>(grid->height.size())){
         putMessage("A VRML ElevationGrid node has illegal parameters.");
@@ -887,7 +887,7 @@ SgMeshPtr VRMLToSGConverterImpl::createMeshFromElevationGrid(VRMLElevationGrid* 
 }
 
 
-void VRMLToSGConverterImpl::setDefaultTextureCoordinateForElevationGrid(const SgMeshPtr& mesh, const VRMLElevationGrid* grid)
+inline void VRMLToSGConverterImpl::setDefaultTextureCoordinateForElevationGrid(const SgMeshPtr& mesh, const VRMLElevationGrid* grid)
 {
     float xmax = grid->xSpacing * (grid->xDimension - 1);
     float zmax = grid->zSpacing * (grid->zDimension - 1);
@@ -904,7 +904,7 @@ void VRMLToSGConverterImpl::setDefaultTextureCoordinateForElevationGrid(const Sg
 }
 
 
-SgMeshPtr VRMLToSGConverterImpl::createMeshFromExtrusion(VRMLExtrusion* extrusion)
+inline SgMeshPtr VRMLToSGConverterImpl::createMeshFromExtrusion(VRMLExtrusion* extrusion)
 {
     bool isClosed = false;
     const int numSpine = extrusion->spine.size();
@@ -1089,7 +1089,7 @@ SgMeshPtr VRMLToSGConverterImpl::createMeshFromExtrusion(VRMLExtrusion* extrusio
 }
 
 
-void VRMLToSGConverterImpl::setDefaultTextureCoordinateForExtrusion(const SgMeshPtr& mesh, const VRMLExtrusion* extrusion)
+inline void VRMLToSGConverterImpl::setDefaultTextureCoordinateForExtrusion(const SgMeshPtr& mesh, const VRMLExtrusion* extrusion)
 {
     const int numSpine = extrusion->spine.size();
     const int numcross = extrusion->crossSection.size();
@@ -1191,7 +1191,7 @@ void VRMLToSGConverterImpl::setDefaultTextureCoordinateForExtrusion(const SgMesh
 }
 
 
-SgMaterial* VRMLToSGConverterImpl::createMaterial(VRMLMaterial* vm)
+inline SgMaterial* VRMLToSGConverterImpl::createMaterial(VRMLMaterial* vm)
 {
     SgMaterial* material = new SgMaterial;
     material->setName(vm->defName);
@@ -1205,7 +1205,7 @@ SgMaterial* VRMLToSGConverterImpl::createMaterial(VRMLMaterial* vm)
 }
 
 
-SgTextureTransform* VRMLToSGConverterImpl::createTextureTransform(VRMLTextureTransform* tt)
+inline SgTextureTransform* VRMLToSGConverterImpl::createTextureTransform(VRMLTextureTransform* tt)
 {
     SgTextureTransform* textureTransform = new SgTextureTransform;
     textureTransform->setName(tt->defName);
@@ -1217,7 +1217,7 @@ SgTextureTransform* VRMLToSGConverterImpl::createTextureTransform(VRMLTextureTra
 }
 
 
-SgTexture* VRMLToSGConverterImpl::createTexture(VRMLTexture* vt)
+inline SgTexture* VRMLToSGConverterImpl::createTexture(VRMLTexture* vt)
 {
     SgTexture* texture = 0;
 
@@ -1294,7 +1294,7 @@ SgTexture* VRMLToSGConverterImpl::createTexture(VRMLTexture* vt)
 }
 
 
-SgNode* VRMLToSGConverterImpl::convertLineSet(VRMLIndexedLineSet* vLineSet)
+inline SgNode* VRMLToSGConverterImpl::convertLineSet(VRMLIndexedLineSet* vLineSet)
 {
     VRMLGeometryToSgPlotMap::iterator p = vrmlGeometryToSgPlotMap.find(vLineSet);
     if(p != vrmlGeometryToSgPlotMap.end()){
@@ -1379,7 +1379,7 @@ SgNode* VRMLToSGConverterImpl::convertLineSet(VRMLIndexedLineSet* vLineSet)
 }
 
 
-SgNode* VRMLToSGConverterImpl::convertPointSet(VRMLPointSet* vPointSet)
+inline SgNode* VRMLToSGConverterImpl::convertPointSet(VRMLPointSet* vPointSet)
 {
     VRMLGeometryToSgPlotMap::iterator p = vrmlGeometryToSgPlotMap.find(vPointSet);
     if(p != vrmlGeometryToSgPlotMap.end()){
@@ -1404,7 +1404,7 @@ SgNode* VRMLToSGConverterImpl::convertPointSet(VRMLPointSet* vPointSet)
 }
 
 
-SgNode* VRMLToSGConverterImpl::convertLightNode(VRMLLight* vlight)
+inline SgNode* VRMLToSGConverterImpl::convertLightNode(VRMLLight* vlight)
 {
     if(VRMLPointLight* vPointLight = dynamic_cast<VRMLSpotLight*>(vlight)){
         return createPointLight(vPointLight);
@@ -1415,7 +1415,7 @@ SgNode* VRMLToSGConverterImpl::convertLightNode(VRMLLight* vlight)
 }
 
 
-void VRMLToSGConverterImpl::setLightCommonProperties(SgLight* light, VRMLLight* vlight)
+inline void VRMLToSGConverterImpl::setLightCommonProperties(SgLight* light, VRMLLight* vlight)
 {
     light->on(vlight->on);
     light->setColor(vlight->color);
@@ -1424,7 +1424,7 @@ void VRMLToSGConverterImpl::setLightCommonProperties(SgLight* light, VRMLLight* 
 }
 
 
-SgNode* VRMLToSGConverterImpl::createPointLight(VRMLPointLight* vlight)
+inline SgNode* VRMLToSGConverterImpl::createPointLight(VRMLPointLight* vlight)
 {
     SgPointLight* light;
     if(VRMLSpotLight* vSpotLight = dynamic_cast<VRMLSpotLight*>(vlight)){
@@ -1449,7 +1449,7 @@ SgNode* VRMLToSGConverterImpl::createPointLight(VRMLPointLight* vlight)
 }
 
 
-SgSpotLight* VRMLToSGConverterImpl::createSpotLight(VRMLSpotLight* vlight)
+inline SgSpotLight* VRMLToSGConverterImpl::createSpotLight(VRMLSpotLight* vlight)
 {
     SgSpotLight* light = new SgSpotLight();
     
@@ -1461,7 +1461,7 @@ SgSpotLight* VRMLToSGConverterImpl::createSpotLight(VRMLSpotLight* vlight)
 }
 
 
-SgDirectionalLight* VRMLToSGConverterImpl::createDirectionalLight(VRMLDirectionalLight* vlight)
+inline SgDirectionalLight* VRMLToSGConverterImpl::createDirectionalLight(VRMLDirectionalLight* vlight)
 {
     SgDirectionalLight* light = new SgDirectionalLight();
     light->setDirection(vlight->direction);
@@ -1470,7 +1470,7 @@ SgDirectionalLight* VRMLToSGConverterImpl::createDirectionalLight(VRMLDirectiona
 }
 
 
-SgNode* VRMLToSGConverterImpl::convertFogNode(VRMLFog* vfog)
+inline SgNode* VRMLToSGConverterImpl::convertFogNode(VRMLFog* vfog)
 {
     SgFog* fog = new SgFog;
     fog->setColor(vfog->color);
@@ -1479,7 +1479,7 @@ SgNode* VRMLToSGConverterImpl::convertFogNode(VRMLFog* vfog)
 }
 
 
-SgNode* VRMLToSGConverterImpl::readNonVrmlInline(VRMLNonVrmlInline* nonVrmlInline)
+inline SgNode* VRMLToSGConverterImpl::readNonVrmlInline(VRMLNonVrmlInline* nonVrmlInline)
 {
     if(!nonVrmlInline->url.empty()){
         if(!sceneLoader){

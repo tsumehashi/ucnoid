@@ -11,19 +11,19 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-BoundingBox::BoundingBox()
+inline BoundingBox::BoundingBox()
 {
     clear();
 }
 
         
-BoundingBox::BoundingBox(const Vector3& min, const Vector3& max)
+inline BoundingBox::BoundingBox(const Vector3& min, const Vector3& max)
 {
     set(min, max);
 }
 
 
-BoundingBox::BoundingBox(const BoundingBox& org)
+inline BoundingBox::BoundingBox(const BoundingBox& org)
 {
     min_ = org.min_;
     max_ = org.max_;
@@ -31,7 +31,7 @@ BoundingBox::BoundingBox(const BoundingBox& org)
 }
 
 
-BoundingBox::BoundingBox(const BoundingBoxf& org)
+inline BoundingBox::BoundingBox(const BoundingBoxf& org)
 {
     min_ = org.min().cast<Vector3::Scalar>();
     max_ = org.max().cast<Vector3::Scalar>();
@@ -39,7 +39,7 @@ BoundingBox::BoundingBox(const BoundingBoxf& org)
 }
 
 
-void BoundingBox::set(const Vector3& min, const Vector3& max)
+inline void BoundingBox::set(const Vector3& min, const Vector3& max)
 {
     min_ = min;
     max_ = max;
@@ -47,7 +47,7 @@ void BoundingBox::set(const Vector3& min, const Vector3& max)
 }
 
 
-void BoundingBox::clear()
+inline void BoundingBox::clear()
 {
     empty_ = true;
     min_.setConstant(std::numeric_limits<Vector3::Scalar>::max());
@@ -55,13 +55,13 @@ void BoundingBox::clear()
 }
 
 
-Vector3 BoundingBox::center() const
+inline Vector3 BoundingBox::center() const
 {
     return (min_ + max_) / 2.0;
 }
 
 
-Vector3 BoundingBox::size() const
+inline Vector3 BoundingBox::size() const
 {
     if(empty_){
         return Vector3::Zero();
@@ -71,7 +71,7 @@ Vector3 BoundingBox::size() const
 }
 
 
-double BoundingBox::boundingSphereRadius() const
+inline double BoundingBox::boundingSphereRadius() const
 {
     if(empty_){
         return 0.0;
@@ -81,7 +81,7 @@ double BoundingBox::boundingSphereRadius() const
 }
 
 
-void BoundingBox::expandBy(double x, double y, double z)
+inline void BoundingBox::expandBy(double x, double y, double z)
 {
     if(x < min_.x()){
         min_.x() = x;
@@ -107,7 +107,7 @@ void BoundingBox::expandBy(double x, double y, double z)
 }
 
 
-void BoundingBox::expandBy(const BoundingBox& bbox)
+inline void BoundingBox::expandBy(const BoundingBox& bbox)
 {
     if(!bbox.empty()){
         if(bbox.min().x() < min_.x()){
@@ -135,7 +135,7 @@ void BoundingBox::expandBy(const BoundingBox& bbox)
 }
 
 
-void BoundingBox::transform(const Affine3& T)
+inline void BoundingBox::transform(const Affine3& T)
 {
     if(!empty()){
         const Vector3 p1 = min_;
@@ -152,26 +152,26 @@ void BoundingBox::transform(const Affine3& T)
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const BoundingBox& bb)
+inline std::ostream& operator<<(std::ostream& os, const BoundingBox& bb)
 {
     os << "(" << bb.min().x() << ", " << bb.min().y() << ", " << bb.min().z() << ") - (";
     os << bb.max().x() << ", " << bb.max().y() << ", " << bb.max().z() << ")";
     return os;
 }
 
-BoundingBoxf::BoundingBoxf()
+inline BoundingBoxf::BoundingBoxf()
 {
     clear();
 }
 
         
-BoundingBoxf::BoundingBoxf(const Vector3f& min, const Vector3f& max)
+inline BoundingBoxf::BoundingBoxf(const Vector3f& min, const Vector3f& max)
 {
     set(min, max);
 }
 
 
-BoundingBoxf::BoundingBoxf(const BoundingBoxf& org)
+inline BoundingBoxf::BoundingBoxf(const BoundingBoxf& org)
 {
     min_ = org.min_;
     max_ = org.max_;
@@ -179,7 +179,7 @@ BoundingBoxf::BoundingBoxf(const BoundingBoxf& org)
 }
 
 
-BoundingBoxf::BoundingBoxf(const BoundingBox& org)
+inline BoundingBoxf::BoundingBoxf(const BoundingBox& org)
 {
     min_ = org.min().cast<Vector3f::Scalar>();
     max_ = org.max().cast<Vector3f::Scalar>();
@@ -187,7 +187,7 @@ BoundingBoxf::BoundingBoxf(const BoundingBox& org)
 }
 
 
-void BoundingBoxf::set(const Vector3f& min, const Vector3f& max)
+inline void BoundingBoxf::set(const Vector3f& min, const Vector3f& max)
 {
     min_ = min;
     max_ = max;
@@ -195,7 +195,7 @@ void BoundingBoxf::set(const Vector3f& min, const Vector3f& max)
 }
 
 
-void BoundingBoxf::clear()
+inline void BoundingBoxf::clear()
 {
     empty_ = true;
     min_.setConstant(std::numeric_limits<Vector3f::Scalar>::max());
@@ -203,19 +203,19 @@ void BoundingBoxf::clear()
 }
 
 
-Vector3f BoundingBoxf::center() const
+inline Vector3f BoundingBoxf::center() const
 {
     return (min_ + max_) / 2.0;
 }
 
 
-float BoundingBoxf::boundingSphereRadius() const
+inline float BoundingBoxf::boundingSphereRadius() const
 {
     return (max_ - center()).norm();
 }
 
 
-void BoundingBoxf::expandBy(float x,  float y, float z)
+inline void BoundingBoxf::expandBy(float x,  float y, float z)
 {
     if(x < min_.x()){
         min_.x() = x;
@@ -241,7 +241,7 @@ void BoundingBoxf::expandBy(float x,  float y, float z)
 }
 
 
-void BoundingBoxf::expandBy(const BoundingBoxf& bbox)
+inline void BoundingBoxf::expandBy(const BoundingBoxf& bbox)
 {
     if(!bbox.empty()){
         if(bbox.min().x() < min_.x()){
@@ -269,7 +269,7 @@ void BoundingBoxf::expandBy(const BoundingBoxf& bbox)
 }
 
 
-void BoundingBoxf::transform(const Affine3f& T)
+inline void BoundingBoxf::transform(const Affine3f& T)
 {
     if(!empty()){
         const Vector3f p1 = min_;

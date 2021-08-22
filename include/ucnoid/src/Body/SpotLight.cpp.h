@@ -13,12 +13,12 @@ inline namespace ucnoid {
 
 namespace detail::spot_light {
 
-static const int PointLightStateSize = PointLight::pointLightStateSize();
+static inline const int PointLightStateSize = PointLight::pointLightStateSize();
 
 }
 
 
-SpotLight::SpotLight()
+inline SpotLight::SpotLight()
 {
     direction_ << 0.0f, 0.0f, -1.0f;
     beamWidth_ = 1.570796f;
@@ -27,13 +27,13 @@ SpotLight::SpotLight()
 }
 
 
-const char* SpotLight::typeName()
+inline const char* SpotLight::typeName()
 {
     return "SpotLight";
 }
 
 
-void SpotLight::copyStateFrom(const SpotLight& other)
+inline void SpotLight::copyStateFrom(const SpotLight& other)
 {
     PointLight::copyStateFrom(other);
     direction_ = other.direction_;
@@ -43,7 +43,7 @@ void SpotLight::copyStateFrom(const SpotLight& other)
 }
 
 
-void SpotLight::copyStateFrom(const DeviceState& other)
+inline void SpotLight::copyStateFrom(const DeviceState& other)
 {
     if(typeid(other) != typeid(SpotLight)){
         throw std::invalid_argument("Type mismatch in the Device::copyStateFrom function");
@@ -52,26 +52,26 @@ void SpotLight::copyStateFrom(const DeviceState& other)
 }
 
 
-SpotLight::SpotLight(const SpotLight& org, bool copyStateOnly)
+inline SpotLight::SpotLight(const SpotLight& org, bool copyStateOnly)
     : PointLight(org, copyStateOnly)
 {
     copyStateFrom(org);
 }
 
 
-DeviceState* SpotLight::cloneState() const
+inline DeviceState* SpotLight::cloneState() const
 {
     return new SpotLight(*this, true);
 }
 
 
-Device* SpotLight::clone() const
+inline Device* SpotLight::clone() const
 {
     return new SpotLight(*this);
 }
 
 
-void SpotLight::forEachActualType(std::function<bool(const std::type_info& type)> func)
+inline void SpotLight::forEachActualType(std::function<bool(const std::type_info& type)> func)
 {
     if(!func(typeid(SpotLight))){
         PointLight::forEachActualType(func);
@@ -79,13 +79,13 @@ void SpotLight::forEachActualType(std::function<bool(const std::type_info& type)
 }
 
 
-int SpotLight::stateSize() const
+inline int SpotLight::stateSize() const
 {
     return detail::spot_light::PointLightStateSize + 6;
 }
 
 
-const double* SpotLight::readState(const double* buf)
+inline const double* SpotLight::readState(const double* buf)
 {
     buf = PointLight::readState(buf);
     direction_ = Eigen::Map<const Vector3>(buf);
@@ -96,7 +96,7 @@ const double* SpotLight::readState(const double* buf)
 }
 
 
-double* SpotLight::writeState(double* out_buf) const
+inline double* SpotLight::writeState(double* out_buf) const
 {
     out_buf = PointLight::writeState(out_buf);
     Eigen::Map<Vector3>(out_buf) << direction_;

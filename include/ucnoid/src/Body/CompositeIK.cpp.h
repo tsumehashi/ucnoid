@@ -12,26 +12,26 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-CompositeIK::CompositeIK()
+inline CompositeIK::CompositeIK()
 {
     targetLink_ = 0;
     hasAnalyticalIK_ = false;
 }
 
 
-CompositeIK::CompositeIK(Body* body, Link* targetLink)
+inline CompositeIK::CompositeIK(Body* body, Link* targetLink)
 {
     reset(body, targetLink);
 }
 
 
-CompositeIK::~CompositeIK()
+inline CompositeIK::~CompositeIK()
 {
 
 }
 
 
-void CompositeIK::reset(Body* body, Link* targetLink)
+inline void CompositeIK::reset(Body* body, Link* targetLink)
 {
     body_ = body;
     targetLink_ = targetLink;
@@ -40,7 +40,7 @@ void CompositeIK::reset(Body* body, Link* targetLink)
 }
    
 
-bool CompositeIK::addBaseLink(Link* baseLink)
+inline bool CompositeIK::addBaseLink(Link* baseLink)
 {
     if(baseLink && targetLink_){
         JointPathPtr path = getCustomJointPath(body_, targetLink_, baseLink);
@@ -54,7 +54,7 @@ bool CompositeIK::addBaseLink(Link* baseLink)
 }
 
 
-void CompositeIK::setMaxIKerror(double e)
+inline void CompositeIK::setMaxIKerror(double e)
 {
     for(size_t i=0; i < paths.size(); ++i){
         paths[i]->setNumericalIKmaxIKerror(e);
@@ -62,7 +62,7 @@ void CompositeIK::setMaxIKerror(double e)
 }
 
 
-bool CompositeIK::calcInverseKinematics(const Position& T)
+inline bool CompositeIK::calcInverseKinematics(const Position& T)
 {
     const int n = body_->numJoints();
 

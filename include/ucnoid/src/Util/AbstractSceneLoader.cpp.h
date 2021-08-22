@@ -10,25 +10,25 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-AbstractSceneLoader::~AbstractSceneLoader()
+inline AbstractSceneLoader::~AbstractSceneLoader()
 {
 
 }
 
 
-void AbstractSceneLoader::setMessageSink(std::ostream& /* os */)
+inline void AbstractSceneLoader::setMessageSink(std::ostream& /* os */)
 {
 
 }
 
 
-void AbstractSceneLoader::setDefaultDivisionNumber(int /* n */)
+inline void AbstractSceneLoader::setDefaultDivisionNumber(int /* n */)
 {
 
 }
 
 
-void AbstractSceneLoader::setDefaultCreaseAngle(double /* theta */)
+inline void AbstractSceneLoader::setDefaultCreaseAngle(double /* theta */)
 {
 
 }

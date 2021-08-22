@@ -11,43 +11,43 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-AbstractBodyLoader::AbstractBodyLoader()
+inline AbstractBodyLoader::AbstractBodyLoader()
 {
 
 }
 
 
-AbstractBodyLoader::~AbstractBodyLoader()
+inline AbstractBodyLoader::~AbstractBodyLoader()
 {
 
 }
 
 
-void AbstractBodyLoader::setMessageSink(std::ostream& os)
+inline void AbstractBodyLoader::setMessageSink(std::ostream& os)
 {
 
 }
 
 
-void AbstractBodyLoader::setVerbose(bool on)
+inline void AbstractBodyLoader::setVerbose(bool on)
 {
 
 }
 
 
-void AbstractBodyLoader::setShapeLoadingEnabled(bool on)
+inline void AbstractBodyLoader::setShapeLoadingEnabled(bool on)
 {
 
 }
 
 
-void AbstractBodyLoader::setDefaultDivisionNumber(int n)
+inline void AbstractBodyLoader::setDefaultDivisionNumber(int n)
 {
 
 }
 
 
-void AbstractBodyLoader::setDefaultCreaseAngle(double theta)
+inline void AbstractBodyLoader::setDefaultCreaseAngle(double theta)
 {
 
 }

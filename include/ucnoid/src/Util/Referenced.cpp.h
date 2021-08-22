@@ -10,7 +10,7 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-Referenced::~Referenced()
+inline Referenced::~Referenced()
 {
     if(weakCounter_){
         weakCounter_->setDestructed();

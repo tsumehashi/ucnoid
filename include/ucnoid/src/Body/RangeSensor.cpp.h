@@ -12,13 +12,13 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-const char* RangeSensor::typeName()
+inline const char* RangeSensor::typeName()
 {
     return "RangeSensor";
 }
 
 
-RangeSensor::RangeSensor()
+inline RangeSensor::RangeSensor()
 {
     on_ = true;
     isRangeDataStateClonable_ = false;
@@ -34,7 +34,7 @@ RangeSensor::RangeSensor()
 }
 
 
-RangeSensor::RangeSensor(const RangeSensor& org, bool copyStateOnly)
+inline RangeSensor::RangeSensor(const RangeSensor& org, bool copyStateOnly)
     : Device(org, copyStateOnly),
       rangeData_(org.rangeData_)
 {
@@ -48,7 +48,7 @@ RangeSensor::RangeSensor(const RangeSensor& org, bool copyStateOnly)
 }
 
 
-void RangeSensor::copyStateFrom(const DeviceState& other)
+inline void RangeSensor::copyStateFrom(const DeviceState& other)
 {
     if(typeid(other) != typeid(RangeSensor)){
         throw std::invalid_argument("Type mismatch in the Device::copyStateFrom function");
@@ -57,14 +57,14 @@ void RangeSensor::copyStateFrom(const DeviceState& other)
 }
 
 
-void RangeSensor::copyStateFrom(const RangeSensor& other)
+inline void RangeSensor::copyStateFrom(const RangeSensor& other)
 {
     copyRangeSensorStateFrom(other);
     rangeData_ = other.rangeData_;
 }
 
 
-void RangeSensor::copyRangeSensorStateFrom(const RangeSensor& other)
+inline void RangeSensor::copyRangeSensorStateFrom(const RangeSensor& other)
 {
     on_ = other.on_;
     yawRange_ = other.yawRange_;
@@ -84,19 +84,19 @@ void RangeSensor::copyRangeSensorStateFrom(const RangeSensor& other)
 }
 
 
-Device* RangeSensor::clone() const
+inline Device* RangeSensor::clone() const
 {
     return new RangeSensor(*this, false);
 }
 
 
-DeviceState* RangeSensor::cloneState() const
+inline DeviceState* RangeSensor::cloneState() const
 {
     return new RangeSensor(*this, true);
 }
 
 
-void RangeSensor::forEachActualType(std::function<bool(const std::type_info& type)> func)
+inline void RangeSensor::forEachActualType(std::function<bool(const std::type_info& type)> func)
 {
     if(!func(typeid(RangeSensor))){
         Device::forEachActualType(func);
@@ -104,7 +104,7 @@ void RangeSensor::forEachActualType(std::function<bool(const std::type_info& typ
 }
 
 
-int RangeSensor::numYawSamples() const
+inline int RangeSensor::numYawSamples() const
 {
     if(yawStep_ > 0.0){
         return static_cast<int>(yawRange_ / yawStep_ + 1.0e-7) + 1;
@@ -114,7 +114,7 @@ int RangeSensor::numYawSamples() const
 }
 
 
-int RangeSensor::numPitchSamples() const
+inline int RangeSensor::numPitchSamples() const
 {
     if(pitchStep_ > 0.0){
         return static_cast<int>(pitchRange_ / pitchStep_ + 1.0e-7) + 1;
@@ -124,7 +124,7 @@ int RangeSensor::numPitchSamples() const
 }
 
 
-RangeSensor::RangeData& RangeSensor::rangeData()
+inline RangeSensor::RangeData& RangeSensor::rangeData()
 {
     if(rangeData_.use_count() > 1){
         rangeData_ = std::make_shared<RangeData>(*rangeData_);
@@ -133,14 +133,14 @@ RangeSensor::RangeData& RangeSensor::rangeData()
 }
 
 
-RangeSensor::RangeData& RangeSensor::newRangeData()
+inline RangeSensor::RangeData& RangeSensor::newRangeData()
 {
     rangeData_ = std::make_shared<RangeData>();
     return *rangeData_;
 }
 
 
-void RangeSensor::setRangeData(std::shared_ptr<RangeData>& data)
+inline void RangeSensor::setRangeData(std::shared_ptr<RangeData>& data)
 {
     if(data.use_count() == 1){
         rangeData_ = data;
@@ -151,13 +151,13 @@ void RangeSensor::setRangeData(std::shared_ptr<RangeData>& data)
 }
 
 
-void RangeSensor::clearState()
+inline void RangeSensor::clearState()
 {
     clearRangeData();
 }
 
 
-void RangeSensor::clearRangeData()
+inline void RangeSensor::clearRangeData()
 {
     if(rangeData_.use_count() == 1){
         rangeData_->clear();
@@ -167,24 +167,24 @@ void RangeSensor::clearRangeData()
 }
 
 
-bool RangeSensor::on() const
+inline bool RangeSensor::on() const
 {
     return on_;
 }
 
 
-void RangeSensor::on(bool on)
+inline void RangeSensor::on(bool on)
 {
     on_ = on;
 }
 
-int RangeSensor::stateSize() const
+inline int RangeSensor::stateSize() const
 {
     return 9;
 }
 
 
-const double* RangeSensor::readState(const double* buf)
+inline const double* RangeSensor::readState(const double* buf)
 {
     on_ = buf[0];
     yawRange_ = buf[1];
@@ -199,7 +199,7 @@ const double* RangeSensor::readState(const double* buf)
 }
 
 
-double* RangeSensor::writeState(double* out_buf) const
+inline double* RangeSensor::writeState(double* out_buf) const
 {
     out_buf[0] = on_ ? 1.0 : 0.0;
     out_buf[1] = yawRange_;

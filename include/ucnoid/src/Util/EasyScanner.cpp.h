@@ -108,7 +108,7 @@ inline double mystrtod(const char* nptr, char** endptr) {
 }   // namespace detail::easy_scanner
 
 
-std::string EasyScanner::Exception::getFullMessage() const
+inline std::string EasyScanner::Exception::getFullMessage() const
 {
     std::string m(message);
     
@@ -132,7 +132,7 @@ std::string EasyScanner::Exception::getFullMessage() const
 }
 
 
-EasyScanner::EasyScanner()
+inline EasyScanner::EasyScanner()
 {
     init();
 }
@@ -148,7 +148,7 @@ EasyScanner::EasyScanner(std::string filename)
 }
 
 
-void EasyScanner::init()
+inline void EasyScanner::init()
 {
     textBuf = 0;
     size = 0;
@@ -173,7 +173,7 @@ void EasyScanner::init()
   @param scanner original object
   @param copy_text If true, new object has same text as original
 */
-EasyScanner::EasyScanner(const EasyScanner& org, bool copyText) :
+inline EasyScanner::EasyScanner(const EasyScanner& org, bool copyText) :
     whiteSpaceChars(org.whiteSpaceChars)
 {
     commentChar = org.commentChar;
@@ -201,7 +201,7 @@ EasyScanner::EasyScanner(const EasyScanner& org, bool copyText) :
 
 
 /*! This function directly sets a text in the main memory */
-void EasyScanner::setText(const char* text, size_t len)
+inline void EasyScanner::setText(const char* text, size_t len)
 {
     if(textBuf) delete[] textBuf;
 
@@ -216,26 +216,26 @@ void EasyScanner::setText(const char* text, size_t len)
 }
 
 
-EasyScanner::~EasyScanner()
+inline EasyScanner::~EasyScanner()
 {
     if(textBuf) delete[] textBuf;
 }
 
 
-void EasyScanner::setLineNumberOffset(int offset)
+inline void EasyScanner::setLineNumberOffset(int offset)
 {
     lineNumberOffset = offset;
 }
 
 
-void EasyScanner::moveToHead()
+inline void EasyScanner::moveToHead()
 {
     text = textBuf;
     lineNumber = lineNumberOffset;
 }
 
 
-void EasyScanner::putSymbols()
+inline void EasyScanner::putSymbols()
 {
     SymbolMap::iterator p = symbols->begin();
     while(p != symbols->end()){
@@ -245,7 +245,7 @@ void EasyScanner::putSymbols()
 }
 
 
-void EasyScanner::throwException(const char* message)
+inline void EasyScanner::throwException(const char* message)
 {
     Exception ex;
     ex.message = message ? message : defaultErrorMessage;
@@ -255,7 +255,7 @@ void EasyScanner::throwException(const char* message)
 }
 
 
-void EasyScanner::throwException(const std::string& message)
+inline void EasyScanner::throwException(const std::string& message)
 {
     throwException(message.c_str());
 }
@@ -265,20 +265,20 @@ void EasyScanner::throwException(const std::string& message)
   This function sets the identifier character of comment beginning.
   @param cc Identifier character. Default is '#'. If you want no comment, set 0.
 */
-void EasyScanner::setCommentChar(char cc)
+inline void EasyScanner::setCommentChar(char cc)
 {
     commentChar = cc ? cc : 0xffff;
 }
 
 
-void EasyScanner::setLineOriented(bool on)
+inline void EasyScanner::setLineOriented(bool on)
 {
     isLineOriented = on;
 }
 
 
 /*!  If there is a character to ignore, you can set it by this function */
-void EasyScanner::setWhiteSpaceChar(char ws)
+inline void EasyScanner::setWhiteSpaceChar(char ws)
 {
     whiteSpaceChars.push_back(ws);
 }
@@ -288,7 +288,7 @@ void EasyScanner::setWhiteSpaceChar(char ws)
   If you want to read quoted string, set quote character by this function.
   In default, this is unset.
 */
-void EasyScanner::setQuoteChar(char qs)
+inline void EasyScanner::setQuoteChar(char qs)
 {
     quoteChar = qs;
 }
@@ -298,7 +298,7 @@ void EasyScanner::setQuoteChar(char qs)
    This function loads a text from a given file.
    The function thorws EasyScanner::Exception when the file cannot be loaded.
 */
-void EasyScanner::loadFile(const std::string& filename)
+inline void EasyScanner::loadFile(const std::string& filename)
 {
     lineNumber = 0;
     this->filename.clear();
@@ -345,13 +345,13 @@ void EasyScanner::loadFile(const std::string& filename)
 /**
    move the current position to just before the end (LF or EOF) of a line
 */
-void EasyScanner::skipToLineEnd()
+inline void EasyScanner::skipToLineEnd()
 {
     while(*text != '\r' && *text != '\n' && *text != '\0') text++;
 }
 
 
-void EasyScanner::skipSpace()
+inline void EasyScanner::skipSpace()
 {
     int n = whiteSpaceChars.size();
     while(true){
@@ -391,7 +391,7 @@ void EasyScanner::skipSpace()
    This function does not call 'skipSpace()'.
    On the other hand, 'readLF()' calls 'skipSpace()' before calling 'readLF0()'
 */
-bool EasyScanner::readLF0()
+inline bool EasyScanner::readLF0()
 {
     if(*text == '\n'){
         text++;
@@ -409,7 +409,7 @@ bool EasyScanner::readLF0()
 }
 
 
-bool EasyScanner::checkLF()
+inline bool EasyScanner::checkLF()
 {
     skipSpace();    
     if(*text == '\n' || *text == '\r'){
@@ -419,7 +419,7 @@ bool EasyScanner::checkLF()
 }
 
 
-int EasyScanner::readToken()
+inline int EasyScanner::readToken()
 {
     skipSpace();
 
@@ -476,7 +476,7 @@ int EasyScanner::readToken()
 /*!
   This function makes all the characters in stringValue lower case
 */
-void EasyScanner::toLower()
+inline void EasyScanner::toLower()
 {
     for(size_t i=0; i < stringValue.size(); ++i){
         stringValue[i] = tolower(stringValue[i]);
@@ -484,7 +484,7 @@ void EasyScanner::toLower()
 }
 
 
-bool EasyScanner::extractQuotedString()
+inline bool EasyScanner::extractQuotedString()
 {
     text++;
     char* org = text;
@@ -516,7 +516,7 @@ bool EasyScanner::extractQuotedString()
 }
 
 
-bool EasyScanner::readFloat()
+inline bool EasyScanner::readFloat()
 {
     char* tail;
 
@@ -533,7 +533,7 @@ bool EasyScanner::readFloat()
 }
 
 
-bool EasyScanner::readDouble()
+inline bool EasyScanner::readDouble()
 {
     char* tail;
 
@@ -550,7 +550,7 @@ bool EasyScanner::readDouble()
 }
 
 
-bool EasyScanner::readInt()
+inline bool EasyScanner::readInt()
 {
     char* tail;
 
@@ -566,7 +566,7 @@ bool EasyScanner::readInt()
 }
 
 
-bool EasyScanner::readChar()
+inline bool EasyScanner::readChar()
 {
     skipSpace();
 
@@ -580,7 +580,7 @@ bool EasyScanner::readChar()
 }
 
 
-bool EasyScanner::readChar(int chara)
+inline bool EasyScanner::readChar(int chara)
 {
     skipSpace();
 
@@ -592,7 +592,7 @@ bool EasyScanner::readChar(int chara)
     return false;
 }
 
-int EasyScanner::peekChar()
+inline int EasyScanner::peekChar()
 {
     skipSpace();
 
@@ -600,7 +600,7 @@ int EasyScanner::peekChar()
 }
 
 
-bool EasyScanner::readWord0()
+inline bool EasyScanner::readWord0()
 {
     char* org = text;
 
@@ -621,7 +621,7 @@ bool EasyScanner::readWord0()
 }
 
 
-bool EasyScanner::readString0(const int delimiterChar)
+inline bool EasyScanner::readString0(const int delimiterChar)
 {
     char* org = text;
 
@@ -642,7 +642,7 @@ bool EasyScanner::readString0(const int delimiterChar)
 }
 
 
-bool EasyScanner::readString(const char* str)
+inline bool EasyScanner::readString(const char* str)
 {
     skipSpace();
 
@@ -662,7 +662,7 @@ bool EasyScanner::readString(const char* str)
    read a quoted string. If 'allowNoQuotedWord' is true,
    the function read a word without quotations.
 */
-bool EasyScanner::readQuotedString(bool allowNoQuotedWord)
+inline bool EasyScanner::readQuotedString(bool allowNoQuotedWord)
 {
     skipSpace();
 
@@ -677,7 +677,7 @@ bool EasyScanner::readQuotedString(bool allowNoQuotedWord)
 }
 
 
-bool EasyScanner::readUnquotedTextBlock()
+inline bool EasyScanner::readUnquotedTextBlock()
 {
     skipSpace();
 
@@ -698,7 +698,7 @@ bool EasyScanner::readUnquotedTextBlock()
 
 
 
-bool EasyScanner::readSymbol()
+inline bool EasyScanner::readSymbol()
 {
     if(readWord()){
         symbolValue = getSymbolID(stringValue);
@@ -711,7 +711,7 @@ bool EasyScanner::readSymbol()
 }
 
 
-bool EasyScanner::readSymbol(int id)
+inline bool EasyScanner::readSymbol(int id)
 {
     char* org = text;
     int orglineNumber = lineNumber;
@@ -730,7 +730,7 @@ bool EasyScanner::readSymbol(int id)
 }
 
 
-bool EasyScanner::skipLine()
+inline bool EasyScanner::skipLine()
 {
     while(true){
         if(readLF0()){
@@ -744,7 +744,7 @@ bool EasyScanner::skipLine()
 }
 
 
-bool EasyScanner::readLine()
+inline bool EasyScanner::readLine()
 {
     char* org = text;
 
@@ -767,7 +767,7 @@ bool EasyScanner::readLine()
 }
 
 
-bool EasyScanner::skipBlankLines()
+inline bool EasyScanner::skipBlankLines()
 {
     do {
         if(*text == '\0'){
@@ -781,7 +781,7 @@ bool EasyScanner::skipBlankLines()
 
 // operators
 
-EasyScanner& operator>>(EasyScanner& scanner, double& value)
+inline EasyScanner& operator>>(EasyScanner& scanner, double& value)
 {
     if(!scanner.readDouble()){
         scanner.throwException("scan error: can't read double value");
@@ -791,7 +791,7 @@ EasyScanner& operator>>(EasyScanner& scanner, double& value)
 }
 
 
-EasyScanner& operator>>(EasyScanner& scanner, int& value)
+inline EasyScanner& operator>>(EasyScanner& scanner, int& value)
 {
     if(!scanner.readInt()){
         scanner.throwException("scan error: can't read int value");
@@ -802,7 +802,7 @@ EasyScanner& operator>>(EasyScanner& scanner, int& value)
 }
 
 
-EasyScanner& operator>>(EasyScanner& scanner, const char* matchString)
+inline EasyScanner& operator>>(EasyScanner& scanner, const char* matchString)
 {
     scanner.skipSpace();
     while(*matchString != '\0'){
@@ -814,7 +814,7 @@ EasyScanner& operator>>(EasyScanner& scanner, const char* matchString)
 }
 
 
-EasyScanner& operator>>(EasyScanner& scanner, char matchChar)
+inline EasyScanner& operator>>(EasyScanner& scanner, char matchChar)
 {
     scanner.skipSpace();
     if(*scanner.text++ != matchChar){
@@ -824,7 +824,7 @@ EasyScanner& operator>>(EasyScanner& scanner, char matchChar)
 }
 
 
-EasyScanner& operator>>(EasyScanner& scanner, std::string& str)
+inline EasyScanner& operator>>(EasyScanner& scanner, std::string& str)
 {
     scanner.skipSpace();
     if(!scanner.readQuotedString(true)){
@@ -835,7 +835,7 @@ EasyScanner& operator>>(EasyScanner& scanner, std::string& str)
 }
 
 
-EasyScanner& operator>>(EasyScanner& scanner, EasyScanner::Endl)
+inline EasyScanner& operator>>(EasyScanner& scanner, EasyScanner::Endl)
 {
     if(!scanner.readLF()){
         scanner.throwException("scan error: end of line unmatched");

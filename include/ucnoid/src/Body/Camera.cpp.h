@@ -11,13 +11,13 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-const char* Camera::typeName()
+inline const char* Camera::typeName()
 {
     return "Camera";
 }
 
 
-Camera::Camera()
+inline Camera::Camera()
 {
     on_ = true;
     isImageStateClonable_ = false;
@@ -34,7 +34,7 @@ Camera::Camera()
 }
 
 
-Camera::Camera(const Camera& org, bool copyStateOnly)
+inline Camera::Camera(const Camera& org, bool copyStateOnly)
     : Device(org, copyStateOnly),
       image_(org.image_)
 {
@@ -48,7 +48,7 @@ Camera::Camera(const Camera& org, bool copyStateOnly)
 }
 
 
-void Camera::copyStateFrom(const DeviceState& other)
+inline void Camera::copyStateFrom(const DeviceState& other)
 {
     if(typeid(other) != typeid(Camera)){
         throw std::invalid_argument("Type mismatch in the Device::copyStateFrom function");
@@ -57,14 +57,14 @@ void Camera::copyStateFrom(const DeviceState& other)
 }
 
 
-void Camera::copyStateFrom(const Camera& other)
+inline void Camera::copyStateFrom(const Camera& other)
 {
     copyCameraStateFrom(other);
     image_ = other.image_;
 }
 
 
-void Camera::copyCameraStateFrom(const Camera& other)
+inline void Camera::copyCameraStateFrom(const Camera& other)
 {
     on_ = other.on_;
     imageType_ = other.imageType_;
@@ -85,19 +85,19 @@ void Camera::copyCameraStateFrom(const Camera& other)
 }
 
 
-Device* Camera::clone() const
+inline Device* Camera::clone() const
 {
     return new Camera(*this, false);
 }
 
 
-DeviceState* Camera::cloneState() const
+inline DeviceState* Camera::cloneState() const
 {
     return new Camera(*this, true);
 }
 
 
-void Camera::forEachActualType(std::function<bool(const std::type_info& type)> func)
+inline void Camera::forEachActualType(std::function<bool(const std::type_info& type)> func)
 {
     if(!func(typeid(Camera))){
         Device::forEachActualType(func);
@@ -105,13 +105,13 @@ void Camera::forEachActualType(std::function<bool(const std::type_info& type)> f
 }
 
 
-void Camera::clearState()
+inline void Camera::clearState()
 {
     clearImage();
 }
 
 
-void Camera::clearImage()
+inline void Camera::clearImage()
 {
     if(image_.use_count() == 1){
         image_->clear();
@@ -121,19 +121,19 @@ void Camera::clearImage()
 }    
 
 
-bool Camera::on() const
+inline bool Camera::on() const
 {
     return on_;
 }
 
 
-void Camera::on(bool on)
+inline void Camera::on(bool on)
 {
     on_ = on;
 }
 
 
-Image& Camera::image()
+inline Image& Camera::image()
 {
     if(image_.use_count() > 1){
         image_ = std::make_shared<Image>(*image_);
@@ -142,14 +142,14 @@ Image& Camera::image()
 }
 
 
-Image& Camera::newImage()
+inline Image& Camera::newImage()
 {
     image_ = std::make_shared<Image>();
     return *image_;
 }
 
 
-void Camera::setImage(std::shared_ptr<Image>& image)
+inline void Camera::setImage(std::shared_ptr<Image>& image)
 {
     if(image.use_count() == 1){
         image_ = image;
@@ -160,13 +160,13 @@ void Camera::setImage(std::shared_ptr<Image>& image)
 }
 
 
-int Camera::stateSize() const
+inline int Camera::stateSize() const
 {
     return 8;
 }
 
 
-const double* Camera::readState(const double* buf)
+inline const double* Camera::readState(const double* buf)
 {
     on_ = buf[0];
     resolutionX_ = buf[1];
@@ -180,7 +180,7 @@ const double* Camera::readState(const double* buf)
 }
 
 
-double* Camera::writeState(double* out_buf) const
+inline double* Camera::writeState(double* out_buf) const
 {
     out_buf[0] = on_ ? 1.0 : 0.0;
     out_buf[1] = resolutionX_;

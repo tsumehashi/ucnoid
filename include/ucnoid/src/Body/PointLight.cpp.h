@@ -13,11 +13,11 @@ inline namespace ucnoid {
 
 namespace detail::point_light {
 
-static const int LightStateSize = Light::lightStateSize();
+static inline const int LightStateSize = Light::lightStateSize();
 
 }
 
-PointLight::PointLight()
+inline PointLight::PointLight()
 {
     constantAttenuation_ = 1.0f;
     linearAttenuation_ = 0.0f;
@@ -25,13 +25,13 @@ PointLight::PointLight()
 }
 
 
-const char* PointLight::typeName()
+inline const char* PointLight::typeName()
 {
     return "PointLight";
 }
 
 
-void PointLight::copyStateFrom(const PointLight& other)
+inline void PointLight::copyStateFrom(const PointLight& other)
 {
     Light::copyStateFrom(other);
 
@@ -41,7 +41,7 @@ void PointLight::copyStateFrom(const PointLight& other)
 }
 
 
-void PointLight::copyStateFrom(const DeviceState& other)
+inline void PointLight::copyStateFrom(const DeviceState& other)
 {
     if(typeid(other) != typeid(PointLight)){
         throw std::invalid_argument("Type mismatch in the Device::copyStateFrom function");
@@ -50,26 +50,26 @@ void PointLight::copyStateFrom(const DeviceState& other)
 }
 
 
-PointLight::PointLight(const PointLight& org, bool copyStateOnly)
+inline PointLight::PointLight(const PointLight& org, bool copyStateOnly)
     : Light(org, copyStateOnly)
 {
     copyStateFrom(org);
 }
 
 
-DeviceState* PointLight::cloneState() const
+inline DeviceState* PointLight::cloneState() const
 {
     return new PointLight(*this, true);
 }
 
 
-Device* PointLight::clone() const
+inline Device* PointLight::clone() const
 {
     return new PointLight(*this);
 }
 
 
-void PointLight::forEachActualType(std::function<bool(const std::type_info& type)> func)
+inline void PointLight::forEachActualType(std::function<bool(const std::type_info& type)> func)
 {
     if(!func(typeid(PointLight))){
         Light::forEachActualType(func);
@@ -77,19 +77,19 @@ void PointLight::forEachActualType(std::function<bool(const std::type_info& type
 }
 
 
-int PointLight::pointLightStateSize()
+inline int PointLight::pointLightStateSize()
 {
     return detail::point_light::LightStateSize + 3;
 }
 
 
-int PointLight::stateSize() const
+inline int PointLight::stateSize() const
 {
     return detail::point_light::LightStateSize + 3;
 }
 
 
-const double* PointLight::readState(const double* buf)
+inline const double* PointLight::readState(const double* buf)
 {
     buf = Light::readState(buf);
     constantAttenuation_ = buf[0];
@@ -99,7 +99,7 @@ const double* PointLight::readState(const double* buf)
 }
 
 
-double* PointLight::writeState(double* out_buf) const
+inline double* PointLight::writeState(double* out_buf) const
 {
     out_buf = Light::writeState(out_buf);
     out_buf[0] = constantAttenuation_;

@@ -100,7 +100,7 @@ struct FactoryRegistration
     
 }   // namespace detail::body_loader
 
-bool BodyLoader::registerLoader(const std::string& extension, std::function<AbstractBodyLoaderPtr()> factory)
+inline bool BodyLoader::registerLoader(const std::string& extension, std::function<AbstractBodyLoaderPtr()> factory)
 {
     using namespace detail::body_loader;
     std::lock_guard<std::mutex> lock(loaderFactoryMapMutex);
@@ -130,13 +130,13 @@ public:
 
 
 
-BodyLoader::BodyLoader()
+inline BodyLoader::BodyLoader()
 {
     impl = new BodyLoaderImpl();
 }
 
 
-BodyLoaderImpl::BodyLoaderImpl()
+inline BodyLoaderImpl::BodyLoaderImpl()
 {
     os = &nullout();
     isVerbose = false;
@@ -146,56 +146,56 @@ BodyLoaderImpl::BodyLoaderImpl()
 }
 
 
-BodyLoader::~BodyLoader()
+inline BodyLoader::~BodyLoader()
 {
     delete impl;
 }
 
 
-BodyLoaderImpl::~BodyLoaderImpl()
+inline BodyLoaderImpl::~BodyLoaderImpl()
 {
 
 }
 
 
-void BodyLoader::setMessageSink(std::ostream& os)
+inline void BodyLoader::setMessageSink(std::ostream& os)
 {
     impl->os = &os;
 }
 
 
-void BodyLoader::setVerbose(bool on)
+inline void BodyLoader::setVerbose(bool on)
 {
     impl->isVerbose = on;
 }
 
 
-void BodyLoader::setShapeLoadingEnabled(bool on)
+inline void BodyLoader::setShapeLoadingEnabled(bool on)
 {
     impl->isShapeLoadingEnabled = on;
 }
     
 
-void BodyLoader::setDefaultDivisionNumber(int n)
+inline void BodyLoader::setDefaultDivisionNumber(int n)
 {
     impl->defaultDivisionNumber = n;
 }
 
 
-void BodyLoader::setDefaultCreaseAngle(double theta)
+inline void BodyLoader::setDefaultCreaseAngle(double theta)
 {
     impl->defaultCreaseAngle = theta;
 }
 
 
-bool BodyLoader::load(Body* body, const std::string& filename)
+inline bool BodyLoader::load(Body* body, const std::string& filename)
 {
     body->info()->clear();    
     return impl->load(body, filename);
 }
 
 
-Body* BodyLoader::load(const std::string& filename)
+inline Body* BodyLoader::load(const std::string& filename)
 {
     Body* body = new Body();
     if(load(body, filename)){
@@ -207,7 +207,7 @@ Body* BodyLoader::load(const std::string& filename)
 }
 
 
-bool BodyLoaderImpl::load(Body* body, const std::string& filename)
+inline bool BodyLoaderImpl::load(Body* body, const std::string& filename)
 {
     using namespace detail::body_loader;
     bool result = false;
@@ -266,7 +266,7 @@ bool BodyLoaderImpl::load(Body* body, const std::string& filename)
 }
 
 
-AbstractBodyLoaderPtr BodyLoader::lastActualBodyLoader() const
+inline AbstractBodyLoaderPtr BodyLoader::lastActualBodyLoader() const
 {
     return impl->actualLoader;
 }

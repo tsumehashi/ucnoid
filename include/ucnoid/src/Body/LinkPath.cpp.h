@@ -11,33 +11,33 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-LinkPath::LinkPath()
+inline LinkPath::LinkPath()
 {
 
 }
 
 
-LinkPath::LinkPath(Link* base, Link* end)
+inline LinkPath::LinkPath(Link* base, Link* end)
 {
     setPath(base, end);
 }
 
 
 /// path from the root link
-LinkPath::LinkPath(Link* base)
+inline LinkPath::LinkPath(Link* base)
 {
     setPath(base);
 }
 
 
 /// This method is disabled.
-void LinkPath::find(Link* /* root */, bool /* doUpward */, bool /* doDownward */)
+inline void LinkPath::find(Link* /* root */, bool /* doUpward */, bool /* doDownward */)
 {
     throw "The find method for LinkTraverse cannot be used in LinkPath";
 }
 
 
-bool LinkPath::setPath(Link* base, Link* end)
+inline bool LinkPath::setPath(Link* base, Link* end)
 {
     links.clear();
     numUpwardConnections = 0;
@@ -49,7 +49,7 @@ bool LinkPath::setPath(Link* base, Link* end)
 }
 
 
-bool LinkPath::findPathSub(Link* link, Link* prev, Link* end, bool isUpward)
+inline bool LinkPath::findPathSub(Link* link, Link* prev, Link* end, bool isUpward)
 {
     links.push_back(link);
     if(isUpward){
@@ -85,7 +85,7 @@ bool LinkPath::findPathSub(Link* link, Link* prev, Link* end, bool isUpward)
 
 
 /// path from the root link
-void LinkPath::setPath(Link* end)
+inline void LinkPath::setPath(Link* end)
 {
     links.clear();
     numUpwardConnections = 0;
@@ -94,7 +94,7 @@ void LinkPath::setPath(Link* end)
 }
 
 
-void LinkPath::findPathFromRootSub(Link* link)
+inline void LinkPath::findPathFromRootSub(Link* link)
 {
     links.push_back(link);
     if(link->parent()){

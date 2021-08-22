@@ -12,7 +12,7 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-ForwardDynamics::ForwardDynamics(DyBody* body)
+inline ForwardDynamics::ForwardDynamics(DyBody* body)
     : body(body)
 {
     g.setZero();
@@ -23,50 +23,50 @@ ForwardDynamics::ForwardDynamics(DyBody* body)
 }
 
 
-ForwardDynamics::~ForwardDynamics()
+inline ForwardDynamics::~ForwardDynamics()
 {
 
 }
 
 
-void ForwardDynamics::setTimeStep(double ts)
+inline void ForwardDynamics::setTimeStep(double ts)
 {
     timeStep = ts;
 }
 
 
-void ForwardDynamics::setGravityAcceleration(const Vector3& g)
+inline void ForwardDynamics::setGravityAcceleration(const Vector3& g)
 {
     this->g = g;
 }
 
 
-void ForwardDynamics::setEulerMethod()
+inline void ForwardDynamics::setEulerMethod()
 {
     integrationMode = EULER_METHOD;
 }
 
 
-void ForwardDynamics::setRungeKuttaMethod()
+inline void ForwardDynamics::setRungeKuttaMethod()
 {
     integrationMode = RUNGEKUTTA_METHOD;
 }
 
 
-void ForwardDynamics::enableSensors(bool on)
+inline void ForwardDynamics::enableSensors(bool on)
 {
     sensorsEnabled = on;
 }
 
 
-void ForwardDynamics::setOldAccelSensorCalcMode(bool on)
+inline void ForwardDynamics::setOldAccelSensorCalcMode(bool on)
 {
     sensorHelper.setOldAccelSensorCalcMode(on);
 }
 
 
 /// function from Murray, Li and Sastry p.42
-void ForwardDynamics::SE3exp
+inline void ForwardDynamics::SE3exp
 (Position& out_T, const Position& T0, const Vector3& w, const Vector3& vo, double dt)
 {
     double norm_w = w.norm();
@@ -86,7 +86,7 @@ void ForwardDynamics::SE3exp
 }
 
 
-void ForwardDynamics::initializeSensors()
+inline void ForwardDynamics::initializeSensors()
 {
     body->initializeDeviceStates();
 

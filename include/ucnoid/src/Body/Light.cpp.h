@@ -11,7 +11,7 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-Light::Light()
+inline Light::Light()
 {
     on_ = true;
     color_.setConstant(1.0f);
@@ -19,7 +19,7 @@ Light::Light()
 }
 
 
-void Light::copyStateFrom(const Light& other)
+inline void Light::copyStateFrom(const Light& other)
 {
     on_ = other.on_;
     color_ = other.color_;
@@ -27,14 +27,14 @@ void Light::copyStateFrom(const Light& other)
 }
 
 
-Light::Light(const Light& org, bool copyStateOnly)
+inline Light::Light(const Light& org, bool copyStateOnly)
     : Device(org, copyStateOnly)
 {
     copyStateFrom(org);
 }
 
 
-void Light::forEachActualType(std::function<bool(const std::type_info& type)> func)
+inline void Light::forEachActualType(std::function<bool(const std::type_info& type)> func)
 {
     if(!func(typeid(Light))){
         Device::forEachActualType(func);
@@ -42,25 +42,25 @@ void Light::forEachActualType(std::function<bool(const std::type_info& type)> fu
 }
 
 
-bool Light::on() const
+inline bool Light::on() const
 {
     return on_;
 }
 
 
-void Light::on(bool on)
+inline void Light::on(bool on)
 {
     on_ = on;
 }
 
 
-int Light::lightStateSize()
+inline int Light::lightStateSize()
 {
     return 5;
 }
 
 
-const double* Light::readState(const double* buf)
+inline const double* Light::readState(const double* buf)
 {
     on_ = buf[0];
     color_ = Eigen::Map<const Vector3>(buf + 1).cast<float>();
@@ -69,7 +69,7 @@ const double* Light::readState(const double* buf)
 }
 
 
-double* Light::writeState(double* out_buf) const
+inline double* Light::writeState(double* out_buf) const
 {
     out_buf[0] = on_ ? 1.0 : 0.0;
     out_buf[1] = color_[0];

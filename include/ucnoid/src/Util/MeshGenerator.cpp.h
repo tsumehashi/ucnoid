@@ -16,12 +16,12 @@ inline namespace ucnoid {
 
 namespace detail::mesh_generator {
 
-constexpr double PI = 3.14159265358979323846;
-constexpr int defaultDivisionNumber = 20;
+static constexpr double PI = 3.14159265358979323846;
+static constexpr int defaultDivisionNumber = 20;
 
 }   // namespace detail::mesh_generator
 
-MeshGenerator::MeshGenerator()
+inline MeshGenerator::MeshGenerator()
 {
     isNormalGenerationEnabled_ = true;
     meshFilter = nullptr;
@@ -29,7 +29,7 @@ MeshGenerator::MeshGenerator()
 }
 
 
-MeshGenerator::~MeshGenerator()
+inline MeshGenerator::~MeshGenerator()
 {
     if(meshFilter){
         delete meshFilter;
@@ -37,7 +37,7 @@ MeshGenerator::~MeshGenerator()
 }
 
 
-void MeshGenerator::setDivisionNumber(int n)
+inline void MeshGenerator::setDivisionNumber(int n)
 {
     if(n < 0){
         divisionNumber_ = detail::mesh_generator::defaultDivisionNumber;
@@ -47,31 +47,31 @@ void MeshGenerator::setDivisionNumber(int n)
 }
 
 
-int MeshGenerator::divisionNumber() const
+inline int MeshGenerator::divisionNumber() const
 {
     return divisionNumber_;
 }
 
 
-int MeshGenerator::defaultDivisionNumber()
+inline int MeshGenerator::defaultDivisionNumber()
 {
     return detail::mesh_generator::defaultDivisionNumber;
 }
 
 
-void MeshGenerator::enableNormalGeneration(bool on)
+inline void MeshGenerator::enableNormalGeneration(bool on)
 {
     isNormalGenerationEnabled_ = on;
 }
 
 
-bool MeshGenerator::isNormalGenerationEnabled() const
+inline bool MeshGenerator::isNormalGenerationEnabled() const
 {
     return isNormalGenerationEnabled_;
 }
 
 
-void MeshGenerator::generateNormals(SgMesh* mesh, double creaseAngle)
+inline void MeshGenerator::generateNormals(SgMesh* mesh, double creaseAngle)
 {
     if(isNormalGenerationEnabled_){
         if(!meshFilter){
@@ -82,7 +82,7 @@ void MeshGenerator::generateNormals(SgMesh* mesh, double creaseAngle)
 }
 
 
-SgMesh* MeshGenerator::generateBox(Vector3 size, bool enableTextureCoordinate)
+inline SgMesh* MeshGenerator::generateBox(Vector3 size, bool enableTextureCoordinate)
 {
     if(size.x() < 0.0 || size.y() < 0.0 || size.z() < 0.0){
         return 0;
@@ -133,7 +133,7 @@ SgMesh* MeshGenerator::generateBox(Vector3 size, bool enableTextureCoordinate)
 }
 
 
-SgMesh* MeshGenerator::generateSphere(double radius, bool enableTextureCoordinate)
+inline SgMesh* MeshGenerator::generateSphere(double radius, bool enableTextureCoordinate)
 {
     using detail::mesh_generator::PI;
     if(radius < 0.0 || divisionNumber_ < 4){
@@ -200,7 +200,7 @@ SgMesh* MeshGenerator::generateSphere(double radius, bool enableTextureCoordinat
 }
 
 
-SgMesh* MeshGenerator::generateCylinder(double radius, double height, bool bottom, bool top, bool side,
+inline SgMesh* MeshGenerator::generateCylinder(double radius, double height, bool bottom, bool top, bool side,
         bool enableTextureCoordinate)
 {
     using detail::mesh_generator::PI;
@@ -261,7 +261,7 @@ SgMesh* MeshGenerator::generateCylinder(double radius, double height, bool botto
 }
 
 
-SgMesh* MeshGenerator::generateCone(double radius, double height, bool bottom, bool side,
+inline SgMesh* MeshGenerator::generateCone(double radius, double height, bool bottom, bool side,
         bool enableTextureCoordinate)
 {
     using detail::mesh_generator::PI;
@@ -310,7 +310,7 @@ SgMesh* MeshGenerator::generateCone(double radius, double height, bool bottom, b
 }
 
 
-SgMesh* MeshGenerator::generateCapsule(double radius, double height)
+inline SgMesh* MeshGenerator::generateCapsule(double radius, double height)
 {
     using detail::mesh_generator::PI;
     if(height < 0.0 || radius < 0.0){
@@ -384,7 +384,7 @@ SgMesh* MeshGenerator::generateCapsule(double radius, double height)
 }
 
 
-SgMesh* MeshGenerator::generateDisc(double radius, double innerRadius)
+inline SgMesh* MeshGenerator::generateDisc(double radius, double innerRadius)
 {
     using detail::mesh_generator::PI;
     if(innerRadius <= 0.0 || radius <= innerRadius){
@@ -426,7 +426,7 @@ SgMesh* MeshGenerator::generateDisc(double radius, double innerRadius)
 }
 
 
-SgMesh* MeshGenerator::generateArrow(double cylinderRadius, double cylinderHeight, double coneRadius, double coneHeight)
+inline SgMesh* MeshGenerator::generateArrow(double cylinderRadius, double cylinderHeight, double coneRadius, double coneHeight)
 {
     SgShapePtr cone = new SgShape;
     //setDivisionNumber(20);
@@ -447,7 +447,7 @@ SgMesh* MeshGenerator::generateArrow(double cylinderRadius, double cylinderHeigh
 }
 
 
-SgMesh* MeshGenerator::generateTorus(double radius, double crossSectionRadius)
+inline SgMesh* MeshGenerator::generateTorus(double radius, double crossSectionRadius)
 {
     using detail::mesh_generator::PI;
     int divisionNumber2 = divisionNumber_ / 4;
@@ -488,7 +488,7 @@ SgMesh* MeshGenerator::generateTorus(double radius, double crossSectionRadius)
     return mesh;
 }
 
-SgMesh* MeshGenerator::generateExtrusion(const Extrusion& extrusion, bool enableTextureCoordinate)
+inline SgMesh* MeshGenerator::generateExtrusion(const Extrusion& extrusion, bool enableTextureCoordinate)
 {
     int numSpines = extrusion.spine.size();
     int numCrosses = extrusion.crossSection.size();
@@ -683,7 +683,7 @@ SgMesh* MeshGenerator::generateExtrusion(const Extrusion& extrusion, bool enable
 }
 
 
-SgLineSet* MeshGenerator::generateExtrusionLineSet(const Extrusion& extrusion, SgMesh* mesh)
+inline SgLineSet* MeshGenerator::generateExtrusionLineSet(const Extrusion& extrusion, SgMesh* mesh)
 {
     const int nc = extrusion.crossSection.size();
     const int ns = extrusion.spine.size();
@@ -718,7 +718,7 @@ SgLineSet* MeshGenerator::generateExtrusionLineSet(const Extrusion& extrusion, S
 }
 
 
-SgMesh* MeshGenerator::generateElevationGrid(const ElevationGrid& grid, bool enableTextureCoordinate)
+inline SgMesh* MeshGenerator::generateElevationGrid(const ElevationGrid& grid, bool enableTextureCoordinate)
 {
     SgMesh* mesh = new SgMesh;
     if(grid.xDimension * grid.zDimension != static_cast<int>(grid.height.size())){
@@ -763,7 +763,7 @@ SgMesh* MeshGenerator::generateElevationGrid(const ElevationGrid& grid, bool ena
 }
 
 
-void MeshGenerator::generateTextureCoordinateForBox(SgMesh* mesh)
+inline void MeshGenerator::generateTextureCoordinateForBox(SgMesh* mesh)
 {
     mesh->setTexCoords(new SgTexCoordArray());
     SgTexCoordArray& texCoords = *mesh->texCoords();
@@ -796,7 +796,7 @@ void MeshGenerator::generateTextureCoordinateForBox(SgMesh* mesh)
 /**
    \todo Check if the use of this inefficient function is rellay necessary.
 */
-int MeshGenerator::findTexCoordPoint(const SgTexCoordArray& texCoords, const Vector2f& point)
+inline int MeshGenerator::findTexCoordPoint(const SgTexCoordArray& texCoords, const Vector2f& point)
 {
     for(size_t i=0; i < texCoords.size(); ++i){
         if(texCoords[i].isApprox(point)){
@@ -807,7 +807,7 @@ int MeshGenerator::findTexCoordPoint(const SgTexCoordArray& texCoords, const Vec
 }
 
 
-void MeshGenerator::generateTextureCoordinateForSphere(SgMesh* mesh)
+inline void MeshGenerator::generateTextureCoordinateForSphere(SgMesh* mesh)
 {
     using detail::mesh_generator::PI;
     const SgMesh::Sphere& sphere = mesh->primitive<SgMesh::Sphere>();
@@ -856,7 +856,7 @@ void MeshGenerator::generateTextureCoordinateForSphere(SgMesh* mesh)
 }
 
 
-void MeshGenerator::generateTextureCoordinateForCylinder(SgMesh* mesh)
+inline void MeshGenerator::generateTextureCoordinateForCylinder(SgMesh* mesh)
 {
     using detail::mesh_generator::PI;
     const SgVertexArray& vertices = *mesh->vertices();
@@ -941,7 +941,7 @@ void MeshGenerator::generateTextureCoordinateForCylinder(SgMesh* mesh)
 }
 
 
-void MeshGenerator::generateTextureCoordinateForCone(SgMesh* mesh)
+inline void MeshGenerator::generateTextureCoordinateForCone(SgMesh* mesh)
 {
     using detail::mesh_generator::PI;
     mesh->setTexCoords(new SgTexCoordArray());
@@ -1019,7 +1019,7 @@ void MeshGenerator::generateTextureCoordinateForCone(SgMesh* mesh)
 }
 
 
-void MeshGenerator::generateTextureCoordinateForExtrusion(SgMesh* mesh, const Extrusion& extrusion,
+inline void MeshGenerator::generateTextureCoordinateForExtrusion(SgMesh* mesh, const Extrusion& extrusion,
         int numTriOfbeginCap, int numTriOfendCap, int indexOfendCap)
 {
     const int numSpine = extrusion.spine.size();
@@ -1121,7 +1121,7 @@ void MeshGenerator::generateTextureCoordinateForExtrusion(SgMesh* mesh, const Ex
 }
 
 
-void MeshGenerator::generateTextureCoordinateForElevationGrid(SgMesh* mesh, const ElevationGrid& grid)
+inline void MeshGenerator::generateTextureCoordinateForElevationGrid(SgMesh* mesh, const ElevationGrid& grid)
 {
     float xmax = grid.xSpacing * (grid.xDimension - 1);
     float zmax = grid.zSpacing * (grid.zDimension - 1);
@@ -1138,7 +1138,7 @@ void MeshGenerator::generateTextureCoordinateForElevationGrid(SgMesh* mesh, cons
 }
 
 
-void MeshGenerator::generateTextureCoordinateForIndexedFaceSet(SgMesh* mesh)
+inline void MeshGenerator::generateTextureCoordinateForIndexedFaceSet(SgMesh* mesh)
 {
     const SgVertexArray& vertices = *mesh->vertices();
 

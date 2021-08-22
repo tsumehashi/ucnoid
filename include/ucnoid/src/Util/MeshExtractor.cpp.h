@@ -37,13 +37,13 @@ public:
     bool extract(SgNode* node);
 };
 
-MeshExtractor::MeshExtractor()
+inline MeshExtractor::MeshExtractor()
 {
     impl = new MeshExtractorImpl;
 }
 
 
-MeshExtractorImpl::MeshExtractorImpl()
+inline MeshExtractorImpl::MeshExtractorImpl()
 {
     functions.setFunction<SgGroup>(
         [&](SgGroup* node){ visitGroup(node); });
@@ -59,7 +59,7 @@ MeshExtractorImpl::MeshExtractorImpl()
 }
     
     
-void MeshExtractorImpl::visitGroup(SgGroup* group)
+inline void MeshExtractorImpl::visitGroup(SgGroup* group)
 {
     for(SgGroup::const_iterator p = group->begin(); p != group->end(); ++p){
         functions.dispatch(*p);
@@ -67,7 +67,7 @@ void MeshExtractorImpl::visitGroup(SgGroup* group)
 }
 
 
-void MeshExtractorImpl::visitSwitch(SgSwitch* switchNode)
+inline void MeshExtractorImpl::visitSwitch(SgSwitch* switchNode)
 {
     if(switchNode->isTurnedOn()){
         visitGroup(switchNode);
@@ -75,7 +75,7 @@ void MeshExtractorImpl::visitSwitch(SgSwitch* switchNode)
 }
     
 
-void MeshExtractorImpl::visitTransform(SgTransform* transform)
+inline void MeshExtractorImpl::visitTransform(SgTransform* transform)
 {
     bool isParentScaled = isCurrentScaled;
     isCurrentScaled = true;
@@ -89,7 +89,7 @@ void MeshExtractorImpl::visitTransform(SgTransform* transform)
 }
 
 
-void MeshExtractorImpl::visitPosTransform(SgPosTransform* transform)
+inline void MeshExtractorImpl::visitPosTransform(SgPosTransform* transform)
 {
     const Affine3 T0(currentTransform);
     const Affine3 P0(currentTransformWithoutScaling);
@@ -101,7 +101,7 @@ void MeshExtractorImpl::visitPosTransform(SgPosTransform* transform)
 }
 
 
-void MeshExtractorImpl::visitShape(SgShape* shape)
+inline void MeshExtractorImpl::visitShape(SgShape* shape)
 {
     SgMesh* mesh = shape->mesh();
     if(mesh && mesh->vertices() && !mesh->vertices()->empty() && !mesh->triangleVertices().empty()){
@@ -119,37 +119,37 @@ void MeshExtractorImpl::visitShape(SgShape* shape)
 }
 
 
-SgMesh* MeshExtractor::currentMesh() const
+inline SgMesh* MeshExtractor::currentMesh() const
 {
     return impl->currentMesh;
 }
 
 
-SgShape* MeshExtractor::currentShape() const
+inline SgShape* MeshExtractor::currentShape() const
 {
     return impl->currentShape;
 }
 
 
-const Affine3& MeshExtractor::currentTransform() const
+inline const Affine3& MeshExtractor::currentTransform() const
 {
     return impl->currentTransform;
 }
 
 
-const Affine3& MeshExtractor::currentTransformWithoutScaling() const
+inline const Affine3& MeshExtractor::currentTransformWithoutScaling() const
 {
     return impl->currentTransformWithoutScaling;
 }
 
 
-bool MeshExtractor::isCurrentScaled() const
+inline bool MeshExtractor::isCurrentScaled() const
 {
     return impl->isCurrentScaled;
 }
 
 
-bool MeshExtractor::extract(SgNode* node, std::function<void()> callback)
+inline bool MeshExtractor::extract(SgNode* node, std::function<void()> callback)
 {
     impl->callback1 = callback;
     impl->callback2 = nullptr;
@@ -157,7 +157,7 @@ bool MeshExtractor::extract(SgNode* node, std::function<void()> callback)
 }
 
 
-bool MeshExtractor::extract(SgNode* node, std::function<void(SgMesh* mesh)> callback)
+inline bool MeshExtractor::extract(SgNode* node, std::function<void(SgMesh* mesh)> callback)
 {
     impl->callback1 = nullptr;
     impl->callback2 = callback;
@@ -165,7 +165,7 @@ bool MeshExtractor::extract(SgNode* node, std::function<void(SgMesh* mesh)> call
 }
 
 
-bool MeshExtractorImpl::extract(SgNode* node)
+inline bool MeshExtractorImpl::extract(SgNode* node)
 {
     currentMesh = 0;
     currentShape = 0;
@@ -232,7 +232,7 @@ inline void integrateMesh(MeshExtractor* extractor, SgMesh* mesh)
    \todo take into acount the case where some meshes have normals or colors
    and others don't have them.
 */
-SgMesh* MeshExtractor::integrate(SgNode* node)
+inline SgMesh* MeshExtractor::integrate(SgNode* node)
 {
     SgMesh* integrated = new SgMesh;
     extract(node, [&](){ detail::mesh_extractor::integrateMesh(this, integrated); });

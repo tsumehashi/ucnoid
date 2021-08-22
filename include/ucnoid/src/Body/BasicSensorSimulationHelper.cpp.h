@@ -43,33 +43,33 @@ public:
     void initialize(Body* body, double timeStep, const Vector3& gravityAcceleration);
 };
 
-BasicSensorSimulationHelper::BasicSensorSimulationHelper()
+inline BasicSensorSimulationHelper::BasicSensorSimulationHelper()
 {
     isActive_ = false;
     impl = new BasicSensorSimulationHelperImpl(this);
 }
 
 
-BasicSensorSimulationHelperImpl::BasicSensorSimulationHelperImpl(BasicSensorSimulationHelper* self)
+inline BasicSensorSimulationHelperImpl::BasicSensorSimulationHelperImpl(BasicSensorSimulationHelper* self)
     : self(self)
 {
     isOldAccelSensorCalcMode = false;
 }
 
 
-BasicSensorSimulationHelper::~BasicSensorSimulationHelper()
+inline BasicSensorSimulationHelper::~BasicSensorSimulationHelper()
 {
     delete impl;
 }
 
 
-void BasicSensorSimulationHelper::setOldAccelSensorCalcMode(bool on)
+inline void BasicSensorSimulationHelper::setOldAccelSensorCalcMode(bool on)
 {
     impl->isOldAccelSensorCalcMode = on;
 }
 
 
-void BasicSensorSimulationHelper::initialize(Body* body, double timeStep, const Vector3& gravityAcceleration)
+inline void BasicSensorSimulationHelper::initialize(Body* body, double timeStep, const Vector3& gravityAcceleration)
 {
     isActive_ = false;
 
@@ -89,7 +89,7 @@ void BasicSensorSimulationHelper::initialize(Body* body, double timeStep, const 
 }
 
 
-void BasicSensorSimulationHelperImpl::initialize(Body* body, double timeStep, const Vector3& gravityAcceleration)
+inline void BasicSensorSimulationHelperImpl::initialize(Body* body, double timeStep, const Vector3& gravityAcceleration)
 {
     this->body = body;
     g = gravityAcceleration;
@@ -157,7 +157,7 @@ void BasicSensorSimulationHelperImpl::initialize(Body* body, double timeStep, co
 }
 
 
-void BasicSensorSimulationHelper::updateGyroAndAccelerationSensors()
+inline void BasicSensorSimulationHelper::updateGyroAndAccelerationSensors()
 {
     for(size_t i=0; i < rateGyroSensors_.size(); ++i){
         RateGyroSensor* gyro = rateGyroSensors_[i];

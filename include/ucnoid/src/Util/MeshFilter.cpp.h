@@ -24,7 +24,7 @@ constexpr float PI = 3.14159265358979323846f;
 typedef std::array<int, 3> FaceId;
 
 template<class Triangle>
-FaceId getOverlappingFaceId(Triangle& triangle)
+inline FaceId getOverlappingFaceId(Triangle& triangle)
 {
     FaceId id = { triangle[0], triangle[1], triangle[2] };
     std::sort(id.begin(), id.end());
@@ -32,7 +32,7 @@ FaceId getOverlappingFaceId(Triangle& triangle)
 }
 
 template<class Triangle>
-FaceId getExactFaceId(Triangle& triangle)
+inline FaceId getExactFaceId(Triangle& triangle)
 {
     if(triangle[0] < triangle[1]){
         if(triangle[0] < triangle[2]){
@@ -134,13 +134,13 @@ public:
 };
 
 
-MeshFilter::MeshFilter()
+inline MeshFilter::MeshFilter()
 {
     impl = new MeshFilterImpl();
 }
 
 
-MeshFilterImpl::MeshFilterImpl()
+inline MeshFilterImpl::MeshFilterImpl()
 {
     isNormalOverwritingEnabled = false;
     minCreaseAngle = 0.0f;
@@ -148,13 +148,13 @@ MeshFilterImpl::MeshFilterImpl()
 }
 
 
-MeshFilter::MeshFilter(const MeshFilter& org)
+inline MeshFilter::MeshFilter(const MeshFilter& org)
 {
     impl = new MeshFilterImpl(*org.impl);
 }
 
 
-MeshFilterImpl::MeshFilterImpl(const MeshFilterImpl& org)
+inline MeshFilterImpl::MeshFilterImpl(const MeshFilterImpl& org)
 {
     isNormalOverwritingEnabled = org.isNormalOverwritingEnabled;
     minCreaseAngle = org.minCreaseAngle;
@@ -162,13 +162,13 @@ MeshFilterImpl::MeshFilterImpl(const MeshFilterImpl& org)
 }
 
 
-MeshFilter::~MeshFilter()
+inline MeshFilter::~MeshFilter()
 {
     delete impl;
 }
 
 
-void MeshFilterImpl::forAllMeshes(SgNode* node, std::function<void(SgMesh* mesh)> callback)
+inline void MeshFilterImpl::forAllMeshes(SgNode* node, std::function<void(SgMesh* mesh)> callback)
 {
     if(!meshExtractor){
         meshExtractor.reset(new MeshExtractor);
@@ -177,7 +177,7 @@ void MeshFilterImpl::forAllMeshes(SgNode* node, std::function<void(SgMesh* mesh)
 }
 
 
-void MeshFilter::integrateMeshes(SgMesh* mesh1, SgMesh* mesh2)
+inline void MeshFilter::integrateMeshes(SgMesh* mesh1, SgMesh* mesh2)
 {
     if(!mesh1 || !mesh2 || !mesh2->hasVertices()){
         return;
@@ -216,19 +216,19 @@ void MeshFilter::integrateMeshes(SgMesh* mesh1, SgMesh* mesh2)
 }
 
 
-void MeshFilter::removeRedundantVertices(SgNode* scene)
+inline void MeshFilter::removeRedundantVertices(SgNode* scene)
 {
     impl->forAllMeshes(scene, [&](SgMesh* mesh){ impl->removeRedundantVertices(mesh); });
 }
 
 
-void MeshFilter::removeRedundantVertices(SgMesh* mesh)
+inline void MeshFilter::removeRedundantVertices(SgMesh* mesh)
 {
     impl->removeRedundantVertices(mesh);
 }
 
 
-void MeshFilterImpl::removeRedundantVertices(SgMesh* mesh)
+inline void MeshFilterImpl::removeRedundantVertices(SgMesh* mesh)
 {
     if(!mesh->hasVertices()){
         return;
@@ -290,7 +290,7 @@ void MeshFilterImpl::removeRedundantVertices(SgMesh* mesh)
 }
 
 
-void MeshFilter::removeRedundantFaces(SgNode* scene, int reductionMode)
+inline void MeshFilter::removeRedundantFaces(SgNode* scene, int reductionMode)
 {
     impl->forAllMeshes(
         scene,
@@ -300,13 +300,13 @@ void MeshFilter::removeRedundantFaces(SgNode* scene, int reductionMode)
 }
 
 
-void MeshFilter::removeRedundantFaces(SgMesh* mesh, int reductionMode)
+inline void MeshFilter::removeRedundantFaces(SgMesh* mesh, int reductionMode)
 {
     impl->removeRedundantFaces(mesh, reductionMode);
 }
 
 
-void MeshFilterImpl::removeRedundantFaces(SgMesh* mesh, int reductionMode)
+inline void MeshFilterImpl::removeRedundantFaces(SgMesh* mesh, int reductionMode)
 {
     using namespace detail::mesh_filter;
     const int numOrgTriangles = mesh->numTriangles();
@@ -373,7 +373,7 @@ void MeshFilterImpl::removeRedundantFaces(SgMesh* mesh, int reductionMode)
 }
 
 
-void MeshFilterImpl::removeNormalIndicesOfRedundantFaces(SgMesh* mesh, const std::vector<int>& validFaceIndices)
+inline void MeshFilterImpl::removeNormalIndicesOfRedundantFaces(SgMesh* mesh, const std::vector<int>& validFaceIndices)
 {
     auto& normalIndices = mesh->normalIndices();
     if(!normalIndices.empty()){
@@ -391,19 +391,19 @@ void MeshFilterImpl::removeNormalIndicesOfRedundantFaces(SgMesh* mesh, const std
 }
 
 
-void MeshFilter::removeRedundantNormals(SgNode* scene)
+inline void MeshFilter::removeRedundantNormals(SgNode* scene)
 {
     impl->forAllMeshes(scene, [&](SgMesh* mesh){ impl->removeRedundantNormals(mesh); });
 }
 
 
-void MeshFilter::removeRedundantNormals(SgMesh* mesh)
+inline void MeshFilter::removeRedundantNormals(SgMesh* mesh)
 {
     impl->removeRedundantNormals(mesh);
 }
 
 
-void MeshFilterImpl::removeRedundantNormals(SgMesh* mesh)
+inline void MeshFilterImpl::removeRedundantNormals(SgMesh* mesh)
 {
     if(!mesh->hasNormals()){
         return;
@@ -460,7 +460,7 @@ void MeshFilterImpl::removeRedundantNormals(SgMesh* mesh)
 }
 
 
-bool MeshFilter::generateNormals(SgMesh* mesh, float creaseAngle, bool removeRedundantVertices)
+inline bool MeshFilter::generateNormals(SgMesh* mesh, float creaseAngle, bool removeRedundantVertices)
 {
     if(!mesh->hasVertices() || mesh->triangleVertices().empty()){
         return false;
@@ -480,31 +480,31 @@ bool MeshFilter::generateNormals(SgMesh* mesh, float creaseAngle, bool removeRed
 }
 
 
-void MeshFilter::setNormalOverwritingEnabled(bool on)
+inline void MeshFilter::setNormalOverwritingEnabled(bool on)
 {
     impl->isNormalOverwritingEnabled = on;
 }
 
 
-void MeshFilter::setOverwritingEnabled(bool on)
+inline void MeshFilter::setOverwritingEnabled(bool on)
 {
     setNormalOverwritingEnabled(on);
 }
 
 
-void MeshFilter::setMinCreaseAngle(float angle)
+inline void MeshFilter::setMinCreaseAngle(float angle)
 {
     impl->minCreaseAngle = angle;
 }
 
 
-void MeshFilter::setMaxCreaseAngle(float angle)
+inline void MeshFilter::setMaxCreaseAngle(float angle)
 {
     impl->maxCreaseAngle = angle;
 }
 
 
-void MeshFilterImpl::calculateFaceNormals(SgMesh* mesh, bool ignoreZeroNormals)
+inline void MeshFilterImpl::calculateFaceNormals(SgMesh* mesh, bool ignoreZeroNormals)
 {
     const SgVertexArray& vertices = *mesh->vertices();
     const int numTriangles = mesh->numTriangles();
@@ -531,7 +531,7 @@ void MeshFilterImpl::calculateFaceNormals(SgMesh* mesh, bool ignoreZeroNormals)
 }
 
 
-void MeshFilterImpl::makeFacesOfVertexMap(SgMesh* mesh, bool removeSameNormalFaces)
+inline void MeshFilterImpl::makeFacesOfVertexMap(SgMesh* mesh, bool removeSameNormalFaces)
 {
     facesOfVertexMap.clear();
     facesOfVertexMap.resize(mesh->vertices()->size());
@@ -567,7 +567,7 @@ void MeshFilterImpl::makeFacesOfVertexMap(SgMesh* mesh, bool removeSameNormalFac
 }
     
 
-void MeshFilterImpl::makeFacesOfEdgeMap(SgMesh* mesh)
+inline void MeshFilterImpl::makeFacesOfEdgeMap(SgMesh* mesh)
 {
     facesOfEdgeMap.clear();
     facesOfEdgeMap.reserve(mesh->vertices()->size());
@@ -581,7 +581,7 @@ void MeshFilterImpl::makeFacesOfEdgeMap(SgMesh* mesh)
 }
    
 
-void MeshFilterImpl::setVertexNormals(SgMesh* mesh, float givenCreaseAngle)
+inline void MeshFilterImpl::setVertexNormals(SgMesh* mesh, float givenCreaseAngle)
 {
     const float creaseAngle = std::max(minCreaseAngle, std::min(maxCreaseAngle, givenCreaseAngle));
     

@@ -27,7 +27,7 @@ inline struct NodeTypeRegistration {
 
 }   // namespace detail::scene_drawables
 
-SgMaterial::SgMaterial()
+inline SgMaterial::SgMaterial()
 {
     ambientIntensity_ = 0.2f;
     diffuseColor_ << 0.8f, 0.8f, 0.8f;
@@ -38,7 +38,7 @@ SgMaterial::SgMaterial()
 }
 
 
-SgMaterial::SgMaterial(const SgMaterial& org)
+inline SgMaterial::SgMaterial(const SgMaterial& org)
     : SgObject(org)
 {
     ambientIntensity_ = org.ambientIntensity_;
@@ -50,34 +50,34 @@ SgMaterial::SgMaterial(const SgMaterial& org)
 }
 
 
-SgObject* SgMaterial::clone(SgCloneMap&) const
+inline SgObject* SgMaterial::clone(SgCloneMap&) const
 {
     return new SgMaterial(*this);
 }
 
 
-SgImage::SgImage()
+inline SgImage::SgImage()
     : image_(std::make_shared<Image>())
 {
 
 }
 
 
-SgImage::SgImage(const Image& image)
+inline SgImage::SgImage(const Image& image)
     : image_(std::make_shared<Image>(image))
 {
 
 }
 
 
-SgImage::SgImage(std::shared_ptr<Image> sharedImage)
+inline SgImage::SgImage(std::shared_ptr<Image> sharedImage)
     : image_(sharedImage)
 {
 
 }
 
 
-SgImage::SgImage(const SgImage& org)
+inline SgImage::SgImage(const SgImage& org)
     : SgObject(org),
       image_(org.image_)
 {
@@ -85,13 +85,13 @@ SgImage::SgImage(const SgImage& org)
 }
 
 
-SgObject* SgImage::clone(SgCloneMap&) const
+inline SgObject* SgImage::clone(SgCloneMap&) const
 {
     return new SgImage(*this);
 }
 
 
-Image& SgImage::image()
+inline Image& SgImage::image()
 {
     if(image_.use_count() > 1){
         image_ = std::make_shared<Image>(*image_);
@@ -100,7 +100,7 @@ Image& SgImage::image()
 }
 
 
-unsigned char* SgImage::pixels()
+inline unsigned char* SgImage::pixels()
 {
     if(image_.use_count() > 1){
         image_ = std::make_shared<Image>(*image_);
@@ -109,19 +109,19 @@ unsigned char* SgImage::pixels()
 }
 
 
-void SgImage::setSize(int width, int height, int nComponents)
+inline void SgImage::setSize(int width, int height, int nComponents)
 {
     image().setSize(width, height, nComponents);
 }
 
 
-void SgImage::setSize(int width, int height)
+inline void SgImage::setSize(int width, int height)
 {
     image().setSize(width, height);
 }
 
 
-SgTextureTransform::SgTextureTransform()
+inline SgTextureTransform::SgTextureTransform()
 {
     center_ << 0.0, 0.0; 
     rotation_ = 0;
@@ -130,7 +130,7 @@ SgTextureTransform::SgTextureTransform()
 }
 
 
-SgTextureTransform::SgTextureTransform(const SgTextureTransform& org)
+inline SgTextureTransform::SgTextureTransform(const SgTextureTransform& org)
     : SgObject(org)
 {
     center_ = org.center_;
@@ -140,20 +140,20 @@ SgTextureTransform::SgTextureTransform(const SgTextureTransform& org)
 }
 
 
-SgObject* SgTextureTransform::clone(SgCloneMap&) const
+inline SgObject* SgTextureTransform::clone(SgCloneMap&) const
 {
     return new SgTextureTransform(*this);
 }
 
 
-SgTexture::SgTexture()
+inline SgTexture::SgTexture()
 {
     repeatS_ = true; 
     repeatT_ = true; 
 }
 
 
-SgTexture::SgTexture(const SgTexture& org, SgCloneMap& cloneMap)
+inline SgTexture::SgTexture(const SgTexture& org, SgCloneMap& cloneMap)
     : SgObject(org)
 {
     if(cloneMap.isNonNodeCloningEnabled()){
@@ -173,7 +173,7 @@ SgTexture::SgTexture(const SgTexture& org, SgCloneMap& cloneMap)
 }
 
 
-SgTexture::~SgTexture()
+inline SgTexture::~SgTexture()
 {
     if(image_){
         image_->removeParent(this);
@@ -184,13 +184,13 @@ SgTexture::~SgTexture()
 }    
 
 
-SgObject* SgTexture::clone(SgCloneMap& cloneMap) const
+inline SgObject* SgTexture::clone(SgCloneMap& cloneMap) const
 {
     return new SgTexture(*this, cloneMap);
 }
 
 
-int SgTexture::numChildObjects() const
+inline int SgTexture::numChildObjects() const
 {
     int n = 0;
     if(image_) ++n;
@@ -199,7 +199,7 @@ int SgTexture::numChildObjects() const
 }
 
 
-SgObject* SgTexture::childObject(int index)
+inline SgObject* SgTexture::childObject(int index)
 {
     SgObject* objects[2] = { 0, 0 };
     int i = 0;
@@ -209,7 +209,7 @@ SgObject* SgTexture::childObject(int index)
 }
 
 
-SgImage* SgTexture::setImage(SgImage* image)
+inline SgImage* SgTexture::setImage(SgImage* image)
 {
     if(image_){
         image_->removeParent(this);
@@ -222,7 +222,7 @@ SgImage* SgTexture::setImage(SgImage* image)
 }
 
 
-SgImage* SgTexture::getOrCreateImage()
+inline SgImage* SgTexture::getOrCreateImage()
 {
     if(!image_){
         setImage(new SgImage);
@@ -231,7 +231,7 @@ SgImage* SgTexture::getOrCreateImage()
 }    
 
 
-SgTextureTransform* SgTexture::setTextureTransform(SgTextureTransform* textureTransform)
+inline SgTextureTransform* SgTexture::setTextureTransform(SgTextureTransform* textureTransform)
 {
     if(textureTransform_){
         textureTransform_->removeParent(this);
@@ -244,13 +244,13 @@ SgTextureTransform* SgTexture::setTextureTransform(SgTextureTransform* textureTr
 }
 
 
-SgMeshBase::SgMeshBase()
+inline SgMeshBase::SgMeshBase()
 {
     isSolid_ = false;
 }
 
 
-SgMeshBase::SgMeshBase(const SgMeshBase& org, SgCloneMap& cloneMap)
+inline SgMeshBase::SgMeshBase(const SgMeshBase& org, SgCloneMap& cloneMap)
     : SgObject(org),
       normalIndices_(org.normalIndices_),
       colorIndices_(org.colorIndices_),
@@ -280,7 +280,7 @@ SgMeshBase::SgMeshBase(const SgMeshBase& org, SgCloneMap& cloneMap)
 }
 
 
-SgMeshBase::~SgMeshBase()
+inline SgMeshBase::~SgMeshBase()
 {
     if(vertices_){
         vertices_->removeParent(this);
@@ -297,7 +297,7 @@ SgMeshBase::~SgMeshBase()
 }    
 
     
-int SgMeshBase::numChildObjects() const
+inline int SgMeshBase::numChildObjects() const
 {
     int n = 0;
     if(vertices_) ++n;
@@ -307,7 +307,7 @@ int SgMeshBase::numChildObjects() const
 }
 
 
-SgObject* SgMeshBase::childObject(int index)
+inline SgObject* SgMeshBase::childObject(int index)
 {
     SgObject* objects[3] = { 0, 0, 0 };
     int i = 0;
@@ -318,13 +318,13 @@ SgObject* SgMeshBase::childObject(int index)
 }
 
 
-const BoundingBox& SgMeshBase::boundingBox() const
+inline const BoundingBox& SgMeshBase::boundingBox() const
 {
     return bbox;
 }
 
 
-void SgMeshBase::updateBoundingBox()
+inline void SgMeshBase::updateBoundingBox()
 {
     if(!vertices_){
         bbox.clear();
@@ -338,7 +338,7 @@ void SgMeshBase::updateBoundingBox()
 }
 
 
-SgVertexArray* SgMeshBase::setVertices(SgVertexArray* vertices)
+inline SgVertexArray* SgMeshBase::setVertices(SgVertexArray* vertices)
 {
     if(vertices_){
         vertices_->removeParent(this);
@@ -351,7 +351,7 @@ SgVertexArray* SgMeshBase::setVertices(SgVertexArray* vertices)
 }
 
 
-SgVertexArray* SgMeshBase::getOrCreateVertices()
+inline SgVertexArray* SgMeshBase::getOrCreateVertices()
 {
     if(!vertices_){
         setVertices(new SgVertexArray);
@@ -360,7 +360,7 @@ SgVertexArray* SgMeshBase::getOrCreateVertices()
 }
 
 
-SgNormalArray* SgMeshBase::setNormals(SgNormalArray* normals)
+inline SgNormalArray* SgMeshBase::setNormals(SgNormalArray* normals)
 {
     if(normals_){
         normals_->removeParent(this);
@@ -373,7 +373,7 @@ SgNormalArray* SgMeshBase::setNormals(SgNormalArray* normals)
 }
 
 
-SgNormalArray* SgMeshBase::getOrCreateNormals()
+inline SgNormalArray* SgMeshBase::getOrCreateNormals()
 {
     if(!normals_){
         setNormals(new SgNormalArray);
@@ -382,7 +382,7 @@ SgNormalArray* SgMeshBase::getOrCreateNormals()
 }
 
 
-SgColorArray* SgMeshBase::setColors(SgColorArray* colors)
+inline SgColorArray* SgMeshBase::setColors(SgColorArray* colors)
 {
     if(colors_){
         colors_->removeParent(this);
@@ -395,7 +395,7 @@ SgColorArray* SgMeshBase::setColors(SgColorArray* colors)
 }
 
 
-SgColorArray* SgMeshBase::getOrCreateColors()
+inline SgColorArray* SgMeshBase::getOrCreateColors()
 {
     if(!colors_){
         setColors(new SgColorArray);
@@ -404,7 +404,7 @@ SgColorArray* SgMeshBase::getOrCreateColors()
 }
 
 
-SgTexCoordArray* SgMeshBase::setTexCoords(SgTexCoordArray* texCoords)
+inline SgTexCoordArray* SgMeshBase::setTexCoords(SgTexCoordArray* texCoords)
 {
     if(texCoords_){
         texCoords_->removeParent(this);
@@ -417,7 +417,7 @@ SgTexCoordArray* SgMeshBase::setTexCoords(SgTexCoordArray* texCoords)
 }
 
 
-SgTexCoordArray* SgMeshBase::getOrCreateTexCoords()
+inline SgTexCoordArray* SgMeshBase::getOrCreateTexCoords()
 {
     if(!texCoords_){
         setTexCoords(new SgTexCoordArray);
@@ -426,13 +426,13 @@ SgTexCoordArray* SgMeshBase::getOrCreateTexCoords()
 }
 
 
-SgMesh::SgMesh()
+inline SgMesh::SgMesh()
 {
 
 }
 
 
-SgMesh::SgMesh(const SgMesh& org, SgCloneMap& cloneMap)
+inline SgMesh::SgMesh(const SgMesh& org, SgCloneMap& cloneMap)
     : SgMeshBase(org, cloneMap),
       triangleVertices_(org.triangleVertices_),
       primitive_(org.primitive_)
@@ -441,13 +441,13 @@ SgMesh::SgMesh(const SgMesh& org, SgCloneMap& cloneMap)
 }
 
 
-SgObject* SgMesh::clone(SgCloneMap& cloneMap) const
+inline SgObject* SgMesh::clone(SgCloneMap& cloneMap) const
 {
     return new SgMesh(*this, cloneMap);
 }
 
 
-void SgMesh::updateBoundingBox()
+inline void SgMesh::updateBoundingBox()
 {
     if(!detail::scene_drawables::USE_FACES_FOR_BOUNDING_BOX_CALCULATION){
         SgMeshBase::updateBoundingBox();
@@ -468,7 +468,7 @@ void SgMesh::updateBoundingBox()
 }
 
 
-void SgMesh::transform(const Affine3f& T)
+inline void SgMesh::transform(const Affine3f& T)
 {
     if(hasVertices()){
         auto& v = *vertices();
@@ -486,7 +486,7 @@ void SgMesh::transform(const Affine3f& T)
 }
 
 
-void SgMesh::translate(const Vector3f& translation)
+inline void SgMesh::translate(const Vector3f& translation)
 {
     if(hasVertices()){
         auto& v = *vertices();
@@ -498,7 +498,7 @@ void SgMesh::translate(const Vector3f& translation)
 }
     
 
-void SgMesh::rotate(const Matrix3f& R)
+inline void SgMesh::rotate(const Matrix3f& R)
 {
     if(hasVertices()){
         auto& v = *vertices();
@@ -516,13 +516,13 @@ void SgMesh::rotate(const Matrix3f& R)
 }    
     
 
-SgPolygonMesh::SgPolygonMesh()
+inline SgPolygonMesh::SgPolygonMesh()
 {
 
 }
 
 
-SgPolygonMesh::SgPolygonMesh(const SgPolygonMesh& org, SgCloneMap& cloneMap)
+inline SgPolygonMesh::SgPolygonMesh(const SgPolygonMesh& org, SgCloneMap& cloneMap)
     : SgMeshBase(org, cloneMap),
       polygonVertices_(org.polygonVertices_)
 {
@@ -530,13 +530,13 @@ SgPolygonMesh::SgPolygonMesh(const SgPolygonMesh& org, SgCloneMap& cloneMap)
 }
     
 
-SgObject* SgPolygonMesh::clone(SgCloneMap& cloneMap) const
+inline SgObject* SgPolygonMesh::clone(SgCloneMap& cloneMap) const
 {
     return new SgPolygonMesh(*this, cloneMap);
 }
 
 
-void SgPolygonMesh::updateBoundingBox()
+inline void SgPolygonMesh::updateBoundingBox()
 {
     if(!detail::scene_drawables::USE_FACES_FOR_BOUNDING_BOX_CALCULATION){
         SgMeshBase::updateBoundingBox();
@@ -560,21 +560,21 @@ void SgPolygonMesh::updateBoundingBox()
 }
 
 
-SgShape::SgShape(int polymorhicId)
+inline SgShape::SgShape(int polymorhicId)
     : SgNode(polymorhicId)
 {
 
 }
 
 
-SgShape::SgShape()
+inline SgShape::SgShape()
     : SgShape(findPolymorphicId<SgShape>())
 {
 
 }
 
 
-SgShape::SgShape(const SgShape& org, SgCloneMap& cloneMap)
+inline SgShape::SgShape(const SgShape& org, SgCloneMap& cloneMap)
     : SgNode(org)
 {
     if(cloneMap.isNonNodeCloningEnabled()){
@@ -595,7 +595,7 @@ SgShape::SgShape(const SgShape& org, SgCloneMap& cloneMap)
 }
 
 
-SgShape::~SgShape()
+inline SgShape::~SgShape()
 {
     if(mesh_){
         mesh_->removeParent(this);
@@ -609,13 +609,13 @@ SgShape::~SgShape()
 }    
 
 
-SgObject* SgShape::clone(SgCloneMap& cloneMap) const
+inline SgObject* SgShape::clone(SgCloneMap& cloneMap) const
 {
     return new SgShape(*this, cloneMap);
 }
 
 
-int SgShape::numChildObjects() const
+inline int SgShape::numChildObjects() const
 {
     int n = 0;
     if(mesh_) ++n;
@@ -625,7 +625,7 @@ int SgShape::numChildObjects() const
 }
 
 
-SgObject* SgShape::childObject(int index)
+inline SgObject* SgShape::childObject(int index)
 {
     SgObject* objects[3] = { 0, 0, 0 };
     int i = 0;
@@ -636,7 +636,7 @@ SgObject* SgShape::childObject(int index)
 }
 
 
-const BoundingBox& SgShape::boundingBox() const
+inline const BoundingBox& SgShape::boundingBox() const
 {
     if(mesh()){
         return mesh()->boundingBox();
@@ -645,7 +645,7 @@ const BoundingBox& SgShape::boundingBox() const
 }
 
 
-SgMesh* SgShape::setMesh(SgMesh* mesh)
+inline SgMesh* SgShape::setMesh(SgMesh* mesh)
 {
     if(mesh_){
         mesh_->removeParent(this);
@@ -658,7 +658,7 @@ SgMesh* SgShape::setMesh(SgMesh* mesh)
 }
 
 
-SgMesh* SgShape::getOrCreateMesh()
+inline SgMesh* SgShape::getOrCreateMesh()
 {
     if(!mesh_){
         setMesh(new SgMesh);
@@ -667,7 +667,7 @@ SgMesh* SgShape::getOrCreateMesh()
 }
 
 
-SgMaterial* SgShape::setMaterial(SgMaterial* material)
+inline SgMaterial* SgShape::setMaterial(SgMaterial* material)
 {
     if(material_){
         material_->removeParent(this);
@@ -680,7 +680,7 @@ SgMaterial* SgShape::setMaterial(SgMaterial* material)
 }
 
 
-SgMaterial* SgShape::getOrCreateMaterial()
+inline SgMaterial* SgShape::getOrCreateMaterial()
 {
     if(!material_){
         setMaterial(new SgMaterial);
@@ -689,7 +689,7 @@ SgMaterial* SgShape::getOrCreateMaterial()
 }
 
 
-SgTexture* SgShape::setTexture(SgTexture* texture)
+inline SgTexture* SgShape::setTexture(SgTexture* texture)
 {
     if(texture_){
         texture_->removeParent(this);
@@ -702,7 +702,7 @@ SgTexture* SgShape::setTexture(SgTexture* texture)
 }
 
 
-SgTexture* SgShape::getOrCreateTexture()
+inline SgTexture* SgShape::getOrCreateTexture()
 {
     if(!texture_){
         setTexture(new SgTexture);
@@ -711,14 +711,14 @@ SgTexture* SgShape::getOrCreateTexture()
 }
 
 
-SgPlot::SgPlot(int polymorhicId)
+inline SgPlot::SgPlot(int polymorhicId)
     : SgNode(polymorhicId)
 {
 
 }
         
 
-SgPlot::SgPlot(const SgPlot& org, SgCloneMap& cloneMap)
+inline SgPlot::SgPlot(const SgPlot& org, SgCloneMap& cloneMap)
     : SgNode(org)
 {
     if(cloneMap.isNonNodeCloningEnabled()){
@@ -741,7 +741,7 @@ SgPlot::SgPlot(const SgPlot& org, SgCloneMap& cloneMap)
     bbox = org.bbox;
 }
 
-SgPlot::~SgPlot()
+inline SgPlot::~SgPlot()
 {
     if(vertices_){
         vertices_->removeParent(this);
@@ -758,7 +758,7 @@ SgPlot::~SgPlot()
 }    
 
 
-int SgPlot::numChildObjects() const
+inline int SgPlot::numChildObjects() const
 {
     int n = 0;
     if(vertices_) ++n;
@@ -767,7 +767,7 @@ int SgPlot::numChildObjects() const
 }
     
 
-SgObject* SgPlot::childObject(int index)
+inline SgObject* SgPlot::childObject(int index)
 {
     SgObject* objects[2] = { 0, 0 };
     int i = 0;
@@ -777,13 +777,13 @@ SgObject* SgPlot::childObject(int index)
 }
     
 
-const BoundingBox& SgPlot::boundingBox() const
+inline const BoundingBox& SgPlot::boundingBox() const
 {
     return bbox;
 }
 
 
-void SgPlot::updateBoundingBox()
+inline void SgPlot::updateBoundingBox()
 {
     if(!vertices_){
         bbox.clear();
@@ -797,7 +797,7 @@ void SgPlot::updateBoundingBox()
 }
 
 
-void SgPlot::clear()
+inline void SgPlot::clear()
 {
     if(vertices_){
         vertices_->clear();
@@ -814,7 +814,7 @@ void SgPlot::clear()
 }
 
 
-SgVertexArray* SgPlot::setVertices(SgVertexArray* vertices)
+inline SgVertexArray* SgPlot::setVertices(SgVertexArray* vertices)
 {
     if(vertices_){
         vertices_->removeParent(this);
@@ -827,7 +827,7 @@ SgVertexArray* SgPlot::setVertices(SgVertexArray* vertices)
 }
 
 
-SgVertexArray* SgPlot::getOrCreateVertices()
+inline SgVertexArray* SgPlot::getOrCreateVertices()
 {
     if(!vertices_){
         setVertices(new SgVertexArray);
@@ -836,7 +836,7 @@ SgVertexArray* SgPlot::getOrCreateVertices()
 }
 
 
-SgNormalArray* SgPlot::setNormals(SgNormalArray* normals)
+inline SgNormalArray* SgPlot::setNormals(SgNormalArray* normals)
 {
     if(normals_){
         normals_->removeParent(this);
@@ -849,7 +849,7 @@ SgNormalArray* SgPlot::setNormals(SgNormalArray* normals)
 }
 
 
-SgNormalArray* SgPlot::getOrCreateNormals()
+inline SgNormalArray* SgPlot::getOrCreateNormals()
 {
     if(!normals_){
         setNormals(new SgNormalArray);
@@ -858,7 +858,7 @@ SgNormalArray* SgPlot::getOrCreateNormals()
 }
 
 
-SgMaterial* SgPlot::setMaterial(SgMaterial* material)
+inline SgMaterial* SgPlot::setMaterial(SgMaterial* material)
 {
     if(material_){
         material_->removeParent(this);
@@ -871,7 +871,7 @@ SgMaterial* SgPlot::setMaterial(SgMaterial* material)
 }
 
 
-SgMaterial* SgPlot::getOrCreateMaterial()
+inline SgMaterial* SgPlot::getOrCreateMaterial()
 {
     if(!material_){
         setMaterial(new SgMaterial);
@@ -880,7 +880,7 @@ SgMaterial* SgPlot::getOrCreateMaterial()
 }
 
 
-SgColorArray* SgPlot::setColors(SgColorArray* colors)
+inline SgColorArray* SgPlot::setColors(SgColorArray* colors)
 {
     if(colors_){
         colors_->removeParent(this);
@@ -893,7 +893,7 @@ SgColorArray* SgPlot::setColors(SgColorArray* colors)
 }
 
 
-SgColorArray* SgPlot::getOrCreateColors()
+inline SgColorArray* SgPlot::getOrCreateColors()
 {
     if(!colors_){
         setColors(new SgColorArray);
@@ -902,94 +902,94 @@ SgColorArray* SgPlot::getOrCreateColors()
 }
 
 
-SgPointSet::SgPointSet(int polymorhicId)
+inline SgPointSet::SgPointSet(int polymorhicId)
     : SgPlot(polymorhicId)
 {
     pointSize_ = 0.0;
 }
 
 
-SgPointSet::SgPointSet()
+inline SgPointSet::SgPointSet()
     : SgPointSet(findPolymorphicId<SgPointSet>())
 {
 
 }
 
 
-SgPointSet::SgPointSet(const SgPointSet& org, SgCloneMap& cloneMap)
+inline SgPointSet::SgPointSet(const SgPointSet& org, SgCloneMap& cloneMap)
     : SgPlot(org, cloneMap)
 {
     pointSize_ = org.pointSize_;
 }
 
 
-SgObject* SgPointSet::clone(SgCloneMap& cloneMap) const
+inline SgObject* SgPointSet::clone(SgCloneMap& cloneMap) const
 {
     return new SgPointSet(*this, cloneMap);
 }
 
 
-SgLineSet::SgLineSet(int polymorhicId)
+inline SgLineSet::SgLineSet(int polymorhicId)
     : SgPlot(polymorhicId)
 {
     lineWidth_ = 0.0;
 }
 
 
-SgLineSet::SgLineSet()
+inline SgLineSet::SgLineSet()
     : SgLineSet(findPolymorphicId<SgLineSet>())
 {
     lineWidth_ = 0.0;
 }
 
 
-SgLineSet::SgLineSet(const SgLineSet& org, SgCloneMap& cloneMap)
+inline SgLineSet::SgLineSet(const SgLineSet& org, SgCloneMap& cloneMap)
     : SgPlot(org, cloneMap)
 {
     lineWidth_ = org.lineWidth_;
 }
 
     
-SgObject* SgLineSet::clone(SgCloneMap& cloneMap) const
+inline SgObject* SgLineSet::clone(SgCloneMap& cloneMap) const
 {
     return new SgLineSet(*this, cloneMap);
 }
     
 
-SgOverlay::SgOverlay(int polymorhicId)
+inline SgOverlay::SgOverlay(int polymorhicId)
     : SgGroup(polymorhicId)
 {
 
 }
 
 
-SgOverlay::SgOverlay()
+inline SgOverlay::SgOverlay()
     : SgOverlay(findPolymorphicId<SgOverlay>())
 {
 
 }
 
 
-SgOverlay::SgOverlay(const SgOverlay& org, SgCloneMap& cloneMap)
+inline SgOverlay::SgOverlay(const SgOverlay& org, SgCloneMap& cloneMap)
     : SgGroup(org, cloneMap)
 {
 
 }
 
 
-SgOverlay::~SgOverlay()
+inline SgOverlay::~SgOverlay()
 {
 
 }
 
 
-SgObject* SgOverlay::clone(SgCloneMap& cloneMap) const
+inline SgObject* SgOverlay::clone(SgCloneMap& cloneMap) const
 {
     return new SgOverlay(*this, cloneMap);
 }
 
 
-void SgOverlay::calcViewVolume(double /* viewportWidth */, double /* viewportHeight */, ViewVolume& io_volume)
+inline void SgOverlay::calcViewVolume(double /* viewportWidth */, double /* viewportHeight */, ViewVolume& io_volume)
 {
     io_volume.left = -1.0;
     io_volume.right = 1.0;

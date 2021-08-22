@@ -34,7 +34,9 @@
 #include <limits>
 #include <fstream>
 #include <iomanip>
+#if UCNOID_NOT_SUPPORTED
 #include <boost/lexical_cast.hpp>
+#endif  // UCNOID_NOT_SUPPORTED
 
 using namespace std;
 using namespace cnoid;
@@ -488,7 +490,7 @@ CFSImpl::ConstraintForceSolverImpl(WorldBase& world) :
 }
 
 
-CFSImpl::~ConstraintForceSolverImpl()
+inline CFSImpl::~ConstraintForceSolverImpl()
 {
     if(CFS_DEBUG){
         os.close();
@@ -496,7 +498,7 @@ CFSImpl::~ConstraintForceSolverImpl()
 }
 
 
-void CFSImpl::initBody(const DyBodyPtr& body, BodyData& bodyData)
+inline void CFSImpl::initBody(const DyBodyPtr& body, BodyData& bodyData)
 {
     body->clearExternalForces();
     bodyData.body = body;
@@ -515,7 +517,7 @@ void CFSImpl::initBody(const DyBodyPtr& body, BodyData& bodyData)
 }
 
 
-void CFSImpl::initWorldExtraJoints()
+inline void CFSImpl::initWorldExtraJoints()
 {
     for(size_t i=0; i < world.extrajoints.size(); i++){
         ExtraJoint& extrajoint = world.extrajoints[i];
@@ -535,7 +537,7 @@ void CFSImpl::initWorldExtraJoints()
 }
 
 
-void CFSImpl::initBodyExtraJoints(int bodyIndex)
+inline void CFSImpl::initBodyExtraJoints(int bodyIndex)
 {
     const DyBodyPtr& body = world.body(bodyIndex);
     for(int j=0; j < body->numExtraJoints(); ++j){
@@ -546,7 +548,7 @@ void CFSImpl::initBodyExtraJoints(int bodyIndex)
 
 
 // initialize extra joints for making closed links
-void CFSImpl::initExtraJointSub(ExtraJoint& extrajoint, int bodyIndex0, int bodyIndex1)
+inline void CFSImpl::initExtraJointSub(ExtraJoint& extrajoint, int bodyIndex0, int bodyIndex1)
 {
     ExtraJointLinkPairPtr linkPair;
     linkPair = std::make_shared<ExtraJointLinkPair>();
@@ -600,7 +602,7 @@ void CFSImpl::initExtraJointSub(ExtraJoint& extrajoint, int bodyIndex0, int body
 }
 
 
-void CFSImpl::init2Dconstraint(int bodyIndex)
+inline void CFSImpl::init2Dconstraint(int bodyIndex)
 {
     if(!bodyFor2dConstraint){
         bodyFor2dConstraint = new DyBody();
@@ -642,12 +644,12 @@ void CFSImpl::init2Dconstraint(int bodyIndex)
 }
         
     
-void CFSImpl::initialize(void)
+inline void CFSImpl::initialize(void)
 {
     if(CFS_DEBUG || CFS_MCP_DEBUG){
         static int ntest = 0;
         os.close();
-        os.open((string("cfs-log-") + boost::lexical_cast<string>(ntest++) + ".log").c_str());
+        os.open((string("cfs-log-") + std::to_string(ntest++) + ".log").c_str());
         //os << setprecision(50);
     }
 
@@ -783,7 +785,7 @@ inline void CFSImpl::clearExternalForces()
 }
 
 
-void CFSImpl::solve()
+inline void CFSImpl::solve()
 {
     if(CFS_DEBUG){
         os << "Time: " << world.currentTime() << std::endl;
@@ -884,7 +886,7 @@ void CFSImpl::solve()
 }
 
 
-void CFSImpl::setConstraintPoints()
+inline void CFSImpl::setConstraintPoints()
 {
 #ifdef ENABLE_SIMULATION_PROFILING
     timer.begin();
@@ -1116,7 +1118,7 @@ void CFSImpl::setFrictionVectors(ConstraintPoint& contact)
 }
 #endif  // UCNOID_NOT_SUPPORTED
 
-void CFSImpl::setExtraJointConstraintPoints(const ExtraJointLinkPairPtr& linkPair)
+inline void CFSImpl::setExtraJointConstraintPoints(const ExtraJointLinkPairPtr& linkPair)
 {
     ConstraintPointArray& constraintPoints = linkPair->constraintPoints;
 
@@ -1165,7 +1167,7 @@ void CFSImpl::setExtraJointConstraintPoints(const ExtraJointLinkPairPtr& linkPai
 }
 
 
-void CFSImpl::set2dConstraintPoints(const Constrain2dLinkPairPtr& linkPair)
+inline void CFSImpl::set2dConstraintPoints(const Constrain2dLinkPairPtr& linkPair)
 {
     static const Vector3 yAxis(0.0, 1.0, 0.0);
     
@@ -1191,7 +1193,7 @@ void CFSImpl::set2dConstraintPoints(const Constrain2dLinkPairPtr& linkPair)
 
 
 
-void CFSImpl::putContactPoints()
+inline void CFSImpl::putContactPoints()
 {
     os << "Contact Points\n";
     for(size_t i=0; i < constrainedLinkPairs.size(); ++i){
@@ -1232,7 +1234,7 @@ void CFSImpl::putContactPoints()
 }
 
 
-void CFSImpl::solveImpactConstraints()
+inline void CFSImpl::solveImpactConstraints()
 {
     if(CFS_DEBUG){
         os << "Impacts !" << std::endl;
@@ -1240,7 +1242,7 @@ void CFSImpl::solveImpactConstraints()
 }
 
 
-void CFSImpl::initMatrices()
+inline void CFSImpl::initMatrices()
 {
     const int n = globalNumConstraintVectors;
     const int m = globalNumFrictionVectors;
@@ -1270,7 +1272,7 @@ void CFSImpl::initMatrices()
 }
 
 
-void CFSImpl::setAccelCalcSkipInformation()
+inline void CFSImpl::setAccelCalcSkipInformation()
 {
     // clear skip check numbers
     for(size_t i=0; i < bodiesData.size(); ++i){
@@ -1304,7 +1306,7 @@ void CFSImpl::setAccelCalcSkipInformation()
 }
 
 
-void CFSImpl::setDefaultAccelerationVector()
+inline void CFSImpl::setDefaultAccelerationVector()
 {
     // calculate accelerations with no constraint force
     for(size_t i=0; i < bodiesData.size(); ++i){
@@ -1355,7 +1357,7 @@ void CFSImpl::setDefaultAccelerationVector()
 }
 
 
-void CFSImpl::setAccelerationMatrix()
+inline void CFSImpl::setAccelerationMatrix()
 {
     const int n = globalNumConstraintVectors;
     const int m = globalNumFrictionVectors;
@@ -1440,7 +1442,7 @@ void CFSImpl::setAccelerationMatrix()
 }
 
 
-void CFSImpl::initABMForceElementsWithNoExtForce(BodyData& bodyData)
+inline void CFSImpl::initABMForceElementsWithNoExtForce(BodyData& bodyData)
 {
     bodyData.dpf.setZero();
     bodyData.dptau.setZero();
@@ -1484,7 +1486,7 @@ void CFSImpl::initABMForceElementsWithNoExtForce(BodyData& bodyData)
 }
 
 
-void CFSImpl::calcABMForceElementsWithTestForce
+inline void CFSImpl::calcABMForceElementsWithTestForce
 (BodyData& bodyData, DyLink* linkToApplyForce, const Vector3& f, const Vector3& tau)
 {
     std::vector<LinkData>& linksData = bodyData.linksData;
@@ -1510,7 +1512,7 @@ void CFSImpl::calcABMForceElementsWithTestForce
 }
 
 
-void CFSImpl::calcAccelsABM(BodyData& bodyData, int constraintIndex)
+inline void CFSImpl::calcAccelsABM(BodyData& bodyData, int constraintIndex)
 {
     std::vector<LinkData>& linksData = bodyData.linksData;
     LinkData& rootData = linksData[0];
@@ -1569,7 +1571,7 @@ void CFSImpl::calcAccelsABM(BodyData& bodyData, int constraintIndex)
 }
 
 
-void CFSImpl::calcAccelsMM(BodyData& bodyData, int constraintIndex)
+inline void CFSImpl::calcAccelsMM(BodyData& bodyData, int constraintIndex)
 {
     std::vector<LinkData>& linksData = bodyData.linksData;
 
@@ -1601,7 +1603,7 @@ void CFSImpl::calcAccelsMM(BodyData& bodyData, int constraintIndex)
 }
 
 
-void CFSImpl::extractRelAccelsOfConstraintPoints
+inline void CFSImpl::extractRelAccelsOfConstraintPoints
 (Eigen::Block<MatrixX>& Kxn, Eigen::Block<MatrixX>& Kxt, int testForceIndex, int constraintIndex)
 {
     int maxConstraintIndexToExtract = ASSUME_SYMMETRIC_MATRIX ? constraintIndex : globalNumConstraintVectors;
@@ -1631,7 +1633,7 @@ void CFSImpl::extractRelAccelsOfConstraintPoints
 }
 
 
-void CFSImpl::extractRelAccelsFromLinkPairCase1
+inline void CFSImpl::extractRelAccelsFromLinkPairCase1
 (Eigen::Block<MatrixX>& Kxn, Eigen::Block<MatrixX>& Kxt,
  LinkPair& linkPair, int testForceIndex, int maxConstraintIndexToExtract)
 {
@@ -1672,7 +1674,7 @@ void CFSImpl::extractRelAccelsFromLinkPairCase1
 }
 
 
-void CFSImpl::extractRelAccelsFromLinkPairCase2
+inline void CFSImpl::extractRelAccelsFromLinkPairCase2
 (Eigen::Block<MatrixX>& Kxn, Eigen::Block<MatrixX>& Kxt,
  LinkPair& linkPair, int iTestForce, int iDefault, int testForceIndex, int maxConstraintIndexToExtract)
 {
@@ -1709,7 +1711,7 @@ void CFSImpl::extractRelAccelsFromLinkPairCase2
 }
 
 
-void CFSImpl::extractRelAccelsFromLinkPairCase3
+inline void CFSImpl::extractRelAccelsFromLinkPairCase3
 (Eigen::Block<MatrixX>& Kxn, Eigen::Block<MatrixX>& Kxt, LinkPair& linkPair, int testForceIndex, int maxConstraintIndexToExtract)
 {
     ConstraintPointArray& constraintPoints = linkPair.constraintPoints;
@@ -1732,7 +1734,7 @@ void CFSImpl::extractRelAccelsFromLinkPairCase3
 }
 
 
-void CFSImpl::copySymmetricElementsOfAccelerationMatrix
+inline void CFSImpl::copySymmetricElementsOfAccelerationMatrix
 (Eigen::Block<MatrixX>& Knn, Eigen::Block<MatrixX>& Ktn, Eigen::Block<MatrixX>& Knt, Eigen::Block<MatrixX>& Ktt)
 {
     for(size_t linkPairIndex=0; linkPairIndex < constrainedLinkPairs.size(); ++linkPairIndex){
@@ -1769,7 +1771,7 @@ void CFSImpl::copySymmetricElementsOfAccelerationMatrix
 }
 
 
-void CFSImpl::clearSingularPointConstraintsOfClosedLoopConnections()
+inline void CFSImpl::clearSingularPointConstraintsOfClosedLoopConnections()
 {
     for(int i = 0; i < Mlcp.rows(); ++i){
         if(Mlcp(i, i) < 1.0e-4){
@@ -1782,7 +1784,7 @@ void CFSImpl::clearSingularPointConstraintsOfClosedLoopConnections()
 }
 
 
-void CFSImpl::setConstantVectorAndMuBlock()
+inline void CFSImpl::setConstantVectorAndMuBlock()
 {
     double dtinv = 1.0 / world.timeStep();
     const int block2 = globalNumConstraintVectors;
@@ -1858,7 +1860,7 @@ void CFSImpl::setConstantVectorAndMuBlock()
 }
 
 
-void CFSImpl::addConstraintForceToLinks()
+inline void CFSImpl::addConstraintForceToLinks()
 {
     int n = constrainedLinkPairs.size();
     for(int i=0; i < n; ++i){
@@ -1872,7 +1874,7 @@ void CFSImpl::addConstraintForceToLinks()
 }
 
 
-void CFSImpl::addConstraintForceToLink(LinkPair* linkPair, int ipair)
+inline void CFSImpl::addConstraintForceToLink(LinkPair* linkPair, int ipair)
 {
     Vector3 f_total   = Vector3::Zero();
     Vector3 tau_total = Vector3::Zero();
@@ -1911,7 +1913,7 @@ void CFSImpl::addConstraintForceToLink(LinkPair* linkPair, int ipair)
 
 
 
-void CFSImpl::solveMCPByProjectedGaussSeidel(const MatrixX& M, const VectorX& b, VectorX& x)
+inline void CFSImpl::solveMCPByProjectedGaussSeidel(const MatrixX& M, const VectorX& b, VectorX& x)
 {
     static const int loopBlockSize = DEFAULT_NUM_GAUSS_SEIDEL_ITERATION_BLOCK;
 
@@ -1986,7 +1988,7 @@ void CFSImpl::solveMCPByProjectedGaussSeidel(const MatrixX& M, const VectorX& b,
 }
 
 
-void CFSImpl::solveMCPByProjectedGaussSeidelMainStep(const MatrixX& M, const VectorX& b, VectorX& x)
+inline void CFSImpl::solveMCPByProjectedGaussSeidelMainStep(const MatrixX& M, const VectorX& b, VectorX& x)
 {
     const int size = globalNumConstraintVectors + globalNumFrictionVectors;
 
@@ -2101,7 +2103,7 @@ void CFSImpl::solveMCPByProjectedGaussSeidelMainStep(const MatrixX& M, const Vec
 }
 
 
-void CFSImpl::solveMCPByProjectedGaussSeidelInitial
+inline void CFSImpl::solveMCPByProjectedGaussSeidelInitial
 (const MatrixX& M, const VectorX& b, VectorX& x, const int numIteration)
 {
     const int size = globalNumConstraintVectors + globalNumFrictionVectors;
@@ -2227,7 +2229,7 @@ void CFSImpl::solveMCPByProjectedGaussSeidelInitial
 }
 
 
-void CFSImpl::checkLCPResult(MatrixX& M, VectorX& b, VectorX& x)
+inline void CFSImpl::checkLCPResult(MatrixX& M, VectorX& b, VectorX& x)
 {
     os << "check LCP result\n";
     os << "-------------------------------\n";
@@ -2257,7 +2259,7 @@ void CFSImpl::checkLCPResult(MatrixX& M, VectorX& b, VectorX& x)
 }
 
 
-void CFSImpl::checkMCPResult(MatrixX& M, VectorX& b, VectorX& x)
+inline void CFSImpl::checkMCPResult(MatrixX& M, VectorX& b, VectorX& x)
 {
     os << "check MCP result\n";
     os << "-------------------------------\n";
@@ -2344,13 +2346,13 @@ bool CFSImpl::callPathLCPSolver(MatrixX& Mlcp, VectorX& b, VectorX& solution)
 #endif
 
 
-ConstraintForceSolver::ConstraintForceSolver(WorldBase& world)
+inline ConstraintForceSolver::ConstraintForceSolver(WorldBase& world)
 {
     impl = new CFSImpl(world);
 }
 
 
-ConstraintForceSolver::~ConstraintForceSolver()
+inline ConstraintForceSolver::~ConstraintForceSolver()
 {
     delete impl;
 }
@@ -2449,37 +2451,37 @@ double ConstraintForceSolver::contactCullingDepth()
 }
 #endif  // UCNOID_NOT_SUPPORTED
 
-void ConstraintForceSolver::setCoefficientOfRestitution(double epsilon)
+inline void ConstraintForceSolver::setCoefficientOfRestitution(double epsilon)
 {
     impl->defaultCoefficientOfRestitution = epsilon;
 }
 
 
-double ConstraintForceSolver::coefficientOfRestitution() const
+inline double ConstraintForceSolver::coefficientOfRestitution() const
 {
     return impl->defaultCoefficientOfRestitution;
 }
 
 
-void ConstraintForceSolver::setGaussSeidelErrorCriterion(double e)
+inline void ConstraintForceSolver::setGaussSeidelErrorCriterion(double e)
 {
     impl->gaussSeidelErrorCriterion = e;
 }
 
 
-double ConstraintForceSolver::gaussSeidelErrorCriterion()
+inline double ConstraintForceSolver::gaussSeidelErrorCriterion()
 {
     return impl->gaussSeidelErrorCriterion;
 }
 
 
-void ConstraintForceSolver::setGaussSeidelMaxNumIterations(int n)
+inline void ConstraintForceSolver::setGaussSeidelMaxNumIterations(int n)
 {
     impl->maxNumGaussSeidelIteration = n;
 }
 
 
-int ConstraintForceSolver::gaussSeidelMaxNumIterations()
+inline int ConstraintForceSolver::gaussSeidelMaxNumIterations()
 {
     return impl->maxNumGaussSeidelIteration;
 }
@@ -2504,31 +2506,31 @@ double ConstraintForceSolver::contactCorrectionVelocityRatio()
 }
 #endif  // UCNOID_NOT_SUPPORTED
 
-void ConstraintForceSolver::enableConstraintForceOutput(bool on)
+inline void ConstraintForceSolver::enableConstraintForceOutput(bool on)
 {
     impl->isConstraintForceOutputMode = on;
 }
 
 
-void ConstraintForceSolver::set2Dmode(bool on)
+inline void ConstraintForceSolver::set2Dmode(bool on)
 {
     impl->is2Dmode = on;
 }
 
 
-void ConstraintForceSolver::initialize(void)
+inline void ConstraintForceSolver::initialize(void)
 {
     impl->initialize();
 }
 
 
-void ConstraintForceSolver::solve()
+inline void ConstraintForceSolver::solve()
 {
     impl->solve();
 }
 
 
-void ConstraintForceSolver::clearExternalForces()
+inline void ConstraintForceSolver::clearExternalForces()
 {
     impl->clearExternalForces();
 }

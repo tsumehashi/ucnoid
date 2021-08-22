@@ -12,26 +12,26 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-DyLink::DyLink()
+inline DyLink::DyLink()
 {
 
 }
 
 
-DyLink::DyLink(const Link& link)
+inline DyLink::DyLink(const Link& link)
     : Link(link)
 {
 
 }
 
 
-Link* DyLink::clone() const
+inline Link* DyLink::clone() const
 {
     return new DyLink(*this);
 }
 
 
-void DyLink::initializeState()
+inline void DyLink::initializeState()
 {
     Link::initializeState();
 
@@ -40,7 +40,7 @@ void DyLink::initializeState()
 }
 
 
-void DyLink::prependChild(Link* link)
+inline void DyLink::prependChild(Link* link)
 {
     if(DyLink* dyLink = dynamic_cast<DyLink*>(link)){
         Link::prependChild(dyLink);
@@ -50,7 +50,7 @@ void DyLink::prependChild(Link* link)
 }
 
 
-void DyLink::appendChild(Link* link)
+inline void DyLink::appendChild(Link* link)
 {
     if(DyLink* dyLink = dynamic_cast<DyLink*>(link)){
         Link::appendChild(dyLink);
@@ -60,31 +60,31 @@ void DyLink::appendChild(Link* link)
 }
 
 
-DyBody::DyBody()
+inline DyBody::DyBody()
 {
 
 }
 
 
-DyBody::DyBody(const Body& org)
+inline DyBody::DyBody(const Body& org)
 {
     copy(org);
 }
 
     
-Body* DyBody::clone() const
+inline Body* DyBody::clone() const
 {
     return new DyBody(*this);
 }
 
 
-Link* DyBody::createLink(const Link* org) const
+inline Link* DyBody::createLink(const Link* org) const
 {
     return org ? new DyLink(*org) : new DyLink();
 }
 
 
-void DyBody::calcSpatialForwardKinematics()
+inline void DyBody::calcSpatialForwardKinematics()
 {
     const LinkTraverse& traverse = linkTraverse();
     const int n = traverse.numLinks();

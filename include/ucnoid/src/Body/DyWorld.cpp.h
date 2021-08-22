@@ -22,7 +22,7 @@ static const double DEFAULT_GRAVITY_ACCELERATION = 9.80665;
 static const bool debugMode = false;
 }
 
-WorldBase::WorldBase()
+inline WorldBase::WorldBase()
 {
     currentTime_ = 0.0;
     timeStep_ = 0.005;
@@ -36,20 +36,20 @@ WorldBase::WorldBase()
 }
 
 
-WorldBase::~WorldBase()
+inline WorldBase::~WorldBase()
 {
 
 }
 
 
-int WorldBase::bodyIndex(const std::string& name) const
+inline int WorldBase::bodyIndex(const std::string& name) const
 {
     NameToIndexMap::const_iterator p = nameToBodyIndexMap.find(name);
     return (p != nameToBodyIndexMap.end()) ? p->second : -1;
 }
 
 
-DyBody* WorldBase::body(int index) const
+inline DyBody* WorldBase::body(int index) const
 {
     if(index < 0 || (int)bodyInfoArray.size() <= index){
         return 0;
@@ -58,7 +58,7 @@ DyBody* WorldBase::body(int index) const
 }
 
 
-DyBody* WorldBase::body(const std::string& name) const
+inline DyBody* WorldBase::body(const std::string& name) const
 {
     int idx = bodyIndex(name);
     if(idx < 0 || (int)bodyInfoArray.size() <= idx){
@@ -68,37 +68,37 @@ DyBody* WorldBase::body(const std::string& name) const
 }
 
 
-void WorldBase::setTimeStep(double ts)
+inline void WorldBase::setTimeStep(double ts)
 {
     timeStep_ = ts;
 }
 
 
-void WorldBase::setCurrentTime(double time)
+inline void WorldBase::setCurrentTime(double time)
 {
     currentTime_ = time;
 }
 
 
-void WorldBase::setGravityAcceleration(const Vector3& g)
+inline void WorldBase::setGravityAcceleration(const Vector3& g)
 {
     this->g = g;
 }
 
 
-void WorldBase::enableSensors(bool on)
+inline void WorldBase::enableSensors(bool on)
 {
     sensorsAreEnabled = on;
 }
 
 
-void WorldBase::setOldAccelSensorCalcMode(bool on)
+inline void WorldBase::setOldAccelSensorCalcMode(bool on)
 {
     isOldAccelSensorCalcMode = on;
 }
 
 
-void WorldBase::initialize()
+inline void WorldBase::initialize()
 {
     const int n = bodyInfoArray.size();
 
@@ -124,7 +124,7 @@ void WorldBase::initialize()
 }
 
 
-void WorldBase::setVirtualJointForces()
+inline void WorldBase::setVirtualJointForces()
 {
     for(size_t i=0; i < bodyInfoArray.size(); ++i){
         BodyInfo& info = bodyInfoArray[i];
@@ -135,7 +135,7 @@ void WorldBase::setVirtualJointForces()
 }
 
 
-void WorldBase::calcNextState()
+inline void WorldBase::calcNextState()
 {
     if(detail::dy_world::debugMode){
         std::cout << "World current time = " << currentTime_ << std::endl;
@@ -150,7 +150,7 @@ void WorldBase::calcNextState()
 }
 
 
-int WorldBase::addBody(DyBody* body)
+inline int WorldBase::addBody(DyBody* body)
 {
     if(!body->name().empty()){
         nameToBodyIndexMap[body->name()] = bodyInfoArray.size();
@@ -164,7 +164,7 @@ int WorldBase::addBody(DyBody* body)
 }
 
 
-int WorldBase::addBody(DyBody* body, const ForwardDynamicsPtr& forwardDynamics)
+inline int WorldBase::addBody(DyBody* body, const ForwardDynamicsPtr& forwardDynamics)
 {
     int index = addBody(body);
     bodyInfoArray[index].forwardDynamics = forwardDynamics;
@@ -172,33 +172,33 @@ int WorldBase::addBody(DyBody* body, const ForwardDynamicsPtr& forwardDynamics)
 }
 
 
-void WorldBase::clearBodies()
+inline void WorldBase::clearBodies()
 {
     nameToBodyIndexMap.clear();
     bodyInfoArray.clear();
 }
 
 
-void WorldBase::clearCollisionPairs()
+inline void WorldBase::clearCollisionPairs()
 {
     linkPairKeyToIndexMap.clear();
     numRegisteredLinkPairs = 0;
 }
 
 
-void WorldBase::setEulerMethod()
+inline void WorldBase::setEulerMethod()
 {
     isEulerMethod = true;
 }
 
 
-void WorldBase::setRungeKuttaMethod()
+inline void WorldBase::setRungeKuttaMethod()
 {
     isEulerMethod = false;
 }
 
 
-std::pair<int,bool> WorldBase::getIndexOfLinkPairs(DyLink* link1, DyLink* link2)
+inline std::pair<int,bool> WorldBase::getIndexOfLinkPairs(DyLink* link1, DyLink* link2)
 {
     int index = -1;
     bool isRegistered = false;
@@ -229,7 +229,7 @@ std::pair<int,bool> WorldBase::getIndexOfLinkPairs(DyLink* link1, DyLink* link2)
 }
 
 
-bool WorldBase::LinkPairKey::operator<(const LinkPairKey& pair2) const
+inline bool WorldBase::LinkPairKey::operator<(const LinkPairKey& pair2) const
 {
     if(link1 < pair2.link1){
         return true;

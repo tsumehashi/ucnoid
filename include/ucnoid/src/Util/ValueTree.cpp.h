@@ -24,7 +24,7 @@ namespace detail::value_tree {
 
 const bool debugTrace = false;
 
-const char* getTypeName(int typeBits){
+inline const char* getTypeName(int typeBits){
     if(typeBits & ValueNode::SCALAR){
         return "scalar";
     } else if(typeBits & ValueNode::MAPPING){
@@ -50,7 +50,7 @@ inline ValueNode::Initializer initializer;
 
 //ValueNode::Initializer ValueNode::initializer;
 
-ValueNode::Initializer::Initializer()
+inline ValueNode::Initializer::Initializer()
 {
     using namespace detail::value_tree;
     invalidNode = new ValueNode(INVALID_NODE);
@@ -68,20 +68,20 @@ ValueNode::Initializer::Initializer()
 }
 
 
-ValueNode::Exception::Exception()
+inline ValueNode::Exception::Exception()
 {
     line_ = -1;
     column_ = -1;
 }
 
 
-ValueNode::Exception::~Exception()
+inline ValueNode::Exception::~Exception()
 {
 
 }
 
 
-std::string ValueNode::Exception::message() const
+inline std::string ValueNode::Exception::message() const
 {
     if(!message_.empty()){
         if(line_ >= 0){
@@ -111,7 +111,7 @@ std::string ValueNode::Exception::message() const
 }
 
 
-ValueNode::ValueNode(const ValueNode& org)
+inline ValueNode::ValueNode(const ValueNode& org)
     : typeBits(org.typeBits),
       line_(org.line_),
       column_(org.column_),
@@ -121,14 +121,14 @@ ValueNode::ValueNode(const ValueNode& org)
 }
 
 
-ValueNode* ValueNode::clone() const
+inline ValueNode* ValueNode::clone() const
 {
     return new ValueNode(*this);
 }
 
 
 // disabled
-ValueNode& ValueNode::operator=(const ValueNode&)
+inline ValueNode& ValueNode::operator=(const ValueNode&)
 {
     // throw an exception here ?
     return *this;
@@ -162,7 +162,7 @@ ValueNode& ValueNode::operator=(const ValueNode&)
 */
 
 
-bool ValueNode::read(int &out_value) const
+inline bool ValueNode::read(int &out_value) const
 {
     if(isScalar()){
         const char* nptr = &(static_cast<const ScalarNode* const>(this)->stringValue_[0]);
@@ -176,7 +176,7 @@ bool ValueNode::read(int &out_value) const
 }
 
 
-int ValueNode::toInt() const
+inline int ValueNode::toInt() const
 {
     if(!isScalar()){
         throwNotScalrException();
@@ -203,7 +203,7 @@ int ValueNode::toInt() const
 }
 
 
-bool ValueNode::read(double& out_value) const
+inline bool ValueNode::read(double& out_value) const
 {
     if(isScalar()){
         const char* nptr = &(static_cast<const ScalarNode* const>(this)->stringValue_[0]);
@@ -217,7 +217,7 @@ bool ValueNode::read(double& out_value) const
 }
 
 
-bool ValueNode::read(float& out_value) const
+inline bool ValueNode::read(float& out_value) const
 {
     if(isScalar()){
         const char* nptr = &(static_cast<const ScalarNode* const>(this)->stringValue_[0]);
@@ -231,7 +231,7 @@ bool ValueNode::read(float& out_value) const
 }
 
 
-double ValueNode::toDouble() const
+inline double ValueNode::toDouble() const
 {
     if(!isScalar()){
         throwNotScalrException();
@@ -258,7 +258,7 @@ double ValueNode::toDouble() const
 }
 
 
-bool ValueNode::read(bool& out_value) const
+inline bool ValueNode::read(bool& out_value) const
 {
     using namespace detail::value_tree;
     if(isScalar()){
@@ -273,7 +273,7 @@ bool ValueNode::read(bool& out_value) const
 }
 
 
-bool ValueNode::toBool() const
+inline bool ValueNode::toBool() const
 {
     using namespace detail::value_tree;
     if(!isScalar()){
@@ -319,7 +319,7 @@ const std::string ValueNode::toString() const
 
 #else
 
-bool ValueNode::read(std::string& out_value) const
+inline bool ValueNode::read(std::string& out_value) const
 {
     if(isScalar()){
         out_value = static_cast<const ScalarNode* const>(this)->stringValue_;
@@ -329,7 +329,7 @@ bool ValueNode::read(std::string& out_value) const
 }
 
 
-const std::string& ValueNode::toString() const
+inline const std::string& ValueNode::toString() const
 {
     if(!isScalar()){
         throwNotScalrException();
@@ -340,7 +340,7 @@ const std::string& ValueNode::toString() const
 #endif
 
 
-ScalarNode::ScalarNode(const std::string& value, StringStyle stringStyle)
+inline ScalarNode::ScalarNode(const std::string& value, StringStyle stringStyle)
     : stringValue_(value),
       stringStyle_(stringStyle)
 {
@@ -350,7 +350,7 @@ ScalarNode::ScalarNode(const std::string& value, StringStyle stringStyle)
 }
 
 
-ScalarNode::ScalarNode(const char* text, size_t length)
+inline ScalarNode::ScalarNode(const char* text, size_t length)
     : stringValue_(text, length)
 {
     typeBits = SCALAR;
@@ -358,7 +358,7 @@ ScalarNode::ScalarNode(const char* text, size_t length)
 }
 
 
-ScalarNode::ScalarNode(const char* text, size_t length, StringStyle stringStyle)
+inline ScalarNode::ScalarNode(const char* text, size_t length, StringStyle stringStyle)
     : stringValue_(text, length),
       stringStyle_(stringStyle)
 {
@@ -368,7 +368,7 @@ ScalarNode::ScalarNode(const char* text, size_t length, StringStyle stringStyle)
 }
 
 
-ScalarNode::ScalarNode(int value)
+inline ScalarNode::ScalarNode(int value)
     : stringValue_(std::to_string(value))
 {
     typeBits = SCALAR;
@@ -378,7 +378,7 @@ ScalarNode::ScalarNode(int value)
 }
 
 
-ScalarNode::ScalarNode(const ScalarNode& org)
+inline ScalarNode::ScalarNode(const ScalarNode& org)
     : ValueNode(org),
       stringValue_(org.stringValue_),
       stringStyle_(org.stringStyle_)
@@ -387,13 +387,13 @@ ScalarNode::ScalarNode(const ScalarNode& org)
 }
 
 
-ValueNode* ScalarNode::clone() const
+inline ValueNode* ScalarNode::clone() const
 {
     return new ScalarNode(*this);
 }
 
 
-const Mapping* ValueNode::toMapping() const
+inline const Mapping* ValueNode::toMapping() const
 {
     if(!isMapping()){
         throwNotMappingException();
@@ -402,7 +402,7 @@ const Mapping* ValueNode::toMapping() const
 }
 
 
-Mapping* ValueNode::toMapping()
+inline Mapping* ValueNode::toMapping()
 {
     if(!isMapping()){
         throwNotMappingException();
@@ -411,7 +411,7 @@ Mapping* ValueNode::toMapping()
 }
 
 
-const Listing* ValueNode::toListing() const
+inline const Listing* ValueNode::toListing() const
 {
     if(!isListing()){
         throwNotListingException();
@@ -420,7 +420,7 @@ const Listing* ValueNode::toListing() const
 }
 
 
-Listing* ValueNode::toListing()
+inline Listing* ValueNode::toListing()
 {
     if(!isListing()){
         throwNotListingException();
@@ -429,7 +429,7 @@ Listing* ValueNode::toListing()
 }
 
 
-void ValueNode::throwException(const std::string& message) const
+inline void ValueNode::throwException(const std::string& message) const
 {
     Exception ex;
     ex.setPosition(line(), column());
@@ -438,7 +438,7 @@ void ValueNode::throwException(const std::string& message) const
 }
 
 
-void ValueNode::throwNotScalrException() const
+inline void ValueNode::throwNotScalrException() const
 {
     using namespace detail::value_tree;
     NotScalarException ex;
@@ -452,7 +452,7 @@ void ValueNode::throwNotScalrException() const
 }
 
 
-void ValueNode::throwNotMappingException() const
+inline void ValueNode::throwNotMappingException() const
 {
     NotMappingException ex;
     ex.setPosition(line(), column());
@@ -461,7 +461,7 @@ void ValueNode::throwNotMappingException() const
 }
 
 
-void ValueNode::throwNotListingException() const
+inline void ValueNode::throwNotListingException() const
 {
     NotListingException ex;
     ex.setPosition(line(), column());
@@ -469,7 +469,7 @@ void ValueNode::throwNotListingException() const
 }
 
 
-Mapping::Mapping()
+inline Mapping::Mapping()
 {
     typeBits = MAPPING;
     line_ = -1;
@@ -482,7 +482,7 @@ Mapping::Mapping()
 }
 
 
-Mapping::Mapping(int line, int column)
+inline Mapping::Mapping(int line, int column)
 {
     typeBits = MAPPING;
     line_ = line;
@@ -494,7 +494,7 @@ Mapping::Mapping(int line, int column)
 }
 
 
-Mapping::Mapping(const Mapping& org)
+inline Mapping::Mapping(const Mapping& org)
     : ValueNode(org),
       values(org.values),
       mode(org.mode),
@@ -506,44 +506,44 @@ Mapping::Mapping(const Mapping& org)
 }
 
 
-ValueNode* Mapping::clone() const
+inline ValueNode* Mapping::clone() const
 {
     return new Mapping(*this);
 }
 
 
-Mapping* Mapping::cloneMapping() const
+inline Mapping* Mapping::cloneMapping() const
 {
     return new Mapping(*this);
 }
 
 
-Mapping::~Mapping()
+inline Mapping::~Mapping()
 {
     clear();
 }
 
 
-void Mapping::clear()
+inline void Mapping::clear()
 {
     values.clear();
     indexCounter = 0;
 }
 
 
-void Mapping::setDoubleFormat(const char* format)
+inline void Mapping::setDoubleFormat(const char* format)
 {
     doubleFormat_ = format;
 }
 
 
-void Mapping::setKeyQuoteStyle(StringStyle style)
+inline void Mapping::setKeyQuoteStyle(StringStyle style)
 {
     keyStringStyle_ = style;
 }
 
 
-ValueNode* Mapping::find(const std::string& key) const
+inline ValueNode* Mapping::find(const std::string& key) const
 {
     if(!isValid()){
         throwNotMappingException();
@@ -557,7 +557,7 @@ ValueNode* Mapping::find(const std::string& key) const
 }
 
 
-Mapping* Mapping::findMapping(const std::string& key) const
+inline Mapping* Mapping::findMapping(const std::string& key) const
 {
     if(!isValid()){
         throwNotMappingException();
@@ -573,7 +573,7 @@ Mapping* Mapping::findMapping(const std::string& key) const
 }
 
 
-Listing* Mapping::findListing(const std::string& key) const
+inline Listing* Mapping::findListing(const std::string& key) const
 {
     if(!isValid()){
         throwNotMappingException();
@@ -589,7 +589,7 @@ Listing* Mapping::findListing(const std::string& key) const
 }
 
 
-ValueNodePtr Mapping::extract(const std::string& key)
+inline ValueNodePtr Mapping::extract(const std::string& key)
 {
     if(!isValid()){
         throwNotMappingException();
@@ -604,7 +604,7 @@ ValueNodePtr Mapping::extract(const std::string& key)
 }
 
 
-bool Mapping::extract(const std::string& key, double& out_value)
+inline bool Mapping::extract(const std::string& key, double& out_value)
 {
     ValueNodePtr node = extract(key);
     if(node){
@@ -615,7 +615,7 @@ bool Mapping::extract(const std::string& key, double& out_value)
 }
 
 
-bool Mapping::extract(const std::string& key, std::string& out_value)
+inline bool Mapping::extract(const std::string& key, std::string& out_value)
 {
     ValueNodePtr node = extract(key);
     if(node){
@@ -626,7 +626,7 @@ bool Mapping::extract(const std::string& key, std::string& out_value)
 }
 
 
-ValueNode& Mapping::get(const std::string& key) const
+inline ValueNode& Mapping::get(const std::string& key) const
 {
     if(!isValid()){
         throwNotMappingException();
@@ -639,7 +639,7 @@ ValueNode& Mapping::get(const std::string& key) const
 }
 
 
-void Mapping::throwKeyNotFoundException(const std::string& key) const
+inline void Mapping::throwKeyNotFoundException(const std::string& key) const
 {
     KeyNotFoundException ex;
     ex.setPosition(line(), column());
@@ -665,7 +665,7 @@ inline void Mapping::insertSub(const std::string& key, ValueNode* node)
 }
 
 
-void Mapping::insert(const std::string& key, ValueNode* node)
+inline void Mapping::insert(const std::string& key, ValueNode* node)
 {
     if(!isValid()){
         throwNotMappingException();
@@ -678,7 +678,7 @@ void Mapping::insert(const std::string& key, ValueNode* node)
 }
 
 
-void Mapping::insert(const Mapping* other)
+inline void Mapping::insert(const Mapping* other)
 {
     if(!isValid()){
         throwNotMappingException();
@@ -687,7 +687,7 @@ void Mapping::insert(const Mapping* other)
 }
 
 
-Mapping* Mapping::openMapping_(const std::string& key, bool doOverwrite)
+inline Mapping* Mapping::openMapping_(const std::string& key, bool doOverwrite)
 {
     if(!isValid()){
         throwNotMappingException();
@@ -719,7 +719,7 @@ Mapping* Mapping::openMapping_(const std::string& key, bool doOverwrite)
 }
 
 
-Mapping* Mapping::openFlowStyleMapping_(const std::string& key, bool doOverwrite)
+inline Mapping* Mapping::openFlowStyleMapping_(const std::string& key, bool doOverwrite)
 {
     Mapping* m = openMapping_(key, doOverwrite);
     m->setFlowStyle(true);
@@ -727,7 +727,7 @@ Mapping* Mapping::openFlowStyleMapping_(const std::string& key, bool doOverwrite
 }
 
 
-Listing* Mapping::openListing_(const std::string& key, bool doOverwrite)
+inline Listing* Mapping::openListing_(const std::string& key, bool doOverwrite)
 {
     if(!isValid()){
         throwNotMappingException();
@@ -759,7 +759,7 @@ Listing* Mapping::openListing_(const std::string& key, bool doOverwrite)
 }
 
 
-Listing* Mapping::openFlowStyleListing_(const std::string& key, bool doOverwrite)
+inline Listing* Mapping::openFlowStyleListing_(const std::string& key, bool doOverwrite)
 {
     Listing* s = openListing_(key, doOverwrite);
     s->setFlowStyle(true);
@@ -767,13 +767,13 @@ Listing* Mapping::openFlowStyleListing_(const std::string& key, bool doOverwrite
 }
 
 
-bool Mapping::remove(const std::string& key)
+inline bool Mapping::remove(const std::string& key)
 {
     return (values.erase(key) > 0);
 }
 
 
-bool Mapping::read(const std::string &key, std::string &out_value) const
+inline bool Mapping::read(const std::string &key, std::string &out_value) const
 {
     ValueNode* node = find(key);
     if(node->isValid()){
@@ -783,7 +783,7 @@ bool Mapping::read(const std::string &key, std::string &out_value) const
 }
 
 
-bool Mapping::read(const std::string &key, bool &out_value) const
+inline bool Mapping::read(const std::string &key, bool &out_value) const
 {
     ValueNode* node = find(key);
     if(node->isValid()){
@@ -793,7 +793,7 @@ bool Mapping::read(const std::string &key, bool &out_value) const
 }
 
 
-bool Mapping::read(const std::string &key, int &out_value) const
+inline bool Mapping::read(const std::string &key, int &out_value) const
 {
     ValueNode* node = find(key);
     if(node->isValid()){
@@ -803,7 +803,7 @@ bool Mapping::read(const std::string &key, int &out_value) const
 }
 
 
-bool Mapping::read(const std::string &key, double &out_value) const
+inline bool Mapping::read(const std::string &key, double &out_value) const
 {
     ValueNode* node = find(key);
     if(node->isValid()){
@@ -813,7 +813,7 @@ bool Mapping::read(const std::string &key, double &out_value) const
 }
 
 
-bool Mapping::read(const std::string &key, float &out_value) const
+inline bool Mapping::read(const std::string &key, float &out_value) const
 {
     ValueNode* node = find(key);
     if(node->isValid()){
@@ -823,7 +823,7 @@ bool Mapping::read(const std::string &key, float &out_value) const
 }
 
 
-void Mapping::write(const std::string &key, const std::string& value, StringStyle stringStyle)
+inline void Mapping::write(const std::string &key, const std::string& value, StringStyle stringStyle)
 {
     iterator p = values.find(key);
     if(p == values.end()){
@@ -842,7 +842,7 @@ void Mapping::write(const std::string &key, const std::string& value, StringStyl
 }
 
 
-void Mapping::writeSub(const std::string &key, const char* text, size_t length, StringStyle stringStyle)
+inline void Mapping::writeSub(const std::string &key, const char* text, size_t length, StringStyle stringStyle)
 {
     iterator p = values.find(key);
     if(p == values.end()){
@@ -862,7 +862,7 @@ void Mapping::writeSub(const std::string &key, const char* text, size_t length, 
 
 
 
-void Mapping::write(const std::string &key, bool value)
+inline void Mapping::write(const std::string &key, bool value)
 {
     if(value){
         writeSub(key, "true", 4, PLAIN_STRING);
@@ -872,7 +872,7 @@ void Mapping::write(const std::string &key, bool value)
 }
 
 
-void Mapping::write(const std::string &key, int value)
+inline void Mapping::write(const std::string &key, int value)
 {
     char buf[32];
     int n = snprintf(buf, 32, "%d", value);
@@ -880,7 +880,7 @@ void Mapping::write(const std::string &key, int value)
 }
 
 
-void Mapping::write(const std::string &key, double value)
+inline void Mapping::write(const std::string &key, double value)
 {
     char buf[32];
     int n = snprintf(buf, 32, doubleFormat_, value);
@@ -888,13 +888,13 @@ void Mapping::write(const std::string &key, double value)
 }
 
 
-void Mapping::writePath(const std::string &key, const std::string& value)
+inline void Mapping::writePath(const std::string &key, const std::string& value)
 {
     write(key, std::filesystem::path(value).string(), DOUBLE_QUOTED);
 }
 
 
-Listing::Listing()
+inline Listing::Listing()
 {
     typeBits = LISTING;
     line_ = -1;
@@ -905,7 +905,7 @@ Listing::Listing()
 }
 
 
-Listing::Listing(int size)
+inline Listing::Listing(int size)
     : values(size)
 {
     typeBits = LISTING;
@@ -917,7 +917,7 @@ Listing::Listing(int size)
 }
 
 
-Listing::Listing(int line, int column)
+inline Listing::Listing(int line, int column)
 {
     typeBits = LISTING;
     line_ = line;
@@ -928,7 +928,7 @@ Listing::Listing(int line, int column)
 }
 
 
-Listing::Listing(int line, int column, int reservedSize)
+inline Listing::Listing(int line, int column, int reservedSize)
     : values(reservedSize)
 {
     typeBits = LISTING;
@@ -941,7 +941,7 @@ Listing::Listing(int line, int column, int reservedSize)
 }
 
 
-Listing::Listing(const Listing& org)
+inline Listing::Listing(const Listing& org)
     : ValueNode(org),
       values(org.values),
       doubleFormat_(org.doubleFormat_),
@@ -952,37 +952,37 @@ Listing::Listing(const Listing& org)
 }
 
 
-ValueNode* Listing::clone() const
+inline ValueNode* Listing::clone() const
 {
     return new Listing(*this);
 }
 
 
-Listing::~Listing()
+inline Listing::~Listing()
 {
     clear();
 }
 
 
-void Listing::clear()
+inline void Listing::clear()
 {
     values.clear();
 }
 
 
-void Listing::reserve(int size)
+inline void Listing::reserve(int size)
 {
     values.reserve(size);
 }
 
 
-void Listing::setDoubleFormat(const char* format)
+inline void Listing::setDoubleFormat(const char* format)
 {
     doubleFormat_ = format;
 }
 
 
-void Listing::insertLF(int maxColumns, int numValues)
+inline void Listing::insertLF(int maxColumns, int numValues)
 {
     if(values.empty()){
         if(numValues > 0 && numValues > maxColumns){
@@ -994,7 +994,7 @@ void Listing::insertLF(int maxColumns, int numValues)
 }
 
 
-void Listing::appendLF()
+inline void Listing::appendLF()
 {
     if(values.empty()){
         doInsertLFBeforeNextElement = true;
@@ -1004,7 +1004,7 @@ void Listing::appendLF()
 }
 
 
-Mapping* Listing::newMapping()
+inline Mapping* Listing::newMapping()
 {
     Mapping* mapping = new Mapping();
     mapping->doubleFormat_ = doubleFormat_;
@@ -1013,7 +1013,7 @@ Mapping* Listing::newMapping()
 }
 
 
-void Listing::append(int value)
+inline void Listing::append(int value)
 {
     char buf[32];
     int n = snprintf(buf, 32, "%d", value);
@@ -1026,7 +1026,7 @@ void Listing::append(int value)
 }
 
 
-void Listing::write(int i, int value)
+inline void Listing::write(int i, int value)
 {
     char buf[32];
     int n = snprintf(buf, 32, "%d", value);
@@ -1044,7 +1044,7 @@ void Listing::write(int i, int value)
 */
 
 
-void Listing::append(double value)
+inline void Listing::append(double value)
 {
     char buf[32];
     int n = snprintf(buf, 32, doubleFormat_, value);
@@ -1057,7 +1057,7 @@ void Listing::append(double value)
 }
 
 
-void Listing::append(const std::string& value, StringStyle stringStyle)
+inline void Listing::append(const std::string& value, StringStyle stringStyle)
 {
     ScalarNode* node = new ScalarNode(value, stringStyle);
     if(doInsertLFBeforeNextElement){
@@ -1068,7 +1068,7 @@ void Listing::append(const std::string& value, StringStyle stringStyle)
 }
 
 
-void Listing::insert(int index, ValueNode* node)
+inline void Listing::insert(int index, ValueNode* node)
 {
     if(index >= 0){
         if(index > static_cast<int>(values.size())){
@@ -1079,7 +1079,7 @@ void Listing::insert(int index, ValueNode* node)
 }
 
 
-void Listing::write(int i, const std::string& value, StringStyle stringStyle)
+inline void Listing::write(int i, const std::string& value, StringStyle stringStyle)
 {
     values[i] = new ScalarNode(value, stringStyle);
 }

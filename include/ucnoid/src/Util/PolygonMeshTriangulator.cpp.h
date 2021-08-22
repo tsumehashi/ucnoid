@@ -47,49 +47,49 @@ public:
 };
 
 
-PolygonMeshTriangulator::PolygonMeshTriangulator()
+inline PolygonMeshTriangulator::PolygonMeshTriangulator()
 {
     impl = new PolygonMeshTriangulatorImpl();
 }
 
 
-PolygonMeshTriangulator::PolygonMeshTriangulator(const PolygonMeshTriangulator& org)
+inline PolygonMeshTriangulator::PolygonMeshTriangulator(const PolygonMeshTriangulator& org)
 {
     impl = new PolygonMeshTriangulatorImpl(*org.impl);
 }
 
 
-PolygonMeshTriangulator::~PolygonMeshTriangulator()
+inline PolygonMeshTriangulator::~PolygonMeshTriangulator()
 {
     delete impl;
 }
 
 
-PolygonMeshTriangulatorImpl::PolygonMeshTriangulatorImpl()
+inline PolygonMeshTriangulatorImpl::PolygonMeshTriangulatorImpl()
 {
     isDeepCopyEnabled = false;
 }
 
 
-void PolygonMeshTriangulator::setDeepCopyEnabled(bool on)
+inline void PolygonMeshTriangulator::setDeepCopyEnabled(bool on)
 {
     impl->isDeepCopyEnabled = on;
 }
 
 
-const std::string& PolygonMeshTriangulator::errorMessage() const
+inline const std::string& PolygonMeshTriangulator::errorMessage() const
 {
     return impl->errorMessage;
 }
 
 
-SgMesh* PolygonMeshTriangulator::triangulate(SgPolygonMesh* polygonMesh)
+inline SgMesh* PolygonMeshTriangulator::triangulate(SgPolygonMesh* polygonMesh)
 {
     return impl->triangulate(polygonMesh);
 }
 
 
-SgMesh* PolygonMeshTriangulatorImpl::triangulate(SgPolygonMesh* orgMesh)
+inline SgMesh* PolygonMeshTriangulatorImpl::triangulate(SgPolygonMesh* orgMesh)
 {
     errorMessage.clear();
     
@@ -210,7 +210,7 @@ SgMesh* PolygonMeshTriangulatorImpl::triangulate(SgPolygonMesh* orgMesh)
 
 
 namespace detail::polygon_mesh_triangulator {
-const char* message1(int elementTypeId){
+inline const char* message1(int elementTypeId){
     switch(elementTypeId){
     case 0: return "The number of normals is less than the number of vertices.";
     case 1: return "The number of colors is less than the number of vertices.";
@@ -219,7 +219,7 @@ const char* message1(int elementTypeId){
     }
 }
 
-const char* message2(int elementTypeId){
+inline const char* message2(int elementTypeId){
     switch(elementTypeId){
     case 0: return "The number of normal indices is less than the number of polygon vertices.";
     case 1: return "The number of color indices is less than the number of polygon vertices.";
@@ -239,7 +239,7 @@ const char* message3(int elementTypeId){
 }
 #else   // UCNOID_NOT_SUPPORTED
 template <typename T>
-std::string message3(int elementTypeId, const T& t){
+inline std::string message3(int elementTypeId, const T& t){
     switch(elementTypeId){
     case 0: return "Normal index " + std::to_string(t) + " is over the range of given normals.";
     case 1: return "Color index " + std::to_string(t) + " is over the range of given colors.";
@@ -252,7 +252,7 @@ std::string message3(int elementTypeId, const T& t){
 }   // namespace detail::polygon_mesh_triangulator
           
 
-bool PolygonMeshTriangulatorImpl::setIndices
+inline bool PolygonMeshTriangulatorImpl::setIndices
 (SgIndexArray& indices, int numElements, const SgIndexArray& orgIndices, const SgIndexArray& orgPolygonVertices, int elementTypeId)
 {
     using namespace detail::polygon_mesh_triangulator;

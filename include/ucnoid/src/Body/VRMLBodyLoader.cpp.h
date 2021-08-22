@@ -162,7 +162,7 @@ inline void throwExceptionOfIllegalField(VRMLProto* proto, const std::string& na
 }
 
 template <typename TValue>
-void requireField(VRMLProto* proto, const std::string& name){
+inline void requireField(VRMLProto* proto, const std::string& name){
     VRMLVariantField* field = proto->findField(name);
     if(!field || !std::holds_alternative<TValue>(*field)){
         throwExceptionOfIllegalField(proto, name, labelOfVRMLfieldType<TValue>());
@@ -170,7 +170,7 @@ void requireField(VRMLProto* proto, const std::string& name){
 }
 
 template <typename TValue>
-VRMLVariantField* addField(VRMLProto* proto, const std::string& name, const TValue& defaultValue) {
+inline VRMLVariantField* addField(VRMLProto* proto, const std::string& name, const TValue& defaultValue) {
     VRMLVariantField* field = proto->findField(name);
     if(!field){
         field = &proto->field(name);
@@ -182,7 +182,7 @@ VRMLVariantField* addField(VRMLProto* proto, const std::string& name, const TVal
 }
 
 template <typename TValue>
-VRMLVariantField* addField(VRMLProto* proto, const std::string& name) {
+inline VRMLVariantField* addField(VRMLProto* proto, const std::string& name) {
     return addField(proto, name, TValue());
 }
 
@@ -195,7 +195,7 @@ inline double getLimitValue(VRMLVariantField& field, double defaultValue)
     return values[0];
 }
 
-template<class ValueType> ValueType getValue(VRMLProtoInstance* node, const char* fieldName)
+template<class ValueType> inline ValueType getValue(VRMLProtoInstance* node, const char* fieldName)
 {
     VRMLProtoFieldMap::const_iterator p = node->fields.find(fieldName);
     if(p == node->fields.end()){
@@ -296,13 +296,13 @@ inline void readVRMLfield(VRMLVariantField& field, Matrix3& out_R)
 }   // namespace detail::vrml_body_loader
 
 
-VRMLBodyLoader::VRMLBodyLoader()
+inline VRMLBodyLoader::VRMLBodyLoader()
 {
     impl = new VRMLBodyLoaderImpl();
 }
 
 
-VRMLBodyLoaderImpl::VRMLBodyLoaderImpl()
+inline VRMLBodyLoaderImpl::VRMLBodyLoaderImpl()
 {
     using namespace detail::vrml_body_loader;
     divisionNumber = sgConverter.divisionNumber();
@@ -340,19 +340,19 @@ VRMLBodyLoaderImpl::VRMLBodyLoaderImpl()
 }
 
 
-VRMLBodyLoader::~VRMLBodyLoader()
+inline VRMLBodyLoader::~VRMLBodyLoader()
 {
     delete impl;
 }
 
 
-VRMLBodyLoaderImpl::~VRMLBodyLoaderImpl()
+inline VRMLBodyLoaderImpl::~VRMLBodyLoaderImpl()
 {
 
 }
 
 
-void VRMLBodyLoader::setMessageSink(std::ostream& os)
+inline void VRMLBodyLoader::setMessageSink(std::ostream& os)
 {
     impl->os_ = &os;
     impl->vrmlParser.setMessageSink(os);
@@ -360,7 +360,7 @@ void VRMLBodyLoader::setMessageSink(std::ostream& os)
 }
 
 
-void VRMLBodyLoader::setVerbose(bool on)
+inline void VRMLBodyLoader::setVerbose(bool on)
 {
     impl->isVerbose = on;
 }
@@ -369,26 +369,26 @@ void VRMLBodyLoader::setVerbose(bool on)
 /**
    \todo fully implement this mode
 */
-void VRMLBodyLoader::enableShapeLoading(bool on)
+inline void VRMLBodyLoader::enableShapeLoading(bool on)
 {
     impl->sgConverter.setTriangulationEnabled(on);
     impl->sgConverter.setNormalGenerationEnabled(on);
 }
     
 
-void VRMLBodyLoader::setDefaultDivisionNumber(int n)
+inline void VRMLBodyLoader::setDefaultDivisionNumber(int n)
 {
     impl->divisionNumber = n;
 }
 
 
-VRMLNodePtr VRMLBodyLoader::getOriginalNode(Link* link)
+inline VRMLNodePtr VRMLBodyLoader::getOriginalNode(Link* link)
 {
     return impl->getOriginalNode(link);
 }
 
 
-VRMLNodePtr VRMLBodyLoaderImpl::getOriginalNode(Link* link)
+inline VRMLNodePtr VRMLBodyLoaderImpl::getOriginalNode(Link* link)
 {
     LinkOriginalMap::iterator it;
     it = linkOriginalMap.find(link);
@@ -399,7 +399,7 @@ VRMLNodePtr VRMLBodyLoaderImpl::getOriginalNode(Link* link)
 }
 
 
-bool VRMLBodyLoader::load(Body* body, const std::string& filename)
+inline bool VRMLBodyLoader::load(Body* body, const std::string& filename)
 {
     body->clearDevices();
     body->clearExtraJoints();
@@ -407,7 +407,7 @@ bool VRMLBodyLoader::load(Body* body, const std::string& filename)
 }
 
 
-bool VRMLBodyLoaderImpl::load(Body* body, const std::string& filename)
+inline bool VRMLBodyLoaderImpl::load(Body* body, const std::string& filename)
 {
     bool result = false;
 
@@ -447,7 +447,7 @@ bool VRMLBodyLoaderImpl::load(Body* body, const std::string& filename)
 }
 
 
-void VRMLBodyLoaderImpl::readTopNodes()
+inline void VRMLBodyLoaderImpl::readTopNodes()
 {
     using namespace detail::vrml_body_loader;
     bool humanoidNodeLoaded = false;
@@ -506,7 +506,7 @@ void VRMLBodyLoaderImpl::readTopNodes()
 }
 
 
-void VRMLBodyLoaderImpl::checkHumanoidProto(VRMLProto* proto)
+inline void VRMLBodyLoaderImpl::checkHumanoidProto(VRMLProto* proto)
 {
     using namespace detail::vrml_body_loader;
     // required fields
@@ -524,7 +524,7 @@ void VRMLBodyLoaderImpl::checkHumanoidProto(VRMLProto* proto)
 }
 
 
-void VRMLBodyLoaderImpl::checkJointProto(VRMLProto* proto)
+inline void VRMLBodyLoaderImpl::checkJointProto(VRMLProto* proto)
 {
     using namespace detail::vrml_body_loader;
     // required fields
@@ -569,7 +569,7 @@ void VRMLBodyLoaderImpl::checkJointProto(VRMLProto* proto)
 }
 
 
-void VRMLBodyLoaderImpl::checkSegmentProto(VRMLProto* proto)
+inline void VRMLBodyLoaderImpl::checkSegmentProto(VRMLProto* proto)
 {
     using namespace detail::vrml_body_loader;
     requireField<SFVec3f>(proto, "centerOfMass");
@@ -579,7 +579,7 @@ void VRMLBodyLoaderImpl::checkSegmentProto(VRMLProto* proto)
 }
 
 
-void VRMLBodyLoaderImpl::checkSurfaceProto(VRMLProto* proto)
+inline void VRMLBodyLoaderImpl::checkSurfaceProto(VRMLProto* proto)
 {
     using namespace detail::vrml_body_loader;
     requireField<MFNode>(proto, "visual");
@@ -587,7 +587,7 @@ void VRMLBodyLoaderImpl::checkSurfaceProto(VRMLProto* proto)
 }
 
 
-void VRMLBodyLoaderImpl::checkSensorProtoCommon(VRMLProto* proto)
+inline void VRMLBodyLoaderImpl::checkSensorProtoCommon(VRMLProto* proto)
 {
     using namespace detail::vrml_body_loader;
     requireField<SFInt32>(proto, "sensorId");
@@ -596,7 +596,7 @@ void VRMLBodyLoaderImpl::checkSensorProtoCommon(VRMLProto* proto)
 }
 
 
-void VRMLBodyLoaderImpl::checkDeviceProtoCommon(VRMLProto* proto)
+inline void VRMLBodyLoaderImpl::checkDeviceProtoCommon(VRMLProto* proto)
 {
     using namespace detail::vrml_body_loader;
     requireField<SFVec3f>(proto, "translation");
@@ -604,7 +604,7 @@ void VRMLBodyLoaderImpl::checkDeviceProtoCommon(VRMLProto* proto)
 }
 
 
-void VRMLBodyLoaderImpl::checkVisionSensorProto(VRMLProto* proto)
+inline void VRMLBodyLoaderImpl::checkVisionSensorProto(VRMLProto* proto)
 {
     using namespace detail::vrml_body_loader;
     checkDeviceProtoCommon(proto);
@@ -619,7 +619,7 @@ void VRMLBodyLoaderImpl::checkVisionSensorProto(VRMLProto* proto)
 }
 
 
-void VRMLBodyLoaderImpl::checkRangeSensorProto(VRMLProto* proto)
+inline void VRMLBodyLoaderImpl::checkRangeSensorProto(VRMLProto* proto)
 {
     using namespace detail::vrml_body_loader;
     checkDeviceProtoCommon(proto);
@@ -632,7 +632,7 @@ void VRMLBodyLoaderImpl::checkRangeSensorProto(VRMLProto* proto)
 }
 
 
-void VRMLBodyLoaderImpl::checkSpotLightDeviceProto(VRMLProto* proto)
+inline void VRMLBodyLoaderImpl::checkSpotLightDeviceProto(VRMLProto* proto)
 {
     using namespace detail::vrml_body_loader;
     checkDeviceProtoCommon(proto);
@@ -648,7 +648,7 @@ void VRMLBodyLoaderImpl::checkSpotLightDeviceProto(VRMLProto* proto)
 }
 
 
-void VRMLBodyLoaderImpl::checkExtraJointProto(VRMLProto* proto)
+inline void VRMLBodyLoaderImpl::checkExtraJointProto(VRMLProto* proto)
 {
     using namespace detail::vrml_body_loader;
     requireField<SFString>(proto, "link1Name");
@@ -660,7 +660,7 @@ void VRMLBodyLoaderImpl::checkExtraJointProto(VRMLProto* proto)
 }
 
         
-void VRMLBodyLoaderImpl::readHumanoidNode(VRMLProtoInstance* humanoidNode)
+inline void VRMLBodyLoaderImpl::readHumanoidNode(VRMLProtoInstance* humanoidNode)
 {
     using namespace detail::vrml_body_loader;
     if(isVerbose) putMessage("Humanoid node");
@@ -716,7 +716,7 @@ void VRMLBodyLoaderImpl::readHumanoidNode(VRMLProtoInstance* humanoidNode)
 }
 
 
-static void setShape(Link* link, SgGroup* shape, bool isVisual)
+static inline void setShape(Link* link, SgGroup* shape, bool isVisual)
 {
     SgNodePtr node;
     if(shape->empty()){
@@ -743,7 +743,7 @@ static void setShape(Link* link, SgGroup* shape, bool isVisual)
 }
 
 
-Link* VRMLBodyLoaderImpl::readJointNode(VRMLProtoInstance* jointNode, const Matrix3& parentRs)
+inline Link* VRMLBodyLoaderImpl::readJointNode(VRMLProtoInstance* jointNode, const Matrix3& parentRs)
 {
     if(isVerbose) putMessage(std::string("Joint node") + jointNode->defName);
 
@@ -803,7 +803,7 @@ Link* VRMLBodyLoaderImpl::readJointNode(VRMLProtoInstance* jointNode, const Matr
 }
 
 
-Link* VRMLBodyLoaderImpl::createLink(VRMLProtoInstance* jointNode, const Matrix3& parentRs)
+inline Link* VRMLBodyLoaderImpl::createLink(VRMLProtoInstance* jointNode, const Matrix3& parentRs)
 {
     using namespace detail::vrml_body_loader;
     Link* link = body->createLink();
@@ -940,7 +940,7 @@ Link* VRMLBodyLoaderImpl::createLink(VRMLProtoInstance* jointNode, const Matrix3
 }    
 
 
-void VRMLBodyLoaderImpl::readJointSubNodes(LinkInfo& iLink, MFNode& childNodes, const ProtoIdSet& acceptableProtoIds, const Affine3& T)
+inline void VRMLBodyLoaderImpl::readJointSubNodes(LinkInfo& iLink, MFNode& childNodes, const ProtoIdSet& acceptableProtoIds, const Affine3& T)
 {
     using namespace detail::vrml_body_loader;
     for(size_t i = 0; i < childNodes.size(); ++i){
@@ -1012,7 +1012,7 @@ void VRMLBodyLoaderImpl::readJointSubNodes(LinkInfo& iLink, MFNode& childNodes, 
 }
 
 
-void VRMLBodyLoaderImpl::readSegmentNode(LinkInfo& iLink, VRMLProtoInstance* segmentNode, const Affine3& T)
+inline void VRMLBodyLoaderImpl::readSegmentNode(LinkInfo& iLink, VRMLProtoInstance* segmentNode, const Affine3& T)
 {
     using namespace detail::vrml_body_loader;
     if(isVerbose) putMessage(std::string("Segment node ") + segmentNode->defName);
@@ -1067,7 +1067,7 @@ void VRMLBodyLoaderImpl::readSegmentNode(LinkInfo& iLink, VRMLProtoInstance* seg
 }
 
 
-void VRMLBodyLoaderImpl::readSurfaceNode(LinkInfo& iLink, VRMLProtoInstance* segmentShapeNode, const Affine3& T)
+inline void VRMLBodyLoaderImpl::readSurfaceNode(LinkInfo& iLink, VRMLProtoInstance* segmentShapeNode, const Affine3& T)
 {
     if(isVerbose) putMessage(std::string("Surface node ") + segmentShapeNode->defName);
     
@@ -1101,7 +1101,7 @@ void VRMLBodyLoaderImpl::readSurfaceNode(LinkInfo& iLink, VRMLProtoInstance* seg
 }
 
 
-void VRMLBodyLoaderImpl::readDeviceNode(LinkInfo& iLink, VRMLProtoInstance* deviceNode, const Affine3& T)
+inline void VRMLBodyLoaderImpl::readDeviceNode(LinkInfo& iLink, VRMLProtoInstance* deviceNode, const Affine3& T)
 {
     const std::string& typeName = deviceNode->proto->protoName;
     if(isVerbose) putMessage(typeName + " node " + deviceNode->defName);
@@ -1132,7 +1132,7 @@ void VRMLBodyLoaderImpl::readDeviceNode(LinkInfo& iLink, VRMLProtoInstance* devi
 }
 
 
-void VRMLBodyLoaderImpl::readDeviceCommonParameters(Device& device, VRMLProtoInstance* node)
+inline void VRMLBodyLoaderImpl::readDeviceCommonParameters(Device& device, VRMLProtoInstance* node)
 {
     using namespace detail::vrml_body_loader;
     device.setName(node->defName);
@@ -1151,7 +1151,7 @@ void VRMLBodyLoaderImpl::readDeviceCommonParameters(Device& device, VRMLProtoIns
 }
 
 
-ForceSensorPtr VRMLBodyLoaderImpl::createForceSensor(VRMLProtoInstance* node)
+inline ForceSensorPtr VRMLBodyLoaderImpl::createForceSensor(VRMLProtoInstance* node)
 {
     using namespace detail::vrml_body_loader;
     ForceSensorPtr sensor = new ForceSensor();
@@ -1168,7 +1168,7 @@ ForceSensorPtr VRMLBodyLoaderImpl::createForceSensor(VRMLProtoInstance* node)
 }
 
 
-RateGyroSensorPtr VRMLBodyLoaderImpl::createRateGyroSensor(VRMLProtoInstance* node)
+inline RateGyroSensorPtr VRMLBodyLoaderImpl::createRateGyroSensor(VRMLProtoInstance* node)
 {
     using namespace detail::vrml_body_loader;
     RateGyroSensorPtr sensor = new RateGyroSensor();
@@ -1182,7 +1182,7 @@ RateGyroSensorPtr VRMLBodyLoaderImpl::createRateGyroSensor(VRMLProtoInstance* no
 }
 
 
-AccelerationSensorPtr VRMLBodyLoaderImpl::createAccelerationSensor(VRMLProtoInstance* node)
+inline AccelerationSensorPtr VRMLBodyLoaderImpl::createAccelerationSensor(VRMLProtoInstance* node)
 {
     using namespace detail::vrml_body_loader;
     AccelerationSensorPtr sensor = new AccelerationSensor();
@@ -1196,7 +1196,7 @@ AccelerationSensorPtr VRMLBodyLoaderImpl::createAccelerationSensor(VRMLProtoInst
 }
 
 
-CameraPtr VRMLBodyLoaderImpl::createCamera(VRMLProtoInstance* node)
+inline CameraPtr VRMLBodyLoaderImpl::createCamera(VRMLProtoInstance* node)
 {
     using namespace detail::vrml_body_loader;
     CameraPtr camera;
@@ -1246,7 +1246,7 @@ CameraPtr VRMLBodyLoaderImpl::createCamera(VRMLProtoInstance* node)
 }
 
 
-RangeSensorPtr VRMLBodyLoaderImpl::createRangeSensor(VRMLProtoInstance* node)
+inline RangeSensorPtr VRMLBodyLoaderImpl::createRangeSensor(VRMLProtoInstance* node)
 {
     using namespace detail::vrml_body_loader;
     RangeSensorPtr rangeSensor = new RangeSensor;
@@ -1269,7 +1269,7 @@ RangeSensorPtr VRMLBodyLoaderImpl::createRangeSensor(VRMLProtoInstance* node)
 }
 
 
-void VRMLBodyLoaderImpl::readLightDeviceCommonParameters(Light& light, VRMLProtoInstance* node)
+inline void VRMLBodyLoaderImpl::readLightDeviceCommonParameters(Light& light, VRMLProtoInstance* node)
 {
     using namespace detail::vrml_body_loader;
     readDeviceCommonParameters(light, node);
@@ -1280,7 +1280,7 @@ void VRMLBodyLoaderImpl::readLightDeviceCommonParameters(Light& light, VRMLProto
 }
 
 
-SpotLightPtr VRMLBodyLoaderImpl::createSpotLight(VRMLProtoInstance* node)
+inline SpotLightPtr VRMLBodyLoaderImpl::createSpotLight(VRMLProtoInstance* node)
 {
     using namespace detail::vrml_body_loader;
     SpotLightPtr light = new SpotLight();
@@ -1300,7 +1300,7 @@ SpotLightPtr VRMLBodyLoaderImpl::createSpotLight(VRMLProtoInstance* node)
 }
 
 
-void VRMLBodyLoaderImpl::setExtraJoints()
+inline void VRMLBodyLoaderImpl::setExtraJoints()
 {
     using namespace detail::vrml_body_loader;
     for(size_t i=0; i < extraJointNodes.size(); ++i){

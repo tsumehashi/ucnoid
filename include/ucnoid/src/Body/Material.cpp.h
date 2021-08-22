@@ -32,7 +32,7 @@ struct DefaultIdIntialization {
 }   // namespace detail::material
 
 
-int Material::id(const std::string name)
+inline int Material::id(const std::string name)
 {
     using namespace detail::material;
     std::lock_guard<std::mutex> guard(idMutex);
@@ -56,7 +56,7 @@ int Material::id(const std::string name)
 }
 
 
-std::string Material::name(int id)
+inline std::string Material::name(int id)
 {
     using namespace detail::material;
     std::lock_guard<std::mutex> guard(idMutex);
@@ -67,7 +67,7 @@ std::string Material::name(int id)
 }
 
 
-Material::Material()
+inline Material::Material()
 {
     roughness_ = 0.5;
     viscosity_ = 0.0;
@@ -75,7 +75,7 @@ Material::Material()
 }
 
 
-Material::Material(const Material& org)
+inline Material::Material(const Material& org)
     : name_(org.name_)
 {
     roughness_ = org.roughness_;
@@ -84,7 +84,7 @@ Material::Material(const Material& org)
 }
 
 
-Material::Material(const Mapping* info)
+inline Material::Material(const Mapping* info)
 {
     roughness_ = 0.5;
     viscosity_ = 0.0;
@@ -96,13 +96,13 @@ Material::Material(const Mapping* info)
 }
 
 
-Material::~Material()
+inline Material::~Material()
 {
 
 }
 
 
-template<> double Material::info(const std::string& key, const double& defaultValue) const
+template<> inline double Material::info(const std::string& key, const double& defaultValue) const
 {
     double value;
     if(info_->read(key, value)){
@@ -112,7 +112,7 @@ template<> double Material::info(const std::string& key, const double& defaultVa
 }
 
 
-template<> bool Material::info(const std::string& key, const bool& defaultValue) const
+template<> inline bool Material::info(const std::string& key, const bool& defaultValue) const
 {
     bool value;
     if(info_->read(key, value)){

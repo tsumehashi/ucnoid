@@ -129,7 +129,7 @@ inline std::string str(const AngleAxis& a)
 }
 
 template<class VectorType>
-static bool toVector3_(const std::string& s, VectorType& out_v)
+static inline bool toVector3_(const std::string& s, VectorType& out_v)
 {
     const char* nptr = s.c_str();
     char* endptr;

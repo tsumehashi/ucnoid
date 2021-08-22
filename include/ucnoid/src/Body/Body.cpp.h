@@ -72,7 +72,7 @@ public:
 
 
 
-Body::Body()
+inline Body::Body()
 {
     initialize();
     rootLink_ = createLink();
@@ -85,7 +85,7 @@ Body::Body()
 }
 
 
-void Body::initialize()
+inline void Body::initialize()
 {
     impl = new BodyImpl;
     
@@ -98,13 +98,13 @@ void Body::initialize()
 }
 
 
-Body::Body(const Body& org)
+inline Body::Body(const Body& org)
 {
     copy(org);
 }
 
 
-void Body::copy(const Body& org)
+inline void Body::copy(const Body& org)
 {
     initialize();
 
@@ -146,7 +146,7 @@ void Body::copy(const Body& org)
 }
 
 
-Link* Body::cloneLinkTree(const Link* orgLink)
+inline Link* Body::cloneLinkTree(const Link* orgLink)
 {
     Link* link = createLink(orgLink);
     for(Link* orgChild = orgLink->child(); orgChild; orgChild = orgChild->sibling()){
@@ -156,18 +156,18 @@ Link* Body::cloneLinkTree(const Link* orgLink)
 }
 
 
-Body* Body::clone() const
+inline Body* Body::clone() const
 {
     return new Body(*this);
 }
 
 
-Link* Body::createLink(const Link* org) const
+inline Link* Body::createLink(const Link* org) const
 {
     return org ? new Link(*org) : new Link();
 }
 
-void Body::cloneShapes(SgCloneMap& cloneMap)
+inline void Body::cloneShapes(SgCloneMap& cloneMap)
 {
     const int n = linkTraverse_.numLinks();
     for(int i=0; i < n; ++i){
@@ -188,7 +188,7 @@ void Body::cloneShapes(SgCloneMap& cloneMap)
 }
 
 
-Body::~Body()
+inline Body::~Body()
 {
     setRootLink(0);
 #if UCNOID_NOT_SUPPORTED
@@ -200,7 +200,7 @@ Body::~Body()
 }
 
 
-void Body::setRootLink(Link* link)
+inline void Body::setRootLink(Link* link)
 {
     if(rootLink_){
         rootLink_->setBody(0);
@@ -213,7 +213,7 @@ void Body::setRootLink(Link* link)
 }
 
 
-Link* Body::createEmptyJoint(int jointId)
+inline Link* Body::createEmptyJoint(int jointId)
 {
     Link* empty = createLink();
     empty->setJointId(jointId);
@@ -221,7 +221,7 @@ Link* Body::createEmptyJoint(int jointId)
 }
 
 
-void Body::updateLinkTree()
+inline void Body::updateLinkTree()
 {
     isStaticModel_ = true;
     
@@ -279,53 +279,53 @@ void Body::updateLinkTree()
 }
 
 
-void Body::resetDefaultPosition(const Position& T)
+inline void Body::resetDefaultPosition(const Position& T)
 {
     rootLink_->setOffsetPosition(T);
 }
 
 
-const std::string& Body::name() const
+inline const std::string& Body::name() const
 {
     return impl->name;
 }
 
 
-void Body::setName(const std::string& name)
+inline void Body::setName(const std::string& name)
 {
     impl->name = name;
 }
 
 
-const std::string& Body::modelName() const
+inline const std::string& Body::modelName() const
 {
     return impl->modelName;
 }
 
 
-void Body::setModelName(const std::string& name)
+inline void Body::setModelName(const std::string& name)
 {
     impl->modelName = name;
 }
 
-const Mapping* Body::info() const
+inline const Mapping* Body::info() const
 {
     return impl->info;
 }
 
 
-Mapping* Body::info()
+inline Mapping* Body::info()
 {
     return impl->info;
 }
 
 
-void Body::resetInfo(Mapping* info)
+inline void Body::resetInfo(Mapping* info)
 {
     impl->info = info;
 }
 
-void Body::addDevice(Device* device)
+inline void Body::addDevice(Device* device)
 {
     device->setIndex(devices_.size());
     devices_.push_back(device);
@@ -335,14 +335,14 @@ void Body::addDevice(Device* device)
 }
 
 
-void Body::clearDevices()
+inline void Body::clearDevices()
 {
     devices_.clear();
     impl->deviceNameMap.clear();
 }
 
 
-Device* Body::findDeviceSub(const std::string& name) const
+inline Device* Body::findDeviceSub(const std::string& name) const
 {
     detail::body::DeviceNameMap::const_iterator p = impl->deviceNameMap.find(name);
     if(p != impl->deviceNameMap.end()){
@@ -351,7 +351,7 @@ Device* Body::findDeviceSub(const std::string& name) const
     return nullptr;
 }
 
-Referenced* Body::findCacheSub(const std::string& name)
+inline Referenced* Body::findCacheSub(const std::string& name)
 {
     detail::body::CacheMap::iterator p = impl->cacheMap.find(name);
     if(p != impl->cacheMap.end()){
@@ -361,7 +361,7 @@ Referenced* Body::findCacheSub(const std::string& name)
 }
 
 
-const Referenced* Body::findCacheSub(const std::string& name) const
+inline const Referenced* Body::findCacheSub(const std::string& name) const
 {
     detail::body::CacheMap::iterator p = impl->cacheMap.find(name);
     if(p != impl->cacheMap.end()){
@@ -371,13 +371,13 @@ const Referenced* Body::findCacheSub(const std::string& name) const
 }
 
 
-void Body::insertCache(const std::string& name, Referenced* cache)
+inline void Body::insertCache(const std::string& name, Referenced* cache)
 {
     impl->cacheMap[name] = cache;
 }
 
 
-bool Body::getCaches(PolymorphicReferencedArrayBase<>& out_caches, std::vector<std::string>& out_names) const
+inline bool Body::getCaches(PolymorphicReferencedArrayBase<>& out_caches, std::vector<std::string>& out_names) const
 {
     out_caches.clear_elements();
     out_names.clear();
@@ -390,31 +390,31 @@ bool Body::getCaches(PolymorphicReferencedArrayBase<>& out_caches, std::vector<s
 }
 
 
-void Body::removeCache(const std::string& name)
+inline void Body::removeCache(const std::string& name)
 {
     impl->cacheMap.erase(name);
 }
 
-Link* Body::link(const std::string& name) const
+inline Link* Body::link(const std::string& name) const
 {
     detail::body::NameToLinkMap::const_iterator p = impl->nameToLinkMap.find(name);
     return (p != impl->nameToLinkMap.end()) ? p->second : 0;
 }
 
 
-double Body::mass() const
+inline double Body::mass() const
 {
     return impl->mass;
 }
 
 
-const Vector3& Body::centerOfMass() const
+inline const Vector3& Body::centerOfMass() const
 {
     return impl->centerOfMass;
 }
 
 
-void Body::initializePosition()
+inline void Body::initializePosition()
 {
     rootLink_->T() = rootLink_->Tb();
 
@@ -428,7 +428,7 @@ void Body::initializePosition()
 }
 
 
-void Body::initializeState()
+inline void Body::initializeState()
 {
     for(auto& link : linkTraverse_){
         link->initializeState();
@@ -439,7 +439,7 @@ void Body::initializeState()
 }
 
 
-void Body::clearExternalForces()
+inline void Body::clearExternalForces()
 {
     int n = linkTraverse_.numLinks();
     for(int i=0; i < n; ++i){
@@ -448,14 +448,14 @@ void Body::clearExternalForces()
     }
 }
 
-void Body::initializeDeviceStates()
+inline void Body::initializeDeviceStates()
 {
     for(size_t i=0; i < devices_.size(); ++i){
         devices_[i]->clearState();
     }
 }
 
-const Vector3& Body::calcCenterOfMass()
+inline const Vector3& Body::calcCenterOfMass()
 {
     double m = 0.0;
     Vector3 mc = Vector3::Zero();
@@ -479,7 +479,7 @@ const Vector3& Body::calcCenterOfMass()
    assuming Link::v,w is already computed by calcForwardKinematics(true);
    assuming Link::wc is already computed by calcCenterOfMass();
 */
-void Body::calcTotalMomentum(Vector3& out_P, Vector3& out_L)
+inline void Body::calcTotalMomentum(Vector3& out_P, Vector3& out_L)
 {
     out_P.setZero();
     out_L.setZero();
@@ -518,7 +518,7 @@ BodyCustomizerInterface* Body::customizerInterface() const
 }
 #endif  // UCNOID_NOT_SUPPORTED
 
-bool Body::hasVirtualJointForces() const
+inline bool Body::hasVirtualJointForces() const
 {
 #if UCNOID_NOT_SUPPORTED
     if(impl->customizerInterface){
@@ -535,7 +535,7 @@ bool Body::hasVirtualJointForces() const
 }
 
 
-void Body::setVirtualJointForces(double timeStep)
+inline void Body::setVirtualJointForces(double timeStep)
 {
 #if UCNOID_NOT_SUPPORTED
     auto customizer = impl->customizerInterface;
@@ -553,7 +553,7 @@ void Body::setVirtualJointForces(double timeStep)
 /**
    The function installs the pre-loaded customizer corresponding to the model name.
 */
-bool Body::installCustomizer()
+inline bool Body::installCustomizer()
 {
 #if UCNOID_NOT_SUPPORTED
     loadDefaultBodyCustomizers(std::cerr);
@@ -646,7 +646,7 @@ BodyInterface* Body::bodyInterface()
 }
 #endif  // UCNOID_NOT_SUPPORTED
 
-void Body::expandLinkOffsetRotations()
+inline void Body::expandLinkOffsetRotations()
 {
     Matrix3 Rs = Matrix3::Identity();
     std::vector<bool> validRsFlags;
@@ -661,7 +661,7 @@ void Body::expandLinkOffsetRotations()
 }
 
 
-void BodyImpl::expandLinkOffsetRotations(Body* body, Link* link, const Matrix3& parentRs, std::vector<bool>& validRsFlags)
+inline void BodyImpl::expandLinkOffsetRotations(Body* body, Link* link, const Matrix3& parentRs, std::vector<bool>& validRsFlags)
 {
     link->setOffsetTranslation(parentRs * link->offsetTranslation());
 
@@ -699,7 +699,7 @@ void BodyImpl::expandLinkOffsetRotations(Body* body, Link* link, const Matrix3& 
     }
 }
 
-void BodyImpl::setRsToShape(const Matrix3& Rs, SgNode* shape, std::function<void(SgNode* node)> setShape)
+inline void BodyImpl::setRsToShape(const Matrix3& Rs, SgNode* shape, std::function<void(SgNode* node)> setShape)
 {
     SgPosTransform* transformRs = new SgPosTransform;
     transformRs->setRotation(Rs);
@@ -708,7 +708,7 @@ void BodyImpl::setRsToShape(const Matrix3& Rs, SgNode* shape, std::function<void
 }
 
 
-void BodyImpl::applyLinkOffsetRotationsToDevices(Body* body, std::vector<bool>& validRsFlags)
+inline void BodyImpl::applyLinkOffsetRotationsToDevices(Body* body, std::vector<bool>& validRsFlags)
 {
     for(int i=0; i < body->numDevices(); ++i){
         Device* device = body->device(i);
@@ -720,7 +720,7 @@ void BodyImpl::applyLinkOffsetRotationsToDevices(Body* body, std::vector<bool>& 
     }
 }
 
-void Body::setCurrentTimeFunction(std::function<double()> func)
+inline void Body::setCurrentTimeFunction(std::function<double()> func)
 {
     currentTimeFunction = func;
 }

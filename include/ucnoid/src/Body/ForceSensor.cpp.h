@@ -11,7 +11,7 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-ForceSensor::ForceSensor()
+inline ForceSensor::ForceSensor()
     : spec(new Spec)
 {
     spec->F_max.setConstant(std::numeric_limits<double>::max());
@@ -19,19 +19,19 @@ ForceSensor::ForceSensor()
 }
 
 
-const char* ForceSensor::typeName()
+inline const char* ForceSensor::typeName()
 {
     return "ForceSensor";
 }
 
 
-void ForceSensor::copyStateFrom(const ForceSensor& other)
+inline void ForceSensor::copyStateFrom(const ForceSensor& other)
 {
     F_ = other.F_;
 }
 
 
-void ForceSensor::copyStateFrom(const DeviceState& other)
+inline void ForceSensor::copyStateFrom(const DeviceState& other)
 {
     if(typeid(other) != typeid(ForceSensor)){
         throw std::invalid_argument("Type mismatch in the Device::copyStateFrom function");
@@ -40,7 +40,7 @@ void ForceSensor::copyStateFrom(const DeviceState& other)
 }
 
 
-ForceSensor::ForceSensor(const ForceSensor& org, bool copyStateOnly)
+inline ForceSensor::ForceSensor(const ForceSensor& org, bool copyStateOnly)
     : Device(org, copyStateOnly)
 {
     copyStateFrom(org);
@@ -56,19 +56,19 @@ ForceSensor::ForceSensor(const ForceSensor& org, bool copyStateOnly)
 }
 
 
-DeviceState* ForceSensor::cloneState() const
+inline DeviceState* ForceSensor::cloneState() const
 {
     return new ForceSensor(*this, true);
 }
 
 
-Device* ForceSensor::clone() const
+inline Device* ForceSensor::clone() const
 {
     return new ForceSensor(*this);
 }
 
 
-void ForceSensor::forEachActualType(std::function<bool(const std::type_info& type)> func)
+inline void ForceSensor::forEachActualType(std::function<bool(const std::type_info& type)> func)
 {
     if(!func(typeid(ForceSensor))){
         Device::forEachActualType(func);
@@ -76,26 +76,26 @@ void ForceSensor::forEachActualType(std::function<bool(const std::type_info& typ
 }
 
 
-void ForceSensor::clearState()
+inline void ForceSensor::clearState()
 {
     F_.setZero();
 }
 
 
-int ForceSensor::stateSize() const
+inline int ForceSensor::stateSize() const
 {
     return 6;
 }
 
 
-const double* ForceSensor::readState(const double* buf)
+inline const double* ForceSensor::readState(const double* buf)
 {
     F_ = Eigen::Map<const Vector6>(buf);
     return buf + 6;
 }
 
 
-double* ForceSensor::writeState(double* out_buf) const
+inline double* ForceSensor::writeState(double* out_buf) const
 {
     Eigen::Map<Vector6>(out_buf) << F_;
     return out_buf + 6;

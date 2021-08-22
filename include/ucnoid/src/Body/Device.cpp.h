@@ -12,7 +12,7 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-Device::Device()
+inline Device::Device()
 {
     ns = new NonState;
     ns->index = -1;
@@ -23,7 +23,7 @@ Device::Device()
 }
 
 
-Device::Device(const Device& org, bool copyStateOnly)
+inline Device::Device(const Device& org, bool copyStateOnly)
 {
     if(copyStateOnly){
         ns = nullptr;
@@ -39,7 +39,7 @@ Device::Device(const Device& org, bool copyStateOnly)
 }
 
 
-Device::~Device()
+inline Device::~Device()
 {
     if(ns){
         delete ns;
@@ -47,25 +47,25 @@ Device::~Device()
 }
 
 
-void Device::forEachActualType(std::function<bool(const std::type_info& type)> func)
+inline void Device::forEachActualType(std::function<bool(const std::type_info& type)> func)
 {
     func(typeid(Device));
 }
 
 
-void Device::clearState()
+inline void Device::clearState()
 {
 
 }
 
 
-bool Device::on() const
+inline bool Device::on() const
 {
     return true;
 }
 
 
-void Device::on(bool)
+inline void Device::on(bool)
 {
 
 }

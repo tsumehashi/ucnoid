@@ -391,12 +391,12 @@ void ImageIO::save(const Image& image, const std::string& filename)
 namespace cnoid {
 inline namespace ucnoid {
 
-ImageIO::ImageIO()
+inline ImageIO::ImageIO()
 {
     isUpsideDown_ = false;
 }
 
-void ImageIO::load(Image& image, const std::string& filename)
+inline void ImageIO::load(Image& image, const std::string& filename)
 {
 #if 0
     if(iends_with(filename, "png")){
@@ -412,7 +412,7 @@ void ImageIO::load(Image& image, const std::string& filename)
 }
 
 
-void ImageIO::save(const Image& image, const std::string& filename)
+inline void ImageIO::save(const Image& image, const std::string& filename)
 {
 #if 0
     if(iends_with(filename, "png")){

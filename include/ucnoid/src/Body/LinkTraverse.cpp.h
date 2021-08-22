@@ -13,26 +13,26 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-LinkTraverse::LinkTraverse()
+inline LinkTraverse::LinkTraverse()
 {
 
 }
 
 
-LinkTraverse::LinkTraverse(int size)
+inline LinkTraverse::LinkTraverse(int size)
     : links(size)
 {
     links.clear();
 }
 
 
-LinkTraverse::LinkTraverse(Link* root, bool doUpward, bool doDownward)
+inline LinkTraverse::LinkTraverse(Link* root, bool doUpward, bool doDownward)
 {
     find(root, doUpward, doDownward);
 }
 
 
-LinkTraverse::LinkTraverse(const LinkTraverse& org)
+inline LinkTraverse::LinkTraverse(const LinkTraverse& org)
     : links(org.links),
       numUpwardConnections(org.numUpwardConnections)
 {
@@ -40,19 +40,19 @@ LinkTraverse::LinkTraverse(const LinkTraverse& org)
 }
 
 
-LinkTraverse::~LinkTraverse()
+inline LinkTraverse::~LinkTraverse()
 {
 
 }
 
 
-void LinkTraverse::clear()
+inline void LinkTraverse::clear()
 {
     links.clear();
     numUpwardConnections = 0;
 }
 
-void LinkTraverse::find(Link* root, bool doUpward, bool doDownward)
+inline void LinkTraverse::find(Link* root, bool doUpward, bool doDownward)
 {
     numUpwardConnections = 0;
     links.clear();
@@ -60,7 +60,7 @@ void LinkTraverse::find(Link* root, bool doUpward, bool doDownward)
 }
 
 
-void LinkTraverse::traverse(Link* link, bool doUpward, bool doDownward, bool isUpward, Link* prev)
+inline void LinkTraverse::traverse(Link* link, bool doUpward, bool doDownward, bool isUpward, Link* prev)
 {
     links.push_back(link);
     if(isUpward){
@@ -80,7 +80,7 @@ void LinkTraverse::traverse(Link* link, bool doUpward, bool doDownward, bool isU
 }
 
 
-void LinkTraverse::append(Link* link, bool isDownward)
+inline void LinkTraverse::append(Link* link, bool isDownward)
 {
     links.push_back(link);
     if(!isDownward){
@@ -89,7 +89,7 @@ void LinkTraverse::append(Link* link, bool isDownward)
 }
 
 
-void LinkTraverse::calcForwardKinematics(bool calcVelocity, bool calcAcceleration) const
+inline void LinkTraverse::calcForwardKinematics(bool calcVelocity, bool calcAcceleration) const
 {
     Vector3 arm;
     int i;

@@ -21,7 +21,7 @@ static const bool rootAttitudeNormalizationEnabled = false;
 
 }   // namespace detail::forward_dynamics_abm
 
-ForwardDynamicsABM::ForwardDynamicsABM(DyBody* body) :
+inline ForwardDynamicsABM::ForwardDynamicsABM(DyBody* body) :
     ForwardDynamics(body),
     q0(body->numLinks()),
     dq0(body->numLinks()),
@@ -32,13 +32,13 @@ ForwardDynamicsABM::ForwardDynamicsABM(DyBody* body) :
 }
 
 
-ForwardDynamicsABM::~ForwardDynamicsABM()
+inline ForwardDynamicsABM::~ForwardDynamicsABM()
 {
 
 }
 
 
-void ForwardDynamicsABM::initialize()
+inline void ForwardDynamicsABM::initialize()
 {
     DyLink* rootLink = body->rootLink();
     rootLink->sw().setZero();
@@ -69,7 +69,7 @@ inline void ForwardDynamicsABM::calcABMLastHalf()
 }
 
 
-void ForwardDynamicsABM::calcNextState()
+inline void ForwardDynamicsABM::calcNextState()
 {
     switch(integrationMode){
 
@@ -94,7 +94,7 @@ void ForwardDynamicsABM::calcNextState()
 }
 
 
-void ForwardDynamicsABM::calcMotionWithEulerMethod()
+inline void ForwardDynamicsABM::calcMotionWithEulerMethod()
 {
     calcABMLastHalf();
 
@@ -124,7 +124,7 @@ void ForwardDynamicsABM::calcMotionWithEulerMethod()
 }
 
 
-void ForwardDynamicsABM::integrateRungeKuttaOneStep(double r, double dt)
+inline void ForwardDynamicsABM::integrateRungeKuttaOneStep(double r, double dt)
 {
     DyLink* root = body->rootLink();
 
@@ -154,7 +154,7 @@ void ForwardDynamicsABM::integrateRungeKuttaOneStep(double r, double dt)
 }
 
 
-void ForwardDynamicsABM::calcMotionWithRungeKuttaMethod()
+inline void ForwardDynamicsABM::calcMotionWithRungeKuttaMethod()
 {
     DyLink* root = body->rootLink();
 
@@ -221,7 +221,7 @@ void ForwardDynamicsABM::calcMotionWithRungeKuttaMethod()
    \note v, dv, dw are not used in the forward dynamics, but are calculated
    for forward dynamics users.
 */
-void ForwardDynamicsABM::calcABMPhase1(bool updateNonSpatialVariables)
+inline void ForwardDynamicsABM::calcABMPhase1(bool updateNonSpatialVariables)
 {
     const LinkTraverse& traverse = body->linkTraverse();
     const int n = traverse.numLinks();
@@ -331,7 +331,7 @@ COMMON_CALCS_FOR_ALL_JOINT_TYPES:
 }
 
 
-void ForwardDynamicsABM::calcABMPhase2()
+inline void ForwardDynamicsABM::calcABMPhase2()
 {
     const LinkTraverse& traverse = body->linkTraverse();
     const int n = traverse.numLinks();
@@ -385,7 +385,7 @@ void ForwardDynamicsABM::calcABMPhase2()
 
 
 // A part of phase 2 (inbound loop) that can be calculated before external forces are given
-void ForwardDynamicsABM::calcABMPhase2Part1()
+inline void ForwardDynamicsABM::calcABMPhase2Part1()
 {
     const LinkTraverse& traverse = body->linkTraverse();
     const int n = traverse.numLinks();
@@ -424,7 +424,7 @@ void ForwardDynamicsABM::calcABMPhase2Part1()
 
 
 // A remaining part of phase 2 that requires external forces
-void ForwardDynamicsABM::calcABMPhase2Part2()
+inline void ForwardDynamicsABM::calcABMPhase2Part2()
 {
     const LinkTraverse& traverse = body->linkTraverse();
     const int n = traverse.numLinks();
@@ -455,7 +455,7 @@ void ForwardDynamicsABM::calcABMPhase2Part2()
 }
 
 
-void ForwardDynamicsABM::calcABMPhase3()
+inline void ForwardDynamicsABM::calcABMPhase3()
 {
     const LinkTraverse& traverse = body->linkTraverse();
 
@@ -502,7 +502,7 @@ void ForwardDynamicsABM::calcABMPhase3()
 }
 
 
-void ForwardDynamicsABM::updateForceSensors()
+inline void ForwardDynamicsABM::updateForceSensors()
 {
     const DeviceList<ForceSensor>& sensors = sensorHelper.forceSensors();
     for(size_t i=0; i < sensors.size(); ++i){

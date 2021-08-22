@@ -11,7 +11,7 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-SgFog::SgFog(int polymorhicId)
+inline SgFog::SgFog(int polymorhicId)
     : SgPreprocessed(polymorhicId)
 {
     color_.setOnes();
@@ -19,14 +19,14 @@ SgFog::SgFog(int polymorhicId)
 }
 
 
-SgFog::SgFog()
+inline SgFog::SgFog()
     : SgFog(findPolymorphicId<SgFog>())
 {
 
 }
 
 
-SgFog::SgFog(const SgFog& org)
+inline SgFog::SgFog(const SgFog& org)
     : SgPreprocessed(org)
 {
     color_ = org.color_;
@@ -34,13 +34,13 @@ SgFog::SgFog(const SgFog& org)
 }
 
 
-SgObject* SgFog::clone(SgCloneMap&) const
+inline SgObject* SgFog::clone(SgCloneMap&) const
 {
     return new SgFog(*this);
 }
 
 
-SgOutlineGroup::SgOutlineGroup(int polymorhicId)
+inline SgOutlineGroup::SgOutlineGroup(int polymorhicId)
     : SgGroup(polymorhicId)
 {
     lineWidth_ = 1.0;
@@ -48,7 +48,7 @@ SgOutlineGroup::SgOutlineGroup(int polymorhicId)
 }
 
 
-SgOutlineGroup::SgOutlineGroup()
+inline SgOutlineGroup::SgOutlineGroup()
     : SgOutlineGroup(findPolymorphicId<SgOutlineGroup>())
 {
 

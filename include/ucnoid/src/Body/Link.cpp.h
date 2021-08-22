@@ -13,7 +13,7 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-Link::Link()
+inline Link::Link()
 {
     index_ = -1;
     jointId_ = -1;
@@ -51,7 +51,7 @@ Link::Link()
 }
 
 
-Link::Link(const Link& org)
+inline Link::Link(const Link& org)
     : name_(org.name_)
 {
     index_ = -1; // should be set by a Body object
@@ -104,13 +104,13 @@ Link::Link(const Link& org)
 }
 
 
-Link* Link::clone() const
+inline Link* Link::clone() const
 {
     return new Link(*this);
 }
 
 
-Link::~Link()
+inline Link::~Link()
 {
     LinkPtr link = child_;
     while(link){
@@ -122,7 +122,7 @@ Link::~Link()
 }
 
 
-void Link::initializeState()
+inline void Link::initializeState()
 {
     u_ = 0.0;
     dq_ = 0.0;
@@ -137,7 +137,7 @@ void Link::initializeState()
 }
 
 
-void Link::setBody(Body* newBody)
+inline void Link::setBody(Body* newBody)
 {
     if(body_ != newBody){
         setBodySub(newBody);
@@ -145,7 +145,7 @@ void Link::setBody(Body* newBody)
 }
 
 
-void Link::setBodySub(Body* newBody)
+inline void Link::setBodySub(Body* newBody)
 {
     body_ = newBody;
     for(Link* link = child_; link; link = link->sibling_){
@@ -154,7 +154,7 @@ void Link::setBodySub(Body* newBody)
 }
 
 
-void Link::prependChild(Link* link)
+inline void Link::prependChild(Link* link)
 {
     LinkPtr holder;
     if(link->parent_){
@@ -169,7 +169,7 @@ void Link::prependChild(Link* link)
 }
 
 
-void Link::appendChild(Link* link)
+inline void Link::appendChild(Link* link)
 {
     LinkPtr holder;
     if(link->parent_){
@@ -193,7 +193,7 @@ void Link::appendChild(Link* link)
 }
 
 
-bool Link::isOwnerOf(const Link* link) const
+inline bool Link::isOwnerOf(const Link* link) const
 {
     if(link == this){
         return true;
@@ -211,7 +211,7 @@ bool Link::isOwnerOf(const Link* link) const
    A child link is removed from the link.
    If a link given by the parameter is not a child of the link, false is returned.
 */
-bool Link::removeChild(Link* childToRemove)
+inline bool Link::removeChild(Link* childToRemove)
 {
     Link* link = child_;
     Link* prevSibling = 0;
@@ -234,13 +234,13 @@ bool Link::removeChild(Link* childToRemove)
 }
 
 
-void Link::setName(const std::string& name)
+inline void Link::setName(const std::string& name)
 {
     name_ = name;
 }
 
 
-std::string Link::jointTypeString() const
+inline std::string Link::jointTypeString() const
 {
     switch(jointType_){
     case REVOLUTE_JOINT:    return "revolute";
@@ -253,7 +253,7 @@ std::string Link::jointTypeString() const
 }
 
 
-std::string Link::actuationModeString() const
+inline std::string Link::actuationModeString() const
 {
     switch(actuationMode_){
 
@@ -290,47 +290,47 @@ std::string Link::actuationModeString() const
     }
 }
 
-std::string Link::materialName() const
+inline std::string Link::materialName() const
 {
     return Material::name(materialId_);
 }
 
-void Link::setMaterial(const std::string& name)
+inline void Link::setMaterial(const std::string& name)
 {
     setMaterial(Material::id(name));
 }
 
 
-void Link::setShape(SgNode* shape)
+inline void Link::setShape(SgNode* shape)
 {
     visualShape_ = shape;
     collisionShape_ = shape;
 }
 
-void Link::setVisualShape(SgNode* shape)
+inline void Link::setVisualShape(SgNode* shape)
 {
     visualShape_ = shape;
 }
 
 
-void Link::setCollisionShape(SgNode* shape)
+inline void Link::setCollisionShape(SgNode* shape)
 {
     collisionShape_ = shape;
 }
 
-void Link::resetInfo(Mapping* info)
+inline void Link::resetInfo(Mapping* info)
 {
     info_ = info;
 }
 
 
-template<> double Link::info(const std::string& key) const
+template<> inline double Link::info(const std::string& key) const
 {
     return info_->get(key).toDouble();
 }
 
 
-template<> double Link::info(const std::string& key, const double& defaultValue) const
+template<> inline double Link::info(const std::string& key, const double& defaultValue) const
 {
     double value;
     if(info_->read(key, value)){
@@ -340,7 +340,7 @@ template<> double Link::info(const std::string& key, const double& defaultValue)
 }
 
 
-template<> bool Link::info(const std::string& key, const bool& defaultValue) const
+template<> inline bool Link::info(const std::string& key, const bool& defaultValue) const
 {
     bool value;
     if(info_->read(key, value)){
@@ -350,13 +350,13 @@ template<> bool Link::info(const std::string& key, const bool& defaultValue) con
 }
 
 
-template<> void Link::setInfo(const std::string& key, const double& value)
+template<> inline void Link::setInfo(const std::string& key, const double& value)
 {
     info_->write(key, value);
 }
 
 
-template<> void Link::setInfo(const std::string& key, const bool& value)
+template<> inline void Link::setInfo(const std::string& key, const bool& value)
 {
     info_->write(key, value);
 }

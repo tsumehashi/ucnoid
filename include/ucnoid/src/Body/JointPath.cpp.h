@@ -18,27 +18,27 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-double JointPath::numericalIKdefaultDeltaScale()
+inline double JointPath::numericalIKdefaultDeltaScale()
 {
     return 0.9;
 }
 
-double JointPath::numericalIKdefaultTruncateRatio()
+inline double JointPath::numericalIKdefaultTruncateRatio()
 {
     return TruncatedSVD<MatrixXd>::defaultTruncateRatio();
 }
 
-int JointPath::numericalIKdefaultMaxIterations()
+inline int JointPath::numericalIKdefaultMaxIterations()
 {
     return 50;
 }
 
-double JointPath::numericalIKdefaultMaxIKerror()
+inline double JointPath::numericalIKdefaultMaxIKerror()
 {
     return 1.0e-6;
 }
 
-double JointPath::numericalIKdefaultDampingConstant()
+inline double JointPath::numericalIKdefaultDampingConstant()
 {
     return 1.0e-6;
 }
@@ -82,13 +82,13 @@ public:
 };
 
 
-JointPath::JointPath()
+inline JointPath::JointPath()
 {
     initialize();
 }
 
 
-JointPath::JointPath(Link* base, Link* end)
+inline JointPath::JointPath(Link* base, Link* end)
     : linkPath(base, end), 
       joints(linkPath.size())
 {
@@ -97,7 +97,7 @@ JointPath::JointPath(Link* base, Link* end)
 }
 
 
-JointPath::JointPath(Link* end)
+inline JointPath::JointPath(Link* end)
     : linkPath(end), 
       joints(linkPath.size())
 {
@@ -106,14 +106,14 @@ JointPath::JointPath(Link* end)
 }
 
 
-void JointPath::initialize()
+inline void JointPath::initialize()
 {
     nuIK = 0;
     needForwardKinematicsBeforeIK = false;
 }    
 
 
-JointPath::~JointPath()
+inline JointPath::~JointPath()
 {
     if(nuIK){
         delete nuIK;
@@ -121,7 +121,7 @@ JointPath::~JointPath()
 }
 
 
-bool JointPath::setPath(Link* base, Link* end)
+inline bool JointPath::setPath(Link* base, Link* end)
 {
     if(linkPath.setPath(base, end)){
         extractJoints();
@@ -132,7 +132,7 @@ bool JointPath::setPath(Link* base, Link* end)
 }
 
 
-bool JointPath::setPath(Link* end)
+inline bool JointPath::setPath(Link* end)
 {
     linkPath.setPath(end);
     extractJoints();
@@ -142,7 +142,7 @@ bool JointPath::setPath(Link* end)
 }
 
 
-void JointPath::extractJoints()
+inline void JointPath::extractJoints()
 {
     numUpwardJointConnections = 0;
 
@@ -181,7 +181,7 @@ void JointPath::extractJoints()
 }
 
 
-int JointPath::indexOf(const Link* link) const
+inline int JointPath::indexOf(const Link* link) const
 {
     for(size_t i=0; i < joints.size(); ++i){
         if(joints[i] == link){
@@ -192,7 +192,7 @@ int JointPath::indexOf(const Link* link) const
 }
 
 
-void JointPath::onJointPathUpdated()
+inline void JointPath::onJointPathUpdated()
 {
     if(nuIK){
         nuIK->errorFunc = nullptr;
@@ -201,7 +201,7 @@ void JointPath::onJointPathUpdated()
 }
 
 
-void JointPath::calcJacobian(Eigen::MatrixXd& out_J) const
+inline void JointPath::calcJacobian(Eigen::MatrixXd& out_J) const
 {
     const int n = joints.size();
     out_J.resize(6, n);
@@ -261,49 +261,49 @@ inline JointPathIkImpl* JointPath::getOrCreateNumericalIK()
 }
 
 
-bool JointPath::isBestEffortIKmode() const
+inline bool JointPath::isBestEffortIKmode() const
 {
     return nuIK ? nuIK->isBestEffortIKmode : false;
 }
 
 
-void JointPath::setBestEffortIKmode(bool on)
+inline void JointPath::setBestEffortIKmode(bool on)
 {
     getOrCreateNumericalIK()->isBestEffortIKmode = on;
 }
 
 
-void JointPath::setNumericalIKmaxIKerror(double e)
+inline void JointPath::setNumericalIKmaxIKerror(double e)
 {
     getOrCreateNumericalIK()->maxIKerrorSqr = e * e;
 }
 
 
-void JointPath::setNumericalIKdeltaScale(double s)
+inline void JointPath::setNumericalIKdeltaScale(double s)
 {
     getOrCreateNumericalIK()->deltaScale = s;
 }
 
 
-void JointPath::setNumericalIKtruncateRatio(double r)
+inline void JointPath::setNumericalIKtruncateRatio(double r)
 {
     getOrCreateNumericalIK()->svd.setTruncateRatio(r);
 }
 
     
-void JointPath::setNumericalIKmaxIterations(int n)
+inline void JointPath::setNumericalIKmaxIterations(int n)
 {
     getOrCreateNumericalIK()->maxIterations = n;
 }
 
 
-void JointPath::setNumericalIKdampingConstant(double lambda)
+inline void JointPath::setNumericalIKdampingConstant(double lambda)
 {
     getOrCreateNumericalIK()->dampingConstantSqr = lambda * lambda;
 }
 
 
-void JointPath::customizeTarget
+inline void JointPath::customizeTarget
 (int numTargetElements,
  std::function<double(VectorXd& out_error)> errorFunc,
  std::function<void(MatrixXd& out_Jacobian)> jacobianFunc)
@@ -315,7 +315,7 @@ void JointPath::customizeTarget
 }
 
 
-JointPath& JointPath::setBaseLinkGoal(const Position& T)
+inline JointPath& JointPath::setBaseLinkGoal(const Position& T)
 {
     linkPath.baseLink()->setPosition(T);
     needForwardKinematicsBeforeIK = true;
@@ -323,7 +323,7 @@ JointPath& JointPath::setBaseLinkGoal(const Position& T)
 }
 
 
-bool JointPath::calcInverseKinematics()
+inline bool JointPath::calcInverseKinematics()
 {
     if(nuIK->errorFunc){
         Position T; // dummy
@@ -333,7 +333,7 @@ bool JointPath::calcInverseKinematics()
 }
 
 
-bool JointPath::calcInverseKinematics(const Position& T)
+inline bool JointPath::calcInverseKinematics(const Position& T)
 {
     const bool USE_USUAL_INVERSE_SOLUTION_FOR_6x6_NON_BEST_EFFORT_PROBLEM = false;
     const bool USE_SVD_FOR_BEST_EFFORT_IK = false;
@@ -454,13 +454,13 @@ bool JointPath::calcInverseKinematics(const Position& T)
 }
 
 
-int JointPath::numIterations() const
+inline int JointPath::numIterations() const
 {
     return nuIK ? nuIK->iteration : 0;
 }
 
 
-bool JointPath::hasAnalyticalIK() const
+inline bool JointPath::hasAnalyticalIK() const
 {
     return false;
 }
@@ -484,7 +484,7 @@ JointPath& JointPath::setGoal
 */
 
 
-bool JointPath::calcInverseKinematics
+inline bool JointPath::calcInverseKinematics
 (const Vector3& base_p, const Matrix3& base_R, const Vector3& end_p, const Matrix3& end_R)
 {
     Position T_base;
@@ -499,7 +499,7 @@ bool JointPath::calcInverseKinematics
 }
 
 
-std::ostream& operator<<(std::ostream& os, JointPath& path)
+inline std::ostream& operator<<(std::ostream& os, JointPath& path)
 {
     int n = path.numJoints();
     for(int i=0; i < n; ++i){
@@ -597,7 +597,7 @@ bool CustomJointPath::calcInverseKinematics(const Position& T)
 }
 #endif  // UCNOID_NOT_SUPPORTED
 
-JointPathPtr getCustomJointPath(Body* body, Link* baseLink, Link* targetLink)
+inline JointPathPtr getCustomJointPath(Body* body, Link* baseLink, Link* targetLink)
 {
 #if UCNOID_NOT_SUPPORTED
     if(body->customizerInterface() && body->customizerInterface()->initializeAnalyticIk){

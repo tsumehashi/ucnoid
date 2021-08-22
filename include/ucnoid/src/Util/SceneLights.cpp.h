@@ -11,7 +11,7 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-SgLight::SgLight(int polymorhicId)
+inline SgLight::SgLight(int polymorhicId)
     : SgPreprocessed(polymorhicId)
 {
     on_ = true;
@@ -21,7 +21,7 @@ SgLight::SgLight(int polymorhicId)
 }
 
 
-SgLight::SgLight(const SgLight& org)
+inline SgLight::SgLight(const SgLight& org)
     : SgPreprocessed(org)
 {
     on_ = org.on_;
@@ -31,40 +31,40 @@ SgLight::SgLight(const SgLight& org)
 }
 
 
-SgObject* SgLight::clone(SgCloneMap&) const
+inline SgObject* SgLight::clone(SgCloneMap&) const
 {
     return new SgLight(*this);
 }
 
 
-SgDirectionalLight::SgDirectionalLight(int polymorhicId)
+inline SgDirectionalLight::SgDirectionalLight(int polymorhicId)
     : SgLight(polymorhicId)
 {
     direction_ << 0.0, 0.0, -1.0;
 }
 
 
-SgDirectionalLight::SgDirectionalLight()
+inline SgDirectionalLight::SgDirectionalLight()
     : SgDirectionalLight(findPolymorphicId<SgDirectionalLight>())
 {
 
 }
 
 
-SgDirectionalLight::SgDirectionalLight(const SgDirectionalLight& org)
+inline SgDirectionalLight::SgDirectionalLight(const SgDirectionalLight& org)
     : SgLight(org)
 {
     direction_ = org.direction_;
 }
 
 
-SgObject* SgDirectionalLight::clone(SgCloneMap&) const
+inline SgObject* SgDirectionalLight::clone(SgCloneMap&) const
 {
     return new SgDirectionalLight(*this);
 }
 
 
-SgPointLight::SgPointLight(int polymorhicId)
+inline SgPointLight::SgPointLight(int polymorhicId)
     : SgLight(polymorhicId)
 {
     constantAttenuation_ = 1.0f;
@@ -73,14 +73,14 @@ SgPointLight::SgPointLight(int polymorhicId)
 }
 
 
-SgPointLight::SgPointLight()
+inline SgPointLight::SgPointLight()
     : SgPointLight(findPolymorphicId<SgPointLight>())
 {
 
 }
 
 
-SgPointLight::SgPointLight(const SgPointLight& org)
+inline SgPointLight::SgPointLight(const SgPointLight& org)
     : SgLight(org)
 {
     constantAttenuation_ = org.constantAttenuation_;
@@ -89,13 +89,13 @@ SgPointLight::SgPointLight(const SgPointLight& org)
 }
 
 
-SgObject* SgPointLight::clone(SgCloneMap&) const
+inline SgObject* SgPointLight::clone(SgCloneMap&) const
 {
     return new SgPointLight(*this);
 }
 
 
-SgSpotLight::SgSpotLight(int polymorhicId)
+inline SgSpotLight::SgSpotLight(int polymorhicId)
     : SgPointLight(polymorhicId)
 {
     direction_ << 0.0, 0.0, -1.0;
@@ -105,14 +105,14 @@ SgSpotLight::SgSpotLight(int polymorhicId)
 }
 
 
-SgSpotLight::SgSpotLight()
+inline SgSpotLight::SgSpotLight()
     : SgSpotLight(findPolymorphicId<SgSpotLight>())
 {
 
 }
 
 
-SgSpotLight::SgSpotLight(const SgSpotLight& org)
+inline SgSpotLight::SgSpotLight(const SgSpotLight& org)
     : SgPointLight(org)
 {
     direction_ = org.direction_;
@@ -122,7 +122,7 @@ SgSpotLight::SgSpotLight(const SgSpotLight& org)
 }
 
 
-SgObject* SgSpotLight::clone(SgCloneMap&) const
+inline SgObject* SgSpotLight::clone(SgCloneMap&) const
 {
     return new SgSpotLight(*this);
 }

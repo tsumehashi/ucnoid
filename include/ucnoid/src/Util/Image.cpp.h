@@ -16,7 +16,7 @@
 namespace cnoid {
 inline namespace ucnoid {
 
-Image::Image()
+inline Image::Image()
 {
     width_ = 0;
     height_ = 0;
@@ -24,7 +24,7 @@ Image::Image()
 }
 
 
-Image::Image(const Image& org)
+inline Image::Image(const Image& org)
     : pixels_(org.pixels_)
 {
     width_ = org.width_;
@@ -33,13 +33,13 @@ Image::Image(const Image& org)
 }
 
 
-Image::~Image()
+inline Image::~Image()
 {
     
 }
 
 
-Image& Image::operator=(const Image& rhs)
+inline Image& Image::operator=(const Image& rhs)
 {
     pixels_ = rhs.pixels_;
     width_ = rhs.width_;
@@ -49,7 +49,7 @@ Image& Image::operator=(const Image& rhs)
 }
 
 
-void Image::reset()
+inline void Image::reset()
 {
     pixels_.clear();
     width_ = 0;
@@ -57,7 +57,7 @@ void Image::reset()
 }
 
 
-void Image::setSize(int width, int height, int nComponents)
+inline void Image::setSize(int width, int height, int nComponents)
 {
     if(nComponents > 0 && nComponents <= 4){
         numComponents_ = nComponents;
@@ -76,7 +76,7 @@ void Image::setSize(int width, int height, int nComponents)
 }
 
 
-void Image::setSize(int width, int height)
+inline void Image::setSize(int width, int height)
 {
     width_ = width;
     height_ = height;
@@ -84,13 +84,13 @@ void Image::setSize(int width, int height)
 }
 
 
-void Image::clear()
+inline void Image::clear()
 {
     std::fill(pixels_.begin(), pixels_.end(), 0);
 }
 
 
-void Image::applyVerticalFlip()
+inline void Image::applyVerticalFlip()
 {
     const int heightHalf = height_ / 2;
     const int lineSize = width_ * numComponents_;
@@ -107,14 +107,14 @@ void Image::applyVerticalFlip()
 
 
     
-void Image::load(const std::string& filename)
+inline void Image::load(const std::string& filename)
 {
     ImageIO iio;
     iio.load(*this, filename);
 }
 
 
-void Image::save(const std::string& filename) const
+inline void Image::save(const std::string& filename) const
 {
     ImageIO iio;
     iio.save(*this, filename);

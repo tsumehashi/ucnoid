@@ -159,13 +159,13 @@ public:
 };
 
 
-PinDragIK::PinDragIK(Body* body)
+inline PinDragIK::PinDragIK(Body* body)
 {
     impl = new PinDragIKImpl(body);
 }
 
 
-PinDragIKImpl::PinDragIKImpl(Body* body)
+inline PinDragIKImpl::PinDragIKImpl(Body* body)
     : body_(body),
       NJ(body->numJoints()),
       q_org(NJ),
@@ -194,26 +194,26 @@ PinDragIKImpl::PinDragIKImpl(Body* body)
 }
 
 
-PinDragIK::~PinDragIK()
+inline PinDragIK::~PinDragIK()
 {
     delete impl;
 }
 
 
-Body* PinDragIK::body() const
+inline Body* PinDragIK::body() const
 {
     return impl->body_;
 }
 
 
-void PinDragIK::setBaseLink(Link* baseLink)
+inline void PinDragIK::setBaseLink(Link* baseLink)
 {
     impl->setBaseLink(baseLink);
 }
 
 
 //! if root is zero, root is virtual free 6-DOF link on the top link
-void PinDragIKImpl::setBaseLink(Link* baseLink)
+inline void PinDragIKImpl::setBaseLink(Link* baseLink)
 {
     if(baseLink){
         this->baseLink = baseLink;
@@ -225,13 +225,13 @@ void PinDragIKImpl::setBaseLink(Link* baseLink)
 }
 
 
-void PinDragIK::setFreeRootWeight(double translation, double rotation)
+inline void PinDragIK::setFreeRootWeight(double translation, double rotation)
 {
     impl->setFreeRootWeight(translation, rotation);
 }
 
 
-void PinDragIKImpl::setFreeRootWeight(double translation, double rotation)
+inline void PinDragIKImpl::setFreeRootWeight(double translation, double rotation)
 {
     for(int i=0; i < 3; i++){
         qWeights(NJ + i) = translation;
@@ -240,13 +240,13 @@ void PinDragIKImpl::setFreeRootWeight(double translation, double rotation)
 }
 
 
-void PinDragIK::setTargetLink(Link* targetLink, bool isAttitudeEnabled)
+inline void PinDragIK::setTargetLink(Link* targetLink, bool isAttitudeEnabled)
 {
     impl->setTargetLink(targetLink, isAttitudeEnabled);
 }
 
 
-void PinDragIKImpl::setTargetLink(Link* targetLink, bool isAttitudeEnabled)
+inline void PinDragIKImpl::setTargetLink(Link* targetLink, bool isAttitudeEnabled)
 {
     this->targetLink = targetLink;
     isTargetAttitudeEnabled = isAttitudeEnabled;
@@ -254,25 +254,25 @@ void PinDragIKImpl::setTargetLink(Link* targetLink, bool isAttitudeEnabled)
 }
 
 
-void PinDragIK::setJointWeight(int jointId, double weight)
+inline void PinDragIK::setJointWeight(int jointId, double weight)
 {
     impl->setJointWeight(jointId, weight);
 }
 
 
-void PinDragIKImpl::setJointWeight(int jointId, double weight)
+inline void PinDragIKImpl::setJointWeight(int jointId, double weight)
 {
     qWeights(jointId) = weight;
 }
 
 
-void PinDragIK::setPin(Link* link, InverseKinematics::AxisSet axes, double weight)
+inline void PinDragIK::setPin(Link* link, InverseKinematics::AxisSet axes, double weight)
 {
     impl->setPin(link, axes, weight);
 }
 
 
-void PinDragIKImpl::setPin(Link* link, InverseKinematics::AxisSet axes, double weight)
+inline void PinDragIKImpl::setPin(Link* link, InverseKinematics::AxisSet axes, double weight)
 {
     if(link){
         if(axes == InverseKinematics::NO_AXES){
@@ -286,13 +286,13 @@ void PinDragIKImpl::setPin(Link* link, InverseKinematics::AxisSet axes, double w
 }
 
 
-InverseKinematics::AxisSet PinDragIK::pinAxes(Link* link)
+inline InverseKinematics::AxisSet PinDragIK::pinAxes(Link* link)
 {
     return impl->pinAxes(link);
 }
 
 
-InverseKinematics::AxisSet PinDragIKImpl::pinAxes(Link* link)
+inline InverseKinematics::AxisSet PinDragIKImpl::pinAxes(Link* link)
 {
     PinPropertyMap::iterator p = pinPropertyMap.find(link);
     if(p == pinPropertyMap.end()){
@@ -302,75 +302,75 @@ InverseKinematics::AxisSet PinDragIKImpl::pinAxes(Link* link)
 }
 
 
-void PinDragIK::clearPins()
+inline void PinDragIK::clearPins()
 {
     impl->pinPropertyMap.clear();
 }
 
 
-int PinDragIK::numPinnedLinks()
+inline int PinDragIK::numPinnedLinks()
 {
     return impl->pinPropertyMap.size();
 }
 
 
-void PinDragIK::setIKErrorThresh(double e)
+inline void PinDragIK::setIKErrorThresh(double e)
 {
     impl->setIKErrorThresh(e);
 }
 
 
-void PinDragIKImpl::setIKErrorThresh(double e)
+inline void PinDragIKImpl::setIKErrorThresh(double e)
 {
     ikErrorSqrThresh = e * e;
 }
 
 
-bool PinDragIK::hasAnalyticalIK()
+inline bool PinDragIK::hasAnalyticalIK()
 {
     return false;
 }
 
 
-InverseKinematics::AxisSet PinDragIK::targetAxes() const
+inline InverseKinematics::AxisSet PinDragIK::targetAxes() const
 {
     return impl->isTargetAttitudeEnabled ?
         InverseKinematics::TRANSFORM_6D : InverseKinematics::TRANSLATION_3D;
 }
 
 
-void PinDragIK::setSRInverseParameters(double k0, double w0)
+inline void PinDragIK::setSRInverseParameters(double k0, double w0)
 {
     impl->setSRInverseParameters(k0, w0);
 }
 
 
-void PinDragIKImpl::setSRInverseParameters(double k0, double w0)
+inline void PinDragIKImpl::setSRInverseParameters(double k0, double w0)
 {
     srk0 = k0;
     srw0 = w0;
 }
 
 
-void PinDragIK::enableJointRangeConstraints(bool on)
+inline void PinDragIK::enableJointRangeConstraints(bool on)
 {
     impl->enableJointRangeConstraints(on);
 }
 
 
-void PinDragIKImpl::enableJointRangeConstraints(bool on)
+inline void PinDragIKImpl::enableJointRangeConstraints(bool on)
 {
     isJointRangeConstraintsEnabled = on;
 }
 
 
-bool PinDragIK::initialize()
+inline bool PinDragIK::initialize()
 {
     return impl->initialize();
 }
 
 
-bool PinDragIKImpl::initialize()
+inline bool PinDragIKImpl::initialize()
 {
     if(!targetLink){
         return false;
@@ -462,13 +462,13 @@ bool PinDragIKImpl::initialize()
 }
 
 
-bool PinDragIK::calcInverseKinematics(const Position& T)
+inline bool PinDragIK::calcInverseKinematics(const Position& T)
 {
     return impl->calcInverseKinematics(T);
 }
 
 
-bool PinDragIKImpl::calcInverseKinematics(const Position& T)
+inline bool PinDragIKImpl::calcInverseKinematics(const Position& T)
 {
     for(int i=0; i < NJ; i++){
         q_org[i] = body_->joint(i)->q();
@@ -516,7 +516,7 @@ bool PinDragIKImpl::calcInverseKinematics(const Position& T)
 }
 
 
-PinDragIKImpl::IKStepResult PinDragIKImpl::calcOneStep(const Vector3& v, const Vector3& omega)
+inline PinDragIKImpl::IKStepResult PinDragIKImpl::calcOneStep(const Vector3& v, const Vector3& omega)
 {
     // make Jacobian matrix for the target link
     int axes = InverseKinematics::TRANSLATION_3D;
@@ -600,7 +600,7 @@ PinDragIKImpl::IKStepResult PinDragIKImpl::calcOneStep(const Vector3& v, const V
 }
 
 
-void PinDragIKImpl::solveConstraints()
+inline void PinDragIKImpl::solveConstraints()
 {
     // W = (E - J# J)  (size N x N)
     W.noalias() = MatrixXd::Identity(N, N) - Jinv * J;
@@ -658,7 +658,7 @@ void PinDragIKImpl::solveConstraints()
 }
 
 
-void PinDragIKImpl::setJacobianForOnePath(MatrixXd& J, int row, JointPath& jointPath, int axes)
+inline void PinDragIKImpl::setJacobianForOnePath(MatrixXd& J, int row, JointPath& jointPath, int axes)
 {
     int col;
     const int n = jointPath.numJoints();
@@ -694,7 +694,7 @@ void PinDragIKImpl::setJacobianForOnePath(MatrixXd& J, int row, JointPath& joint
 }
 
 
-void PinDragIKImpl::setJacobianForFreeRoot(MatrixXd& J, int row, JointPath& jointPath, int axes)
+inline void PinDragIKImpl::setJacobianForFreeRoot(MatrixXd& J, int row, JointPath& jointPath, int axes)
 {
     Link* target;
     if(jointPath.numJoints() > 0){
@@ -730,7 +730,7 @@ void PinDragIKImpl::setJacobianForFreeRoot(MatrixXd& J, int row, JointPath& join
 }
 
 
-void PinDragIKImpl::addPinConstraints()
+inline void PinDragIKImpl::addPinConstraints()
 {
     int row = 0;
 
@@ -761,7 +761,7 @@ void PinDragIKImpl::addPinConstraints()
 }
 
 
-void PinDragIKImpl::addJointRangeConstraints()
+inline void PinDragIKImpl::addJointRangeConstraints()
 {
     jointConstraints.clear();
     

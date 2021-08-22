@@ -46,7 +46,7 @@ public:
 };
 
 
-void SceneLoader::registerLoader(const char* extensions, std::function<detail::scene_loader::AbstractSceneLoaderPtr()> factory)
+inline void SceneLoader::registerLoader(const char* extensions, std::function<detail::scene_loader::AbstractSceneLoaderPtr()> factory)
 {
     using namespace detail::scene_loader;
     std::vector<std::string> extensionArray;
@@ -68,7 +68,7 @@ void SceneLoader::registerLoader(const char* extensions, std::function<detail::s
 }
 
 
-std::string SceneLoader::availableFileExtensions()
+inline std::string SceneLoader::availableFileExtensions()
 {
     using namespace detail::scene_loader;
     std::string extensions;
@@ -83,13 +83,13 @@ std::string SceneLoader::availableFileExtensions()
 }
 
 
-SceneLoader::SceneLoader()
+inline SceneLoader::SceneLoader()
 {
     impl = new SceneLoaderImpl;
 }
 
 
-SceneLoaderImpl::SceneLoaderImpl()
+inline SceneLoaderImpl::SceneLoaderImpl()
 {
     os_ = &nullout();
     defaultDivisionNumber = -1;
@@ -97,31 +97,31 @@ SceneLoaderImpl::SceneLoaderImpl()
 }
 
 
-SceneLoader::~SceneLoader()
+inline SceneLoader::~SceneLoader()
 {
     delete impl;
 }
 
 
-void SceneLoader::setMessageSink(std::ostream& os)
+inline void SceneLoader::setMessageSink(std::ostream& os)
 {
     impl->os_ = &os;
 }
 
 
-void SceneLoader::setDefaultDivisionNumber(int n)
+inline void SceneLoader::setDefaultDivisionNumber(int n)
 {
     impl->defaultDivisionNumber = n;
 }
 
 
-void SceneLoader::setDefaultCreaseAngle(double theta)
+inline void SceneLoader::setDefaultCreaseAngle(double theta)
 {
     impl->defaultCreaseAngle = theta;
 }
 
 
-detail::scene_loader::AbstractSceneLoaderPtr SceneLoaderImpl::findLoader(std::string ext)
+inline detail::scene_loader::AbstractSceneLoaderPtr SceneLoaderImpl::findLoader(std::string ext)
 {
     using namespace detail::scene_loader;
     AbstractSceneLoaderPtr loader;
@@ -146,13 +146,13 @@ detail::scene_loader::AbstractSceneLoaderPtr SceneLoaderImpl::findLoader(std::st
 }
 
 
-SgNode* SceneLoader::load(const std::string& filename)
+inline SgNode* SceneLoader::load(const std::string& filename)
 {
     return impl->load(filename);
 }
 
 
-SgNode* SceneLoaderImpl::load(const std::string& filename)
+inline SgNode* SceneLoaderImpl::load(const std::string& filename)
 {
     std::filesystem::path filepath(filename);
 

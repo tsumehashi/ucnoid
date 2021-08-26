@@ -7,9 +7,7 @@
 #define UCNOID_BODY_BODY_LOADER_CPP_H
 
 #include "BodyLoader.h"
-#if UCNOID_NOT_SUPPORTED
 #include "YAMLBodyLoader.h"
-#endif  // UCNOID_NOT_SUPPORTED
 #include "VRMLBodyLoader.h"
 #include "Body.h"
 #include <ucnoid/SceneLoader>
@@ -77,14 +75,12 @@ public:
 struct FactoryRegistration
 {
     FactoryRegistration(){
-#if UCNOID_NOT_SUPPORTED
         BodyLoader::registerLoader(
             "body", [](){ return std::make_shared<YAMLBodyLoader>(); });
         BodyLoader::registerLoader(
             "yaml", [](){ return std::make_shared<YAMLBodyLoader>(); });
         BodyLoader::registerLoader(
             "yml", [](){ return std::make_shared<YAMLBodyLoader>(); });
-#endif  // UCNOID_NOT_SUPPORTED
         BodyLoader::registerLoader(
             "wrl", [](){ return std::make_shared<VRMLBodyLoader>(); });
 #if UCNOID_NOT_SUPPORTED

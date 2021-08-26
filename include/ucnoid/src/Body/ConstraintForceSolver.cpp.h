@@ -38,10 +38,11 @@
 #include <boost/lexical_cast.hpp>
 #endif  // UCNOID_NOT_SUPPORTED
 
-using namespace std;
-using namespace cnoid;
+namespace cnoid
+{
+inline namespace ucnoid {
 
-namespace {
+namespace detail::constraint_force_solver {
 
 #if UCNOID_NOT_SUPPORTED
 typedef CollisionDetector::GeometryHandle GeometryHandle;
@@ -80,7 +81,7 @@ static const int DEFAULT_NUM_GAUSS_SEIDEL_INITIAL_ITERATION = 0;
 static const double DEFAULT_GAUSS_SEIDEL_ERROR_CRITERION = 1.0e-3;
 
 static const double THRESH_TO_SWITCH_REL_ERROR = 1.0e-8;
-//static const double THRESH_TO_SWITCH_REL_ERROR = numeric_limits<double>::epsilon();
+//static const double THRESH_TO_SWITCH_REL_ERROR = std::numeric_limits<double>::epsilon();
 
 static const bool USE_PREVIOUS_LCP_SOLUTION = true;
 
@@ -125,11 +126,7 @@ static const Vector3 local2dConstraintPoints[3] = {
     Vector3( 0.0, 0.0, ( sqrt(3.0) / 2.0))
 };
 
-}
-
-namespace cnoid
-{
-inline namespace ucnoid {
+}   // namespace detail::constraint_force_solver
 
 class ConstraintForceSolverImpl
 {
@@ -137,7 +134,7 @@ public:
     WorldBase& world;
 
     bool isConstraintForceOutputMode;
-    vector<bool> isSelfCollisionDetectionEnabled;
+    std::vector<bool> isSelfCollisionDetectionEnabled;
         
     struct ConstraintPoint {
         int globalIndex;
@@ -249,7 +246,7 @@ public:
     BodyCollisionDetector bodyCollisionDetector;
 #endif  // UCNOID_NOT_SUPPORTED
     
-    unordered_map<Body*, int> bodyIndexMap;
+    std::unordered_map<Body*, int> bodyIndexMap;
     
 #if UCNOID_NOT_SUPPORTED
     typedef unordered_map<IdPair<GeometryHandle>, LinkPair> GeometryPairToLinkPairMap;
@@ -269,7 +266,7 @@ public:
         Vector3 jointConstraintAxes[3];
     };
     typedef std::shared_ptr<ExtraJointLinkPair> ExtraJointLinkPairPtr;
-    vector<ExtraJointLinkPairPtr> extraJointLinkPairs;
+    std::vector<ExtraJointLinkPairPtr> extraJointLinkPairs;
 
     bool is2Dmode;
     DyBodyPtr bodyFor2dConstraint;
@@ -281,7 +278,7 @@ public:
         double globalYpositions[3];
     };
     typedef std::shared_ptr<Constrain2dLinkPair> Constrain2dLinkPairPtr;
-    vector<Constrain2dLinkPairPtr> constrain2dLinkPairs;
+    std::vector<Constrain2dLinkPairPtr> constrain2dLinkPairs;
         
     std::vector<LinkPair*> constrainedLinkPairs;
 
@@ -307,7 +304,7 @@ public:
     VectorX an0;
     VectorX at0;
 
-    // constant vector of LCP
+    // constant std::vector of LCP
     VectorX b;
 
     // contact force solution: normal forces at contact points
@@ -402,7 +399,7 @@ public:
     std::vector<double> m_ij;
 #endif
 
-    ofstream os;
+    std::ofstream os;
 
     template<class TMatrix>
     void putMatrix(TMatrix& M, const char *name) {
@@ -430,12 +427,12 @@ public:
 
     template<class TMatrix>
     void debugPutMatrix(const TMatrix& M, const char *name) {
-        if(CFS_DEBUG_VERBOSE) putMatrix(M, name);
+        if(detail::constraint_force_solver::CFS_DEBUG_VERBOSE) putMatrix(M, name);
     }
 
     template<class TVector>
     void debugPutVector(const TVector& M, const char *name) {
-        if(CFS_DEBUG_VERBOSE) putVector(M, name);
+        if(detail::constraint_force_solver::CFS_DEBUG_VERBOSE) putVector(M, name);
     }
 
 #if UCNOID_NOT_SUPPORTED
@@ -455,14 +452,8 @@ public:
   const double CFSImpl::PI_2 = 1.57079632679489661923;
   #endif
 */
-}
-}
 
-
-namespace {
 typedef ConstraintForceSolverImpl CFSImpl;
-}
-
 
 CFSImpl::ConstraintForceSolverImpl(WorldBase& world) :
 #if UCNOID_NOT_SUPPORTED
@@ -474,15 +465,15 @@ CFSImpl::ConstraintForceSolverImpl(WorldBase& world) :
 {
     defaultStaticFriction = 1.0;
     defaultSlipFriction = 1.0;
-    defaultContactCullingDistance = DEFAULT_CONTACT_CULLING_DISTANCE;
-    defaultContactCullingDepth = DEFAULT_CONTACT_CULLING_DEPTH;
+    defaultContactCullingDistance = detail::constraint_force_solver::DEFAULT_CONTACT_CULLING_DISTANCE;
+    defaultContactCullingDepth = detail::constraint_force_solver::DEFAULT_CONTACT_CULLING_DEPTH;
     defaultCoefficientOfRestitution = 0.0;
     
-    maxNumGaussSeidelIteration = DEFAULT_MAX_NUM_GAUSS_SEIDEL_ITERATION;
-    numGaussSeidelInitialIteration = DEFAULT_NUM_GAUSS_SEIDEL_INITIAL_ITERATION;
-    gaussSeidelErrorCriterion = DEFAULT_GAUSS_SEIDEL_ERROR_CRITERION;
-    contactCorrectionDepth = DEFAULT_CONTACT_CORRECTION_DEPTH;
-    contactCorrectionVelocityRatio = DEFAULT_CONTACT_CORRECTION_VELOCITY_RATIO;
+    maxNumGaussSeidelIteration = detail::constraint_force_solver::DEFAULT_MAX_NUM_GAUSS_SEIDEL_ITERATION;
+    numGaussSeidelInitialIteration = detail::constraint_force_solver::DEFAULT_NUM_GAUSS_SEIDEL_INITIAL_ITERATION;
+    gaussSeidelErrorCriterion = detail::constraint_force_solver::DEFAULT_GAUSS_SEIDEL_ERROR_CRITERION;
+    contactCorrectionDepth = detail::constraint_force_solver::DEFAULT_CONTACT_CORRECTION_DEPTH;
+    contactCorrectionVelocityRatio = detail::constraint_force_solver::DEFAULT_CONTACT_CORRECTION_VELOCITY_RATIO;
 
     isConstraintForceOutputMode = false;
     isSelfCollisionDetectionEnabled.clear();
@@ -492,7 +483,7 @@ CFSImpl::ConstraintForceSolverImpl(WorldBase& world) :
 
 inline CFSImpl::~ConstraintForceSolverImpl()
 {
-    if(CFS_DEBUG){
+    if(detail::constraint_force_solver::CFS_DEBUG){
         os.close();
     }
 }
@@ -582,7 +573,7 @@ inline void CFSImpl::initExtraJointSub(ExtraJoint& extrajoint, int bodyIndex0, i
     for(int k=0; k < numConstraints; ++k){
         ConstraintPoint& constraint = linkPair->constraintPoints[k];
         constraint.numFrictionVectors = 0;
-        constraint.globalFrictionIndex = numeric_limits<int>::max();
+        constraint.globalFrictionIndex = std::numeric_limits<int>::max();
     }
 
     int index[2];
@@ -626,8 +617,8 @@ inline void CFSImpl::init2Dconstraint(int bodyIndex)
     for(int i=0; i < 3; ++i){
         ConstraintPoint& constraint = linkPair->constraintPoints[i];
         constraint.numFrictionVectors = 0;
-        constraint.globalFrictionIndex = numeric_limits<int>::max();
-        linkPair->globalYpositions[i] = (rootLink->R() * local2dConstraintPoints[i] + rootLink->p()).y();
+        constraint.globalFrictionIndex = std::numeric_limits<int>::max();
+        linkPair->globalYpositions[i] = (rootLink->R() * detail::constraint_force_solver::local2dConstraintPoints[i] + rootLink->p()).y();
     }
         
     linkPair->bodyIndex[0] = -1;
@@ -646,14 +637,14 @@ inline void CFSImpl::init2Dconstraint(int bodyIndex)
     
 inline void CFSImpl::initialize(void)
 {
-    if(CFS_DEBUG || CFS_MCP_DEBUG){
+    if(detail::constraint_force_solver::CFS_DEBUG || detail::constraint_force_solver::CFS_MCP_DEBUG){
         static int ntest = 0;
         os.close();
-        os.open((string("cfs-log-") + std::to_string(ntest++) + ".log").c_str());
+        os.open((std::string("cfs-log-") + std::to_string(ntest++) + ".log").c_str());
         //os << setprecision(50);
     }
 
-    if(CFS_MCP_DEBUG){
+    if(detail::constraint_force_solver::CFS_MCP_DEBUG){
         numGaussSeidelTotalCalls = 0;
         numGaussSeidelTotalLoops = 0;
         numGaussSeidelTotalLoopsMax = 0;
@@ -787,7 +778,7 @@ inline void CFSImpl::clearExternalForces()
 
 inline void CFSImpl::solve()
 {
-    if(CFS_DEBUG){
+    if(detail::constraint_force_solver::CFS_DEBUG){
         os << "Time: " << world.currentTime() << std::endl;
     }
 
@@ -813,16 +804,16 @@ inline void CFSImpl::solve()
 
     setConstraintPoints();
 
-    if(CFS_PUT_NUM_CONTACT_POINTS){
-        cout << globalNumContactNormalVectors;
+    if(detail::constraint_force_solver::CFS_PUT_NUM_CONTACT_POINTS){
+        std::cout << globalNumContactNormalVectors;
     }
 
     if(globalNumConstraintVectors > 0){
 
-        if(CFS_DEBUG){
+        if(detail::constraint_force_solver::CFS_DEBUG){
             os << "Num Collisions: " << globalNumContactNormalVectors << std::endl;
         }
-        if(CFS_DEBUG_VERBOSE) putContactPoints();
+        if(detail::constraint_force_solver::CFS_DEBUG_VERBOSE) putContactPoints();
 
         const bool constraintsSizeChanged = ((globalNumFrictionVectors   != prevGlobalNumFrictionVectors) ||
                                              (globalNumConstraintVectors != prevGlobalNumConstraintVectors));
@@ -835,7 +826,7 @@ inline void CFSImpl::solve()
             solveImpactConstraints();
         }
 
-        if(SKIP_REDUNDANT_ACCEL_CALC){
+        if(detail::constraint_force_solver::SKIP_REDUNDANT_ACCEL_CALC){
             setAccelCalcSkipInformation();
         }
 
@@ -846,7 +837,7 @@ inline void CFSImpl::solve()
 		
         setConstantVectorAndMuBlock();
 
-        if(CFS_DEBUG_VERBOSE){
+        if(detail::constraint_force_solver::CFS_DEBUG_VERBOSE){
             debugPutVector(an0, "an0");
             debugPutVector(at0, "at0");
             debugPutMatrix(Mlcp, "Mlcp");
@@ -858,7 +849,7 @@ inline void CFSImpl::solve()
 #ifdef USE_PIVOTING_LCP
         isConverged = callPathLCPSolver(Mlcp, b, solution);
 #else
-        if(!USE_PREVIOUS_LCP_SOLUTION || constraintsSizeChanged){
+        if(!detail::constraint_force_solver::USE_PREVIOUS_LCP_SOLUTION || constraintsSizeChanged){
             solution.setZero();
         }
         solveMCPByProjectedGaussSeidel(Mlcp, b, solution);
@@ -867,12 +858,12 @@ inline void CFSImpl::solve()
 
         if(!isConverged){
             ++numUnconverged;
-            if(CFS_DEBUG)
+            if(detail::constraint_force_solver::CFS_DEBUG)
                 os << "LCP didn't converge" << numUnconverged << std::endl;
         } else {
-            if(CFS_DEBUG)
+            if(detail::constraint_force_solver::CFS_DEBUG)
                 os << "LCP converged" << std::endl;
-            if(CFS_DEBUG_LCPCHECK){
+            if(detail::constraint_force_solver::CFS_DEBUG_LCPCHECK){
                 // checkLCPResult(Mlcp, b, solution);
                 checkMCPResult(Mlcp, b, solution);
             }
@@ -949,7 +940,7 @@ void CFSImpl::extractConstraintPoints(const CollisionPair& collisionPair)
         pLinkPair = &linkPair;
     }
 
-    const vector<Collision>& collisions = collisionPair.collisions();
+    const std::vector<Collision>& collisions = collisionPair.collisions();
 
     auto& collisionHandler = pLinkPair->contactMaterial->collisionHandler;
     if(collisionHandler){
@@ -1176,7 +1167,7 @@ inline void CFSImpl::set2dConstraintPoints(const Constrain2dLinkPairPtr& linkPai
     int n = linkPair->constraintPoints.size();
     for(int i=0; i < n; ++i){
         DyLink* link1 = linkPair->link[1];
-        Vector3 point1 = link1->p() + link1->R() * local2dConstraintPoints[i];
+        Vector3 point1 = link1->p() + link1->R() * detail::constraint_force_solver::local2dConstraintPoints[i];
         ConstraintPoint& constraint = constraintPoints[i];
         constraint.point = point1;
         constraint.normalTowardInside[0] =  yAxis;
@@ -1236,7 +1227,7 @@ inline void CFSImpl::putContactPoints()
 
 inline void CFSImpl::solveImpactConstraints()
 {
-    if(CFS_DEBUG){
+    if(detail::constraint_force_solver::CFS_DEBUG){
         os << "Impacts !" << std::endl;
     }
 }
@@ -1247,13 +1238,13 @@ inline void CFSImpl::initMatrices()
     const int n = globalNumConstraintVectors;
     const int m = globalNumFrictionVectors;
 
-    const int dimLCP = usePivotingLCP ? (n + m + m) : (n + m);
+    const int dimLCP = detail::constraint_force_solver::usePivotingLCP ? (n + m + m) : (n + m);
 
     Mlcp.resize(dimLCP, dimLCP);
     b.resize(dimLCP);
     solution.resize(dimLCP);
 
-    if(usePivotingLCP){
+    if(detail::constraint_force_solver::usePivotingLCP){
         Mlcp.block(0, n + m, n, m).setZero();
         Mlcp.block(n + m, 0, m, n).setZero();
         Mlcp.block(n + m, n, m, m) = -MatrixX::Identity(m, m);
@@ -1280,7 +1271,7 @@ inline void CFSImpl::setAccelCalcSkipInformation()
         if(bodyData.hasConstrainedLinks){
             LinkDataArray& linksData = bodyData.linksData;
             for(size_t j=0; j < linksData.size(); ++j){
-                linksData[j].numberToCheckAccelCalcSkip = numeric_limits<int>::max();
+                linksData[j].numberToCheckAccelCalcSkip = std::numeric_limits<int>::max();
             }
         }
     }
@@ -1316,11 +1307,11 @@ inline void CFSImpl::setDefaultAccelerationVector()
             if(bodyData.forwardDynamicsCBM){
                 bodyData.forwardDynamicsCBM->sumExternalForces();
                 bodyData.forwardDynamicsCBM->solveUnknownAccels();
-                calcAccelsMM(bodyData, numeric_limits<int>::max());
+                calcAccelsMM(bodyData, std::numeric_limits<int>::max());
 
             } else {
                 initABMForceElementsWithNoExtForce(bodyData);
-                calcAccelsABM(bodyData, numeric_limits<int>::max());
+                calcAccelsABM(bodyData, std::numeric_limits<int>::max());
             }
         }
     }
@@ -1436,7 +1427,7 @@ inline void CFSImpl::setAccelerationMatrix()
         }
     }
 
-    if(ASSUME_SYMMETRIC_MATRIX){
+    if(detail::constraint_force_solver::ASSUME_SYMMETRIC_MATRIX){
         copySymmetricElementsOfAccelerationMatrix(Knn, Ktn, Knt, Ktt);
     }
 }
@@ -1543,13 +1534,13 @@ inline void CFSImpl::calcAccelsABM(BodyData& bodyData, int constraintIndex)
     bodyData.dpf  .setZero();
     bodyData.dptau.setZero();
 
-    int skipCheckNumber = ASSUME_SYMMETRIC_MATRIX ? constraintIndex : (numeric_limits<int>::max() - 1);
+    int skipCheckNumber = detail::constraint_force_solver::ASSUME_SYMMETRIC_MATRIX ? constraintIndex : (std::numeric_limits<int>::max() - 1);
     int n = linksData.size();
     for(int linkIndex = 1; linkIndex < n; ++linkIndex){
 
         LinkData& linkData = linksData[linkIndex];
 
-        if(!SKIP_REDUNDANT_ACCEL_CALC || linkData.numberToCheckAccelCalcSkip <= skipCheckNumber){
+        if(!detail::constraint_force_solver::SKIP_REDUNDANT_ACCEL_CALC || linkData.numberToCheckAccelCalcSkip <= skipCheckNumber){
 
             DyLink* link = linkData.link;
             LinkData& parentData = linksData[linkData.parentIndex];
@@ -1580,14 +1571,14 @@ inline void CFSImpl::calcAccelsMM(BodyData& bodyData, int constraintIndex)
     rootData.dvo = rootLink->dvo();
     rootData.dw  = rootLink->dw();
 
-    const int skipCheckNumber = ASSUME_SYMMETRIC_MATRIX ? constraintIndex : (numeric_limits<int>::max() - 1);
+    const int skipCheckNumber = detail::constraint_force_solver::ASSUME_SYMMETRIC_MATRIX ? constraintIndex : (std::numeric_limits<int>::max() - 1);
     const int n = linksData.size();
 
     for(int linkIndex = 1; linkIndex < n; ++linkIndex){
 
         LinkData& linkData = linksData[linkIndex];
 
-        if(!SKIP_REDUNDANT_ACCEL_CALC || linkData.numberToCheckAccelCalcSkip <= skipCheckNumber){
+        if(!detail::constraint_force_solver::SKIP_REDUNDANT_ACCEL_CALC || linkData.numberToCheckAccelCalcSkip <= skipCheckNumber){
 
             DyLink* link = linkData.link;
             LinkData& parentData = linksData[linkData.parentIndex];
@@ -1606,7 +1597,7 @@ inline void CFSImpl::calcAccelsMM(BodyData& bodyData, int constraintIndex)
 inline void CFSImpl::extractRelAccelsOfConstraintPoints
 (Eigen::Block<MatrixX>& Kxn, Eigen::Block<MatrixX>& Kxt, int testForceIndex, int constraintIndex)
 {
-    int maxConstraintIndexToExtract = ASSUME_SYMMETRIC_MATRIX ? constraintIndex : globalNumConstraintVectors;
+    int maxConstraintIndexToExtract = detail::constraint_force_solver::ASSUME_SYMMETRIC_MATRIX ? constraintIndex : globalNumConstraintVectors;
 
 
     for(size_t i=0; i < constrainedLinkPairs.size(); ++i){
@@ -1644,7 +1635,7 @@ inline void CFSImpl::extractRelAccelsFromLinkPairCase1
         ConstraintPoint& constraint = constraintPoints[i];
         int constraintIndex = constraint.globalIndex;
 
-        if(ASSUME_SYMMETRIC_MATRIX && constraintIndex > maxConstraintIndexToExtract){
+        if(detail::constraint_force_solver::ASSUME_SYMMETRIC_MATRIX && constraintIndex > maxConstraintIndexToExtract){
             break;
         }
 
@@ -1685,7 +1676,7 @@ inline void CFSImpl::extractRelAccelsFromLinkPairCase2
         ConstraintPoint& constraint = constraintPoints[i];
         int constraintIndex = constraint.globalIndex;
 
-        if(ASSUME_SYMMETRIC_MATRIX && constraintIndex > maxConstraintIndexToExtract){
+        if(detail::constraint_force_solver::ASSUME_SYMMETRIC_MATRIX && constraintIndex > maxConstraintIndexToExtract){
             break;
         }
 
@@ -1694,7 +1685,7 @@ inline void CFSImpl::extractRelAccelsFromLinkPairCase2
 
         Vector3 dv(linkData->dvo - constraint.point.cross(linkData->dw) + link->w().cross(link->vo() + link->w().cross(constraint.point)));
 
-        if(CFS_DEBUG_VERBOSE_2){
+        if(detail::constraint_force_solver::CFS_DEBUG_VERBOSE_2){
             os << "dv " << constraintIndex << " = " << dv << "\n";
         }
 
@@ -1721,7 +1712,7 @@ inline void CFSImpl::extractRelAccelsFromLinkPairCase3
         ConstraintPoint& constraint = constraintPoints[i];
         int constraintIndex = constraint.globalIndex;
 
-        if(ASSUME_SYMMETRIC_MATRIX && constraintIndex > maxConstraintIndexToExtract){
+        if(detail::constraint_force_solver::ASSUME_SYMMETRIC_MATRIX && constraintIndex > maxConstraintIndexToExtract){
             break;
         }
 
@@ -1778,7 +1769,7 @@ inline void CFSImpl::clearSingularPointConstraintsOfClosedLoopConnections()
             for(int j=0; j < Mlcp.rows(); ++j){
                 Mlcp(j, i) = 0.0;
             }
-            Mlcp(i, i) = numeric_limits<double>::max();
+            Mlcp(i, i) = std::numeric_limits<double>::max();
         }
     }
 }
@@ -1799,7 +1790,7 @@ inline void CFSImpl::setConstantVectorAndMuBlock()
             ConstraintPoint& constraint = linkPair.constraintPoints[j];
             int globalIndex = constraint.globalIndex;
 
-            // set constant vector of LCP
+            // set constant std::vector of LCP
 
             // constraints for normal acceleration
 
@@ -1818,7 +1809,7 @@ inline void CFSImpl::setConstantVectorAndMuBlock()
 
             } else {
                 // contact constraint
-                if(ENABLE_CONTACT_DEPTH_CORRECTION){
+                if(detail::constraint_force_solver::ENABLE_CONTACT_DEPTH_CORRECTION){
                     double velOffset;
                     const double depth = constraint.depth - contactCorrectionDepth;
                     if(depth <= 0.0){
@@ -1840,11 +1831,11 @@ inline void CFSImpl::setConstantVectorAndMuBlock()
                     double tangentProjectionOfRelVelocity = constraint.frictionVector[k][1].dot(constraint.relVelocityOn0);
 
                     b(block2 + globalFrictionIndex) = at0(globalFrictionIndex);
-                    if( !IGNORE_CURRENT_VELOCITY_IN_STATIC_FRICTION || constraint.numFrictionVectors == 1){
+                    if( !detail::constraint_force_solver::IGNORE_CURRENT_VELOCITY_IN_STATIC_FRICTION || constraint.numFrictionVectors == 1){
                         b(block2 + globalFrictionIndex) += tangentProjectionOfRelVelocity * dtinv;
                     }
 
-                    if(usePivotingLCP){
+                    if(detail::constraint_force_solver::usePivotingLCP){
                         // set mu (coefficients of friction)
                         Mlcp(block3 + globalFrictionIndex, globalIndex) = constraint.mu;
                     } else {
@@ -1906,7 +1897,7 @@ inline void CFSImpl::addConstraintForceToLink(LinkPair* linkPair, int ipair)
     link->tau_ext() += tau_total;
 
 
-    if(CFS_DEBUG){
+    if(detail::constraint_force_solver::CFS_DEBUG){
         os << "Constraint force to " << link->name() << ": f = " << f_total << ", tau = " << tau_total << std::endl;
     }
 }
@@ -1915,7 +1906,7 @@ inline void CFSImpl::addConstraintForceToLink(LinkPair* linkPair, int ipair)
 
 inline void CFSImpl::solveMCPByProjectedGaussSeidel(const MatrixX& M, const VectorX& b, VectorX& x)
 {
-    static const int loopBlockSize = DEFAULT_NUM_GAUSS_SEIDEL_ITERATION_BLOCK;
+    static const int loopBlockSize = detail::constraint_force_solver::DEFAULT_NUM_GAUSS_SEIDEL_ITERATION_BLOCK;
 
     if(numGaussSeidelInitialIteration > 0){
         solveMCPByProjectedGaussSeidelInitial(M, b, x, numGaussSeidelInitialIteration);
@@ -1926,7 +1917,7 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidel(const MatrixX& M, const Vect
         numBlockLoops = 1;
     }
 
-    if(CFS_MCP_DEBUG){
+    if(detail::constraint_force_solver::CFS_MCP_DEBUG){
         os << "Iteration ";
     }
 
@@ -1945,7 +1936,7 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidel(const MatrixX& M, const Vect
 
         if(true){
             double n = x.norm();
-            if(n > THRESH_TO_SWITCH_REL_ERROR){
+            if(n > detail::constraint_force_solver::THRESH_TO_SWITCH_REL_ERROR){
                 error = (x - x0).norm() / x.norm();
             } else {
                 error = (x - x0).norm();
@@ -1954,7 +1945,7 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidel(const MatrixX& M, const Vect
             error = 0.0;
             for(int j=0; j < x.size(); ++j){
                 double d = fabs(x(j) - x0(j));
-                if(d > THRESH_TO_SWITCH_REL_ERROR){
+                if(d > detail::constraint_force_solver::THRESH_TO_SWITCH_REL_ERROR){
                     d /= x(j);
                 }
                 if(d > error){
@@ -1964,17 +1955,17 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidel(const MatrixX& M, const Vect
         }
 
         if(error < gaussSeidelErrorCriterion){
-            if(CFS_MCP_DEBUG_SHOW_ITERATION_STOP){
-                os << "stopped at " << (i * loopBlockSize) << ", error = " << error << endl;
+            if(detail::constraint_force_solver::CFS_MCP_DEBUG_SHOW_ITERATION_STOP){
+                os << "stopped at " << (i * loopBlockSize) << ", error = " << error << std::endl;
             }
             break;
         }
     }
 
-    if(CFS_MCP_DEBUG){
+    if(detail::constraint_force_solver::CFS_MCP_DEBUG){
 
         if(i == numBlockLoops){
-            os << "not stopped" << ", error = " << error << endl;
+            os << "not stopped" << ", error = " << error << std::endl;
         }
         
         int n = loopBlockSize * i;
@@ -1983,7 +1974,7 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidel(const MatrixX& M, const Vect
         numGaussSeidelTotalLoopsMax = std::max(numGaussSeidelTotalLoopsMax, n);
         os << ", avarage = " << (numGaussSeidelTotalLoops / numGaussSeidelTotalCalls);
         os << ", max = " << numGaussSeidelTotalLoopsMax;
-        os << endl;
+        os << std::endl;
     }
 }
 
@@ -1995,7 +1986,7 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidelMainStep(const MatrixX& M, co
     for(int j=0; j < globalNumContactNormalVectors; ++j){
 
         double xx;
-        if(M(j,j) == numeric_limits<double>::max()){
+        if(M(j,j) == std::numeric_limits<double>::max()){
             xx=0.0;
         } else {
             double sum = -M(j, j) * x(j);
@@ -2014,7 +2005,7 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidelMainStep(const MatrixX& M, co
     
     for(int j=globalNumContactNormalVectors; j < globalNumConstraintVectors; ++j){
         
-        if(M(j,j) == numeric_limits<double>::max()){
+        if(M(j,j) == std::numeric_limits<double>::max()){
             x(j)=0.0;
         } else {
             double sum = -M(j, j) * x(j);
@@ -2026,13 +2017,13 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidelMainStep(const MatrixX& M, co
     }
     
     
-    if(ENABLE_TRUE_FRICTION_CONE){
+    if(detail::constraint_force_solver::ENABLE_TRUE_FRICTION_CONE){
 
         int contactIndex = 0;
         for(int j=globalNumConstraintVectors; j < size; ++j, ++contactIndex){
             
             double fx0;
-            if(M(j,j) == numeric_limits<double>::max()) {
+            if(M(j,j) == std::numeric_limits<double>::max()) {
                 fx0 = 0.0;
             } else {
                 double sum = -M(j, j) * x(j);
@@ -2046,7 +2037,7 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidelMainStep(const MatrixX& M, co
             ++j;
             
             double fy0;
-            if(M(j,j) == numeric_limits<double>::max()) {
+            if(M(j,j) == std::numeric_limits<double>::max()) {
                 fy0=0.0;
             } else {
                 double sum = -M(j, j) * x(j);
@@ -2077,7 +2068,7 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidelMainStep(const MatrixX& M, co
         for(int j=globalNumConstraintVectors; j < size; ++j, ++frictionIndex){
 
             double xx;
-            if(M(j,j) == numeric_limits<double>::max()) {
+            if(M(j,j) == std::numeric_limits<double>::max()) {
                 xx=0.0;
             } else {
                 double sum = -M(j, j) * x(j);
@@ -2089,7 +2080,7 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidelMainStep(const MatrixX& M, co
             
             const int contactIndex = frictionIndexToContactIndex[frictionIndex];
             const double fmax = mcpHi[contactIndex];
-            const double fmin = (STATIC_FRICTION_BY_TWO_CONSTRAINTS ? -fmax : 0.0);
+            const double fmin = (detail::constraint_force_solver::STATIC_FRICTION_BY_TWO_CONSTRAINTS ? -fmax : 0.0);
             
             if(xx < fmin){
                 x(j) = fmin;
@@ -2116,7 +2107,7 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidelInitial
         for(int j=0; j < globalNumContactNormalVectors; ++j){
 
             double xx;
-            if(M(j,j)==numeric_limits<double>::max()){
+            if(M(j,j)==std::numeric_limits<double>::max()){
                 xx=0.0;
             } else {
                 double sum = -M(j, j) * x(j);
@@ -2136,7 +2127,7 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidelInitial
 
         for(int j=globalNumContactNormalVectors; j < globalNumConstraintVectors; ++j){
 
-            if(M(j,j)==numeric_limits<double>::max()){
+            if(M(j,j)==std::numeric_limits<double>::max()){
                 x(j) = 0.0;
             } else {
                 double sum = -M(j, j) * x(j);
@@ -2148,13 +2139,13 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidelInitial
             r += rstep;
         }
 
-        if(ENABLE_TRUE_FRICTION_CONE){
+        if(detail::constraint_force_solver::ENABLE_TRUE_FRICTION_CONE){
 
             int contactIndex = 0;
             for(int j=globalNumConstraintVectors; j < size; ++j, ++contactIndex){
 
                 double fx0;
-                if(M(j,j)==numeric_limits<double>::max())
+                if(M(j,j)==std::numeric_limits<double>::max())
                     fx0 = 0.0;
                 else{
                     double sum = -M(j, j) * x(j);
@@ -2168,7 +2159,7 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidelInitial
                 ++j;
 
                 double fy0;
-                if(M(j,j)==numeric_limits<double>::max())
+                if(M(j,j)==std::numeric_limits<double>::max())
                     fy0 = 0.0;
                 else{
                     double sum = -M(j, j) * x(j);
@@ -2200,7 +2191,7 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidelInitial
             for(int j=globalNumConstraintVectors; j < size; ++j, ++frictionIndex){
 
                 double xx;
-                if(M(j,j)==numeric_limits<double>::max())
+                if(M(j,j)==std::numeric_limits<double>::max())
                     xx = 0.0;
                 else{
                     double sum = -M(j, j) * x(j);
@@ -2212,7 +2203,7 @@ inline void CFSImpl::solveMCPByProjectedGaussSeidelInitial
 
                 const int contactIndex = frictionIndexToContactIndex[frictionIndex];
                 const double fmax = mcpHi[contactIndex];
-                const double fmin = (STATIC_FRICTION_BY_TWO_CONSTRAINTS ? -fmax : 0.0);
+                const double fmin = (detail::constraint_force_solver::STATIC_FRICTION_BY_TWO_CONSTRAINTS ? -fmax : 0.0);
 
                 if(xx < fmin){
                     x(j) = fmin;
@@ -2409,7 +2400,7 @@ bool ConstraintForceSolver::unregisterCollisionHandler(const std::string& name)
 
 void ConstraintForceSolver::setSelfCollisionDetectionEnabled(int bodyIndex, bool on)
 {
-    vector<bool>& isSCE = impl->isSelfCollisionDetectionEnabled;
+    std::vector<bool>& isSCE = impl->isSelfCollisionDetectionEnabled;
     if(bodyIndex >= isSCE.size()){
         isSCE.resize(bodyIndex+1);
     }
@@ -2418,7 +2409,7 @@ void ConstraintForceSolver::setSelfCollisionDetectionEnabled(int bodyIndex, bool
 
 bool ConstraintForceSolver::isSelfCollisionDetectionEnabled(int bodyIndex) const
 {
-    vector<bool>& isSCE = impl->isSelfCollisionDetectionEnabled;
+    std::vector<bool>& isSCE = impl->isSelfCollisionDetectionEnabled;
     if(bodyIndex < isSCE.size()){
         return impl->isSelfCollisionDetectionEnabled[bodyIndex];
     }else{
@@ -2575,5 +2566,8 @@ double ConstraintForceSolver::getCollisionTime()
     return impl->collisionTime;
 }
 #endif
+
+}   // inline namespace ucnoid
+}   // namespace cnoid
 
 #endif  // UCNOID_BODY_CONSTRAINT_FORCE_SOLVER_CPP_H

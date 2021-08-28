@@ -12,7 +12,7 @@ inline namespace ucnoid {
 
 namespace detail::jacobian {
 
-Matrix3d D(Vector3d r)
+inline Matrix3d D(Vector3d r)
 {
     Matrix3d r_cross;
     r_cross <<
@@ -35,7 +35,7 @@ struct SubMass
     }
 };
 
-void calcSubMass(Link* link, std::vector<SubMass>& subMasses, bool calcIw)
+inline void calcSubMass(Link* link, std::vector<SubMass>& subMasses, bool calcIw)
 {
     Matrix3d R = link->R();
     SubMass& sub = subMasses[link->index()];

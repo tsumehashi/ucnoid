@@ -7,7 +7,9 @@
 
 #include "ValueTree.h"
 #include "EigenUtil.h"
+#if UCNOID_NOT_SUPPORTED
 #include <fmt/format.h>
+#endif  // UCNOID_NOT_SUPPORTED
 #include <functional>
 #include "exportdecl.h"
 
